@@ -1,0 +1,65 @@
+HOWTO build and run the MiniGhost test
+
+0) Default environment
+---------------------
+Default Cray modules are set to use the Cray CCE compiler
+
+
+
+1) Build the code with the cce-build.sh script
+----------------------------------------------
+$ bash cce-build.sh
+The executable is source/miniGhost.x
+
+
+1.1) Build the code enabling CrayPat profiling
+----------------------------------------------
+Load a basic craypat module
+$ module load perftools-lite-events
+This can also be obtained by uncommenting a line in the cce-build.sh script
+Enabling profiling generates a small overhead.
+
+
+
+2) Run the test using the predefined job script
+-----------------------------------------------
+Submit the job script run.pbs
+$ qsub run.pbs
+
+This runs a basic job on 4 nodes with 144 MPI ranks, no OpenMP threading, using 36 cores per node, no hyperthreading, with a 4x6x6 decomposition
+
+The command "qstat -a" can be used to check the progress of the application
+The job output file with application output (and profile info, if enabled) will be called minighost.o<jobnumber>
+
+A reference output file is provided: reference_minighost.o427222
+
+The total time can be extracted by
+$ grep 'Total time for test' <output file>
+
+The baseline reference time is 29.7s
+$ grep 'Total time for test' reference_minighost.o427222
+ Total time for test (sec): 2.970E+01; clock resolution is 1.000E-06 per second.
+
+
+2.1 Run tests with different MPI/OpenMP combinations using the go script
+------------------------------------------------------------------------
+Different MPI, OpenMP, decomposition can be tried by using the script "go" which builds and submits a proper job.
+
+usage: go <nodes> <npx> <npy> <npz> <nthreads>
+
+The following command will build and submit a job equivalent to run.pbs
+$ ./go 4 4 6 6 1
+
+We recommend to stick to 4 nodes and use 36 cores per node, even if the Broadwell processors used have 22 cores per socket
+
+
+
+3) Goal of the exercise 
+-----------------------
+The goal is to reduce the total time achieved running the code on 4 nodes, using 36 cores per node, for a total of 144 cores.
+This can be obtained by tuning runtime options (MPI, OpenMP, decomposition) or by changing the source code.
+The environment is setup to use the Cray CCE compiler, but a script for the Intel compiler is available (intel-build.sh)
+However it has not been tested recently.
+
+
+GOOD LUCK !

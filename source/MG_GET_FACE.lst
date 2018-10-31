@@ -1,0 +1,1593 @@
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+                          S u m m a r y   R e p o r t
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Compilation
+-----------
+File     : /lus/scratch/p02128/work/MiniGhost/source/MG_GET_FACE.F
+Compiled : 10/31/18  05:23:37
+Compiler : Version 8.7.6
+Ftnlx    : Version 8503 (libcif 85008)
+Target   : x86-64
+Command  : ftn_driver.exe -hcpu=broadwell -hstatic -D__CRAYXC
+           -D__CRAY_BROADWELL -D__CRAYXT_COMPUTE_LINUX_TARGET -hnetwork=aries
+           -D_MG_MPI -D_MG_INT4 -D_MG_REAL8 -ffree -hlist=a -c MG_GET_FACE.F
+           -I/opt/cray/pe/cce/8.7.6/cce/x86_64/include/craylibs -I/usr/include
+           -I/usr/include -I/opt/cray/pe/mpt/7.7.3/gni/mpich-cray/8.6/include
+           -I/opt/cray/pe/libsci/18.07.1/CRAY/8.6/x86_64/include
+           -I/opt/cray/rca/2.2.18-6.0.7.0_33.3__g2aa4f39.ari/include
+           -I/opt/cray/pe/pmi/5.0.14/include
+           -I/opt/cray/xpmem/2.2.15-6.0.7.0_35.11__g7549d06.ari/include
+           -I/opt/cray/dmapp/7.1.1-6.0.7.0_34.3__g5a674e0.ari/include
+           -I/opt/cray/gni-headers/5.0.12.0-6.0.7.0_24.1__g3b1768f.ari/include
+           -I/opt/cray/ugni/6.0.14.0-6.0.7.0_23.1__gea11d3d.ari/include
+           -I/opt/cray/udreg/2.3.2-6.0.7.0_33.18__g5196236.ari/include
+           -I/opt/cray/alps/6.6.43-6.0.7.0_26.4__ga796da3.ari/include
+           -I/opt/cray/wlm_detect/1.3.3-6.0.7.0_47.2__g7109084.ari/include
+           -I/opt/cray/krca/2.2.4-6.0.7.0_32.3__g8505b97.ari/include
+           -I/opt/cray-hss-devel/8.0.0/include
+Program
+  Units  : MG_GET_FACE_MOD
+
+ftnlx report
+------------
+Source   : /lus/scratch/p02128/work/MiniGhost/source/MG_GET_FACE.F
+Date     : 10/31/2018  05:23:38
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+                          O p t i o n s   R e p o r t
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Options :  -O cache2,scalar2,thread2,vector2,mpi0,modinline,ipa3,noaggress
+           -O autoprefetch,noautothread,fusion2,nomsgs,nonegmsgs,nooverindex
+           -O pattern,shortcircuit2,unroll2,nozeroinc
+           -h noadd_paren,align_arrays,nobounds,caf,noconcurrent,nocontiguous
+           -h nocontiguous_assumed_shape,fma,nofp_trap,nofunc_trace,noomp_analyz
+           e
+           -h noomp_trace,nopat_trace
+           -h safe_addr,thread_do_concurrent,fp2=approx,flex_mp=default         
+           -h alias=default:standard_restrict         
+           -h static (or -static)
+           -h omp,noacc
+           -h cpu=x86-64,broadwell
+           -h network=aries
+           -K trap=none
+           -s default32
+           -eh
+           -d abcdefgijmopqsvwzACEFIPQRST0
+           -e nBDZ 
+           -f free
+           -m3
+           -S /lus/scratch/tmp/pe_5129/MG_GET_FACE_1.s
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+                          S o u r c e   L i s t i n g
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+
+     %%%    L o o p m a r k   L e g e n d    %%%
+
+     Primary Loop Type        Modifiers
+     ------- ---- ----        ---------
+     A - Pattern matched      a - atomic memory operation
+                              b - blocked
+     C - Collapsed            c - conditional and/or computed
+     D - Deleted               
+     E - Cloned                
+     F - Flat - No calls      f - fused
+     G - Accelerated          g - partitioned
+     I - Inlined              i - interchanged
+     M - Multithreaded        m - partitioned
+                              n - non-blocking remote transfer
+                              p - partial
+     R - Rerolling            r - unrolled
+                              s - shortloop
+     V - Vectorized           w - unwound
+
+     + - More messages listed at end of listing
+     ------------------------------------------
+
+
+    1.                ! ************************************************************************
+    2.                !
+    3.                !               miniGhost: stencil computations with boundary exchange.
+    4.                !                 Copyright (2012) Sandia Corporation
+    5.                !
+    6.                ! Under terms of Contract DE-AC04-94AL85000, there is a non-exclusive
+    7.                ! license for use of this work by or on behalf of the U.S. Government.
+    8.                !
+    9.                ! This library is free software; you can redistribute it and/or modify
+   10.                ! it under the terms of the GNU Lesser General Public License as
+   11.                ! published by the Free Software Foundation; either version 2.1 of the
+   12.                ! License, or (at your option) any later version.
+   13.                !
+   14.                ! This library is distributed in the hope that it will be useful, but
+   15.                ! WITHOUT ANY WARRANTY; without even the implied warranty of
+   16.                ! MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+   17.                ! Lesser General Public License for more details.
+   18.                !
+   19.                ! You should have received a copy of the GNU Lesser General Public
+   20.                ! License along with this library; if not, write to the Free Software
+   21.                ! Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307
+   22.                ! USA
+   23.                ! Questions? Contact Richard F. Barrett (rfbarre@sandia.gov) or
+   24.                !                    Michael A. Heroux (maherou@sandia.gov)
+   25.                !
+   26.                ! ************************************************************************
+   27.                
+   28.                MODULE MG_GET_FACE_MOD
+   29.                
+   30.                   ! Purpose
+   31.                   ! =======
+   32.                   ! Unpack received data buffers into variable faces.
+   33.                
+   34.                   USE MG_CONSTANTS_MOD
+   35.                   USE MG_UTILS_MOD
+   36.                
+   37.                   IMPLICIT NONE
+   38.                
+   39.                CONTAINS
+   40.                
+   41.                   SUBROUTINE GET_FACE ( WHICH, OFFSET, GRID, IERR )
+   42.                
+   43.                      ! ---------------------
+   44.                      ! Argument Declarations
+   45.                      ! ---------------------
+   46.                
+   47.                      INTEGER, INTENT(IN) :: &
+   48.                         WHICH
+   49.                
+   50.                      INTEGER, INTENT(INOUT) :: &
+   51.                         OFFSET
+   52.                
+   53.                      INTEGER, INTENT(OUT) :: &
+   54.                         IERR
+   55.                
+   56.                      REAL(KIND=MG_REAL), DIMENSION(0:NX+1, 0:NY+1, 0:NZ+1), INTENT(OUT) :: &
+   57.                         GRID
+   58.                
+   59.                      ! ------------------
+   60.                      ! Local Declarations
+   61.                      ! ------------------
+   62.                
+   63.                      INTEGER :: &
+   64.                         I, J, K                  ! Counters
+   65.                
+   66.                      ! ---------------------
+   67.                      ! Executable Statements
+   68.                      ! ---------------------
+   69.                
+   70.                      IERR = 0
+   71.                
+   72.                      SELECT CASE ( WHICH )
+   73.                
+   74.                         CASE ( BACK )
+   75.                
+   76.    M---------< !$OMP PARALLEL DO
+   77.  + M m-------<             DO J = 0, NY+1
+   78.    M m A-----<                DO I = 0, NX+1
+   79.    M m A                         GRID ( I, J, 0 ) = RECV_BUFFER_BACK(OFFSET + J*(NX+2) + I+1)
+   80.    M m A----->                END DO
+   81.    M m------->             END DO
+   82.    M---------> !$OMP END PARALLEL DO
+   83.                            OFFSET = OFFSET + (NY+2)*(NX+2)
+   84.                
+   85.                         CASE ( FRONT )
+   86.                
+   87.    M---------< !$OMP PARALLEL DO
+   88.  + M m-------<             DO J = 0, NY+1
+   89.    M m A-----<                DO I = 0, NX+1
+   90.    M m A                         GRID ( I, J, NZ+1 ) = RECV_BUFFER_FRONT(OFFSET + J*(NX+2) + I+1)
+   91.    M m A----->                END DO
+   92.    M m------->             END DO
+   93.    M---------> !$OMP END PARALLEL DO
+   94.                            OFFSET = OFFSET + (NY+2)*(NX+2)
+   95.                
+   96.                         CASE ( EAST )
+   97.                
+   98.    M---------< !$OMP PARALLEL DO
+   99.  + M m-------<             DO K = 0, NZ+1
+  100.  + M m Vpr2--<                DO J = 0, NY+1
+  101.    M m Vpr2                      GRID ( NX+1, J, K ) = RECV_BUFFER_EAST(OFFSET + K*(NY+2) + J+1)
+  102.    M m Vpr2-->                END DO
+  103.    M m------->             END DO
+  104.    M---------> !$OMP END PARALLEL DO
+  105.                            OFFSET = OFFSET + (NZ+2)*(NY+2)
+  106.                
+  107.                         CASE ( WEST )
+  108.                
+  109.    M---------< !$OMP PARALLEL DO
+  110.  + M m-------<             DO K = 0, NZ+1
+  111.  + M m Vpr2--<                DO J = 0, NY+1
+  112.    M m Vpr2                      GRID ( 0, J, K ) = RECV_BUFFER_WEST(OFFSET + K*(NY+2) + J+1)
+  113.    M m Vpr2-->                END DO
+  114.    M m------->             END DO
+  115.    M---------> !$OMP END PARALLEL DO
+  116.                            OFFSET = OFFSET + (NZ+2)*(NY+2)
+  117.                
+  118.                         CASE ( NORTH )
+  119.                
+  120.    M---------< !$OMP PARALLEL DO
+  121.  + M m-------<             DO K = 0, NZ+1
+  122.    M m A-----<                DO I = 0, NX+1
+  123.    M m A                         GRID ( I, NY+1, K ) = RECV_BUFFER_NORTH(OFFSET + K*(NX+2) + I+1)
+  124.    M m A----->                END DO
+  125.    M m------->             END DO
+  126.    M---------> !$OMP END PARALLEL DO
+  127.                            OFFSET = OFFSET + (NZ+2)*(NX+2)
+  128.                
+  129.                         CASE ( SOUTH )
+  130.                
+  131.    M---------< !$OMP PARALLEL DO
+  132.  + M m-------<             DO K = 0, NZ+1
+  133.    M m A-----<                DO I = 0, NX+1
+  134.    M m A                         GRID ( I, 0, K ) = RECV_BUFFER_SOUTH(OFFSET + K*(NX+2) + I+1)
+  135.    M m A----->                END DO
+  136.    M m------->             END DO
+  137.    M---------> !$OMP END PARALLEL DO
+  138.                            OFFSET = OFFSET + (NZ+2)*(NX+2)
+  139.                
+  140.                      END SELECT
+  141.                
+  142.                   END SUBROUTINE GET_FACE
+  143.                
+  144.                   SUBROUTINE MG_GET_FACE ( IVAR, WHICH, OFFSET, IERR )
+  145.                   
+  146.                      ! ---------------------
+  147.                      ! Argument Declarations
+  148.                      ! ---------------------
+  149.                
+  150.                      INTEGER(KIND=MG_INT), INTENT(IN) :: &
+  151.                         IVAR,                             &  ! Which variable.
+  152.                         WHICH                                ! Which boundary (north, south, etc)
+  153.                
+  154.                      INTEGER(KIND=MG_INT), INTENT(INOUT) :: &
+  155.                         OFFSET
+  156.                
+  157.                      INTEGER(KIND=MG_INT), INTENT(OUT) :: &
+  158.                         IERR           ! Return status
+  159.                
+  160.                      ! ------------------
+  161.                      ! Local Declarations
+  162.                      ! ------------------
+  163.                   
+  164.                      INTEGER(KIND=MG_INT) :: &
+  165.                         I, J                            ! Counters
+  166.                   
+  167.                      ! ---------------------
+  168.                      ! Executable Statements
+  169.                      ! ---------------------
+  170.                
+  171.                      IERR = 0
+  172.                
+  173.                      SELECT CASE ( IVAR )
+  174.                
+  175.                         CASE ( 1 )
+  176.                
+  177.  +                         CALL GET_FACE ( WHICH, OFFSET, GRID1, IERR )
+  178.                
+  179.                         CASE ( 2 )
+  180.                
+  181.  +                         CALL GET_FACE ( WHICH, OFFSET, GRID2, IERR )
+  182.                
+  183.                         CASE ( 3 )
+  184.                
+  185.  +                         CALL GET_FACE ( WHICH, OFFSET, GRID3, IERR )
+  186.                
+  187.                         CASE ( 4 )
+  188.                
+  189.  +                         CALL GET_FACE ( WHICH, OFFSET, GRID4, IERR )
+  190.                
+  191.                         CASE ( 5 )
+  192.                
+  193.  +                         CALL GET_FACE ( WHICH, OFFSET, GRID5, IERR )
+  194.                
+  195.                         CASE ( 6 )
+  196.                
+  197.  +                         CALL GET_FACE ( WHICH, OFFSET, GRID6, IERR )
+  198.                
+  199.                         CASE ( 7 )
+  200.                
+  201.  +                         CALL GET_FACE ( WHICH, OFFSET, GRID7, IERR )
+  202.                
+  203.                         CASE ( 8 )
+  204.                
+  205.  +                         CALL GET_FACE ( WHICH, OFFSET, GRID8, IERR )
+  206.                
+  207.                         CASE ( 9 )
+  208.                
+  209.  +                         CALL GET_FACE ( WHICH, OFFSET, GRID9, IERR )
+  210.                
+  211.                         CASE ( 10 )
+  212.                
+  213.  +                         CALL GET_FACE ( WHICH, OFFSET, GRID10, IERR )
+  214.                
+  215.                         CASE ( 11 )
+  216.                
+  217.  +                         CALL GET_FACE ( WHICH, OFFSET, GRID11, IERR )
+  218.                
+  219.                         CASE ( 12 )
+  220.                
+  221.  +                         CALL GET_FACE ( WHICH, OFFSET, GRID12, IERR )
+  222.                
+  223.                         CASE ( 13 )
+  224.                
+  225.  +                         CALL GET_FACE ( WHICH, OFFSET, GRID13, IERR )
+  226.                
+  227.                         CASE ( 14 )
+  228.                
+  229.  +                         CALL GET_FACE ( WHICH, OFFSET, GRID14, IERR )
+  230.                
+  231.                         CASE ( 15 )
+  232.                
+  233.  +                         CALL GET_FACE ( WHICH, OFFSET, GRID15, IERR )
+  234.                
+  235.                         CASE ( 16 )
+  236.                
+  237.  +                         CALL GET_FACE ( WHICH, OFFSET, GRID16, IERR )
+  238.                
+  239.                         CASE ( 17 )
+  240.                
+  241.  +                         CALL GET_FACE ( WHICH, OFFSET, GRID17, IERR )
+  242.                
+  243.                         CASE ( 18 )
+  244.                
+  245.  +                         CALL GET_FACE ( WHICH, OFFSET, GRID18, IERR )
+  246.                
+  247.                         CASE ( 19 )
+  248.                
+  249.  +                         CALL GET_FACE ( WHICH, OFFSET, GRID19, IERR )
+  250.                
+  251.                         CASE ( 20 )
+  252.                
+  253.  +                         CALL GET_FACE ( WHICH, OFFSET, GRID20, IERR )
+  254.                
+  255.                         CASE ( 21 )
+  256.                
+  257.  +                         CALL GET_FACE ( WHICH, OFFSET, GRID21, IERR )
+  258.                
+  259.                         CASE ( 22 )
+  260.                
+  261.  +                         CALL GET_FACE ( WHICH, OFFSET, GRID22, IERR )
+  262.                
+  263.                         CASE ( 23 )
+  264.                
+  265.  +                         CALL GET_FACE ( WHICH, OFFSET, GRID23, IERR )
+  266.                
+  267.                         CASE ( 24 )
+  268.                
+  269.  +                         CALL GET_FACE ( WHICH, OFFSET, GRID24, IERR )
+  270.                
+  271.                         CASE ( 25 )
+  272.                
+  273.  +                         CALL GET_FACE ( WHICH, OFFSET, GRID25, IERR )
+  274.                
+  275.                         CASE ( 26 )
+  276.                
+  277.  +                         CALL GET_FACE ( WHICH, OFFSET, GRID26, IERR )
+  278.                
+  279.                         CASE ( 27 )
+  280.                
+  281.  +                         CALL GET_FACE ( WHICH, OFFSET, GRID27, IERR )
+  282.                
+  283.                         CASE ( 28 )
+  284.                
+  285.  +                         CALL GET_FACE ( WHICH, OFFSET, GRID28, IERR )
+  286.                
+  287.                         CASE ( 29 )
+  288.                
+  289.  +                         CALL GET_FACE ( WHICH, OFFSET, GRID29, IERR )
+  290.                
+  291.                         CASE ( 30 )
+  292.                
+  293.  +                         CALL GET_FACE ( WHICH, OFFSET, GRID30, IERR )
+  294.                
+  295.                         CASE ( 31 )
+  296.                
+  297.  +                         CALL GET_FACE ( WHICH, OFFSET, GRID31, IERR )
+  298.                
+  299.                         CASE ( 32 )
+  300.                
+  301.  +                         CALL GET_FACE ( WHICH, OFFSET, GRID32, IERR )
+  302.                
+  303.                         CASE ( 33 )
+  304.                
+  305.  +                         CALL GET_FACE ( WHICH, OFFSET, GRID33, IERR )
+  306.                
+  307.                         CASE ( 34 )
+  308.                
+  309.  +                         CALL GET_FACE ( WHICH, OFFSET, GRID34, IERR )
+  310.                
+  311.                         CASE ( 35 )
+  312.                
+  313.  +                         CALL GET_FACE ( WHICH, OFFSET, GRID35, IERR )
+  314.                
+  315.                         CASE ( 36 )
+  316.                
+  317.  +                         CALL GET_FACE ( WHICH, OFFSET, GRID36, IERR )
+  318.                
+  319.                         CASE ( 37 )
+  320.                
+  321.  +                         CALL GET_FACE ( WHICH, OFFSET, GRID37, IERR )
+  322.                
+  323.                         CASE ( 38 )
+  324.                
+  325.  +                         CALL GET_FACE ( WHICH, OFFSET, GRID38, IERR )
+  326.                
+  327.                         CASE ( 39 )
+  328.                
+  329.  +                         CALL GET_FACE ( WHICH, OFFSET, GRID39, IERR )
+  330.                
+  331.                         CASE ( 40 )
+  332.                
+  333.  +                         CALL GET_FACE ( WHICH, OFFSET, GRID40, IERR )
+  334.                
+  335.                      END SELECT
+  336.                
+  337.                      RETURN
+  338.                   
+  339.                   END SUBROUTINE MG_GET_FACE
+ftn-5002 ftn: NOTE MG_GET_FACE, File = MG_GET_FACE.F, Line = 339 
+  Local variable "J" is declared but neither defined nor used.
+
+ftn-5002 ftn: NOTE MG_GET_FACE, File = MG_GET_FACE.F, Line = 339 
+  Local variable "I" is declared but neither defined nor used.
+
+  340.                
+  341.                END MODULE MG_GET_FACE_MOD
+
+ftn-6823 ftn: THREAD GET_FACE, File = MG_GET_FACE.F, Line = 76 
+  A region starting at line 76 and ending at line 82 was multi-threaded.
+
+ftn-6294 ftn: VECTOR GET_FACE, File = MG_GET_FACE.F, Line = 77 
+  A loop starting at line 77 was not vectorized because a better candidate was found at line 78.
+
+ftn-6817 ftn: THREAD GET_FACE, File = MG_GET_FACE.F, Line = 77 
+  A loop starting at line 77 was partitioned.
+
+ftn-6202 ftn: VECTOR GET_FACE, File = MG_GET_FACE.F, Line = 78 
+  A loop starting at line 78 was replaced by a library call.
+
+ftn-6823 ftn: THREAD GET_FACE, File = MG_GET_FACE.F, Line = 87 
+  A region starting at line 87 and ending at line 93 was multi-threaded.
+
+ftn-6294 ftn: VECTOR GET_FACE, File = MG_GET_FACE.F, Line = 88 
+  A loop starting at line 88 was not vectorized because a better candidate was found at line 89.
+
+ftn-6817 ftn: THREAD GET_FACE, File = MG_GET_FACE.F, Line = 88 
+  A loop starting at line 88 was partitioned.
+
+ftn-6202 ftn: VECTOR GET_FACE, File = MG_GET_FACE.F, Line = 89 
+  A loop starting at line 89 was replaced by a library call.
+
+ftn-6823 ftn: THREAD GET_FACE, File = MG_GET_FACE.F, Line = 98 
+  A region starting at line 98 and ending at line 104 was multi-threaded.
+
+ftn-6294 ftn: VECTOR GET_FACE, File = MG_GET_FACE.F, Line = 99 
+  A loop starting at line 99 was not vectorized because a better candidate was found at line 100.
+
+ftn-6817 ftn: THREAD GET_FACE, File = MG_GET_FACE.F, Line = 99 
+  A loop starting at line 99 was partitioned.
+
+ftn-6005 ftn: SCALAR GET_FACE, File = MG_GET_FACE.F, Line = 100 
+  A loop starting at line 100 was unrolled 2 times.
+
+ftn-6381 ftn: VECTOR GET_FACE, File = MG_GET_FACE.F, Line = 100 
+  A loop starting at line 100 was vector pipelined.
+
+ftn-6209 ftn: VECTOR GET_FACE, File = MG_GET_FACE.F, Line = 100 
+  A loop starting at line 100 was partially vectorized.
+
+ftn-6823 ftn: THREAD GET_FACE, File = MG_GET_FACE.F, Line = 109 
+  A region starting at line 109 and ending at line 115 was multi-threaded.
+
+ftn-6294 ftn: VECTOR GET_FACE, File = MG_GET_FACE.F, Line = 110 
+  A loop starting at line 110 was not vectorized because a better candidate was found at line 111.
+
+ftn-6817 ftn: THREAD GET_FACE, File = MG_GET_FACE.F, Line = 110 
+  A loop starting at line 110 was partitioned.
+
+ftn-6005 ftn: SCALAR GET_FACE, File = MG_GET_FACE.F, Line = 111 
+  A loop starting at line 111 was unrolled 2 times.
+
+ftn-6381 ftn: VECTOR GET_FACE, File = MG_GET_FACE.F, Line = 111 
+  A loop starting at line 111 was vector pipelined.
+
+ftn-6209 ftn: VECTOR GET_FACE, File = MG_GET_FACE.F, Line = 111 
+  A loop starting at line 111 was partially vectorized.
+
+ftn-6823 ftn: THREAD GET_FACE, File = MG_GET_FACE.F, Line = 120 
+  A region starting at line 120 and ending at line 126 was multi-threaded.
+
+ftn-6294 ftn: VECTOR GET_FACE, File = MG_GET_FACE.F, Line = 121 
+  A loop starting at line 121 was not vectorized because a better candidate was found at line 122.
+
+ftn-6817 ftn: THREAD GET_FACE, File = MG_GET_FACE.F, Line = 121 
+  A loop starting at line 121 was partitioned.
+
+ftn-6202 ftn: VECTOR GET_FACE, File = MG_GET_FACE.F, Line = 122 
+  A loop starting at line 122 was replaced by a library call.
+
+ftn-6823 ftn: THREAD GET_FACE, File = MG_GET_FACE.F, Line = 131 
+  A region starting at line 131 and ending at line 137 was multi-threaded.
+
+ftn-6294 ftn: VECTOR GET_FACE, File = MG_GET_FACE.F, Line = 132 
+  A loop starting at line 132 was not vectorized because a better candidate was found at line 133.
+
+ftn-6817 ftn: THREAD GET_FACE, File = MG_GET_FACE.F, Line = 132 
+  A loop starting at line 132 was partitioned.
+
+ftn-6202 ftn: VECTOR GET_FACE, File = MG_GET_FACE.F, Line = 133 
+  A loop starting at line 133 was replaced by a library call.
+
+ftn-3171 ftn: IPA MG_GET_FACE, File = MG_GET_FACE.F, Line = 177, Column = 18 
+  "get_face" (called from "mg_get_face") was not inlined because it is not in the body of a loop.
+
+ftn-3171 ftn: IPA MG_GET_FACE, File = MG_GET_FACE.F, Line = 181, Column = 18 
+  "get_face" (called from "mg_get_face") was not inlined because it is not in the body of a loop.
+
+ftn-3171 ftn: IPA MG_GET_FACE, File = MG_GET_FACE.F, Line = 185, Column = 18 
+  "get_face" (called from "mg_get_face") was not inlined because it is not in the body of a loop.
+
+ftn-3171 ftn: IPA MG_GET_FACE, File = MG_GET_FACE.F, Line = 189, Column = 18 
+  "get_face" (called from "mg_get_face") was not inlined because it is not in the body of a loop.
+
+ftn-3171 ftn: IPA MG_GET_FACE, File = MG_GET_FACE.F, Line = 193, Column = 18 
+  "get_face" (called from "mg_get_face") was not inlined because it is not in the body of a loop.
+
+ftn-3171 ftn: IPA MG_GET_FACE, File = MG_GET_FACE.F, Line = 197, Column = 18 
+  "get_face" (called from "mg_get_face") was not inlined because it is not in the body of a loop.
+
+ftn-3171 ftn: IPA MG_GET_FACE, File = MG_GET_FACE.F, Line = 201, Column = 18 
+  "get_face" (called from "mg_get_face") was not inlined because it is not in the body of a loop.
+
+ftn-3171 ftn: IPA MG_GET_FACE, File = MG_GET_FACE.F, Line = 205, Column = 18 
+  "get_face" (called from "mg_get_face") was not inlined because it is not in the body of a loop.
+
+ftn-3171 ftn: IPA MG_GET_FACE, File = MG_GET_FACE.F, Line = 209, Column = 18 
+  "get_face" (called from "mg_get_face") was not inlined because it is not in the body of a loop.
+
+ftn-3171 ftn: IPA MG_GET_FACE, File = MG_GET_FACE.F, Line = 213, Column = 18 
+  "get_face" (called from "mg_get_face") was not inlined because it is not in the body of a loop.
+
+ftn-3171 ftn: IPA MG_GET_FACE, File = MG_GET_FACE.F, Line = 217, Column = 18 
+  "get_face" (called from "mg_get_face") was not inlined because it is not in the body of a loop.
+
+ftn-3171 ftn: IPA MG_GET_FACE, File = MG_GET_FACE.F, Line = 221, Column = 18 
+  "get_face" (called from "mg_get_face") was not inlined because it is not in the body of a loop.
+
+ftn-3171 ftn: IPA MG_GET_FACE, File = MG_GET_FACE.F, Line = 225, Column = 18 
+  "get_face" (called from "mg_get_face") was not inlined because it is not in the body of a loop.
+
+ftn-3171 ftn: IPA MG_GET_FACE, File = MG_GET_FACE.F, Line = 229, Column = 18 
+  "get_face" (called from "mg_get_face") was not inlined because it is not in the body of a loop.
+
+ftn-3171 ftn: IPA MG_GET_FACE, File = MG_GET_FACE.F, Line = 233, Column = 18 
+  "get_face" (called from "mg_get_face") was not inlined because it is not in the body of a loop.
+
+ftn-3171 ftn: IPA MG_GET_FACE, File = MG_GET_FACE.F, Line = 237, Column = 18 
+  "get_face" (called from "mg_get_face") was not inlined because it is not in the body of a loop.
+
+ftn-3171 ftn: IPA MG_GET_FACE, File = MG_GET_FACE.F, Line = 241, Column = 18 
+  "get_face" (called from "mg_get_face") was not inlined because it is not in the body of a loop.
+
+ftn-3171 ftn: IPA MG_GET_FACE, File = MG_GET_FACE.F, Line = 245, Column = 18 
+  "get_face" (called from "mg_get_face") was not inlined because it is not in the body of a loop.
+
+ftn-3171 ftn: IPA MG_GET_FACE, File = MG_GET_FACE.F, Line = 249, Column = 18 
+  "get_face" (called from "mg_get_face") was not inlined because it is not in the body of a loop.
+
+ftn-3171 ftn: IPA MG_GET_FACE, File = MG_GET_FACE.F, Line = 253, Column = 18 
+  "get_face" (called from "mg_get_face") was not inlined because it is not in the body of a loop.
+
+ftn-3171 ftn: IPA MG_GET_FACE, File = MG_GET_FACE.F, Line = 257, Column = 18 
+  "get_face" (called from "mg_get_face") was not inlined because it is not in the body of a loop.
+
+ftn-3171 ftn: IPA MG_GET_FACE, File = MG_GET_FACE.F, Line = 261, Column = 18 
+  "get_face" (called from "mg_get_face") was not inlined because it is not in the body of a loop.
+
+ftn-3171 ftn: IPA MG_GET_FACE, File = MG_GET_FACE.F, Line = 265, Column = 18 
+  "get_face" (called from "mg_get_face") was not inlined because it is not in the body of a loop.
+
+ftn-3171 ftn: IPA MG_GET_FACE, File = MG_GET_FACE.F, Line = 269, Column = 18 
+  "get_face" (called from "mg_get_face") was not inlined because it is not in the body of a loop.
+
+ftn-3171 ftn: IPA MG_GET_FACE, File = MG_GET_FACE.F, Line = 273, Column = 18 
+  "get_face" (called from "mg_get_face") was not inlined because it is not in the body of a loop.
+
+ftn-3171 ftn: IPA MG_GET_FACE, File = MG_GET_FACE.F, Line = 277, Column = 18 
+  "get_face" (called from "mg_get_face") was not inlined because it is not in the body of a loop.
+
+ftn-3171 ftn: IPA MG_GET_FACE, File = MG_GET_FACE.F, Line = 281, Column = 18 
+  "get_face" (called from "mg_get_face") was not inlined because it is not in the body of a loop.
+
+ftn-3171 ftn: IPA MG_GET_FACE, File = MG_GET_FACE.F, Line = 285, Column = 18 
+  "get_face" (called from "mg_get_face") was not inlined because it is not in the body of a loop.
+
+ftn-3171 ftn: IPA MG_GET_FACE, File = MG_GET_FACE.F, Line = 289, Column = 18 
+  "get_face" (called from "mg_get_face") was not inlined because it is not in the body of a loop.
+
+ftn-3171 ftn: IPA MG_GET_FACE, File = MG_GET_FACE.F, Line = 293, Column = 18 
+  "get_face" (called from "mg_get_face") was not inlined because it is not in the body of a loop.
+
+ftn-3171 ftn: IPA MG_GET_FACE, File = MG_GET_FACE.F, Line = 297, Column = 18 
+  "get_face" (called from "mg_get_face") was not inlined because it is not in the body of a loop.
+
+ftn-3171 ftn: IPA MG_GET_FACE, File = MG_GET_FACE.F, Line = 301, Column = 18 
+  "get_face" (called from "mg_get_face") was not inlined because it is not in the body of a loop.
+
+ftn-3171 ftn: IPA MG_GET_FACE, File = MG_GET_FACE.F, Line = 305, Column = 18 
+  "get_face" (called from "mg_get_face") was not inlined because it is not in the body of a loop.
+
+ftn-3171 ftn: IPA MG_GET_FACE, File = MG_GET_FACE.F, Line = 309, Column = 18 
+  "get_face" (called from "mg_get_face") was not inlined because it is not in the body of a loop.
+
+ftn-3171 ftn: IPA MG_GET_FACE, File = MG_GET_FACE.F, Line = 313, Column = 18 
+  "get_face" (called from "mg_get_face") was not inlined because it is not in the body of a loop.
+
+ftn-3171 ftn: IPA MG_GET_FACE, File = MG_GET_FACE.F, Line = 317, Column = 18 
+  "get_face" (called from "mg_get_face") was not inlined because it is not in the body of a loop.
+
+ftn-3171 ftn: IPA MG_GET_FACE, File = MG_GET_FACE.F, Line = 321, Column = 18 
+  "get_face" (called from "mg_get_face") was not inlined because it is not in the body of a loop.
+
+ftn-3171 ftn: IPA MG_GET_FACE, File = MG_GET_FACE.F, Line = 325, Column = 18 
+  "get_face" (called from "mg_get_face") was not inlined because it is not in the body of a loop.
+
+ftn-3171 ftn: IPA MG_GET_FACE, File = MG_GET_FACE.F, Line = 329, Column = 18 
+  "get_face" (called from "mg_get_face") was not inlined because it is not in the body of a loop.
+
+ftn-3171 ftn: IPA MG_GET_FACE, File = MG_GET_FACE.F, Line = 333, Column = 18 
+  "get_face" (called from "mg_get_face") was not inlined because it is not in the body of a loop.
+
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+             C r o s s   R e f e r e n c e   for   MG_GET_FACE_MOD
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Name                                      Storage/Owner                   
+----                                      -------------                   
+
+BACK                                      Module MG_CONSTANTS_MOD         
+  Parameter, Integer(kind=4), Use assoc
+  Declared  
+  Defined   
+  Referenced      74
+  Referenced in contained procedure
+
+EAST                                      Module MG_CONSTANTS_MOD         
+  Parameter, Integer(kind=4), Use assoc
+  Declared  
+  Defined   
+  Referenced      96
+  Referenced in contained procedure
+
+FRONT                                     Module MG_CONSTANTS_MOD         
+  Parameter, Integer(kind=4), Use assoc
+  Declared  
+  Defined   
+  Referenced      85
+  Referenced in contained procedure
+
+GET_FACE                                                                  
+  Subroutine, Module procedure
+  Declared        41
+  Defined   
+  Referenced     177     177     181     181     185     185     189     189     193     193     197     197     201     201     205
+           205     209     209     213     213     217     217     221     221     225     225     229     229     233     233
+           237     237     241     241     245     245     249     249     253     253     257     257     261     261     265
+           265     269     269     273     273     277     277     281     281     285     285     289     289     293     293
+           297     297     301     301     305     305     309     309     313     313     317     317     321     321     325
+           325     329     329     333     333
+
+GRID                                      GET_FACE                        
+  Dummy Argument, Real(kind=8), Dimension(0:<exp>,0:<exp>,0:<exp>),
+                                                        Intent(out)
+  Declared        41      57
+  Defined         79      90     101     112     123     134
+  Referenced
+
+GRID1                                     Module MG_CONSTANTS_MOD         
+  Real(kind=8), Use assoc, Dimension(:,:,:), Allocatable
+  Declared  
+  Defined   
+  Referenced     177
+  Referenced in contained procedure
+
+GRID10                                    Module MG_CONSTANTS_MOD         
+  Real(kind=8), Use assoc, Dimension(:,:,:), Allocatable
+  Declared  
+  Defined   
+  Referenced     213
+  Referenced in contained procedure
+
+GRID11                                    Module MG_CONSTANTS_MOD         
+  Real(kind=8), Use assoc, Dimension(:,:,:), Allocatable
+  Declared  
+  Defined   
+  Referenced     217
+  Referenced in contained procedure
+
+GRID12                                    Module MG_CONSTANTS_MOD         
+  Real(kind=8), Use assoc, Dimension(:,:,:), Allocatable
+  Declared  
+  Defined   
+  Referenced     221
+  Referenced in contained procedure
+
+GRID13                                    Module MG_CONSTANTS_MOD         
+  Real(kind=8), Use assoc, Dimension(:,:,:), Allocatable
+  Declared  
+  Defined   
+  Referenced     225
+  Referenced in contained procedure
+
+GRID14                                    Module MG_CONSTANTS_MOD         
+  Real(kind=8), Use assoc, Dimension(:,:,:), Allocatable
+  Declared  
+  Defined   
+  Referenced     229
+  Referenced in contained procedure
+
+GRID15                                    Module MG_CONSTANTS_MOD         
+  Real(kind=8), Use assoc, Dimension(:,:,:), Allocatable
+  Declared  
+  Defined   
+  Referenced     233
+  Referenced in contained procedure
+
+GRID16                                    Module MG_CONSTANTS_MOD         
+  Real(kind=8), Use assoc, Dimension(:,:,:), Allocatable
+  Declared  
+  Defined   
+  Referenced     237
+  Referenced in contained procedure
+
+GRID17                                    Module MG_CONSTANTS_MOD         
+  Real(kind=8), Use assoc, Dimension(:,:,:), Allocatable
+  Declared  
+  Defined   
+  Referenced     241
+  Referenced in contained procedure
+
+GRID18                                    Module MG_CONSTANTS_MOD         
+  Real(kind=8), Use assoc, Dimension(:,:,:), Allocatable
+  Declared  
+  Defined   
+  Referenced     245
+  Referenced in contained procedure
+
+GRID19                                    Module MG_CONSTANTS_MOD         
+  Real(kind=8), Use assoc, Dimension(:,:,:), Allocatable
+  Declared  
+  Defined   
+  Referenced     249
+  Referenced in contained procedure
+
+GRID2                                     Module MG_CONSTANTS_MOD         
+  Real(kind=8), Use assoc, Dimension(:,:,:), Allocatable
+  Declared  
+  Defined   
+  Referenced     181
+  Referenced in contained procedure
+
+GRID20                                    Module MG_CONSTANTS_MOD         
+  Real(kind=8), Use assoc, Dimension(:,:,:), Allocatable
+  Declared  
+  Defined   
+  Referenced     253
+  Referenced in contained procedure
+
+GRID21                                    Module MG_CONSTANTS_MOD         
+  Real(kind=8), Use assoc, Dimension(:,:,:), Allocatable
+  Declared  
+  Defined   
+  Referenced     257
+  Referenced in contained procedure
+
+GRID22                                    Module MG_CONSTANTS_MOD         
+  Real(kind=8), Use assoc, Dimension(:,:,:), Allocatable
+  Declared  
+  Defined   
+  Referenced     261
+  Referenced in contained procedure
+
+GRID23                                    Module MG_CONSTANTS_MOD         
+  Real(kind=8), Use assoc, Dimension(:,:,:), Allocatable
+  Declared  
+  Defined   
+  Referenced     265
+  Referenced in contained procedure
+
+GRID24                                    Module MG_CONSTANTS_MOD         
+  Real(kind=8), Use assoc, Dimension(:,:,:), Allocatable
+  Declared  
+  Defined   
+  Referenced     269
+  Referenced in contained procedure
+
+GRID25                                    Module MG_CONSTANTS_MOD         
+  Real(kind=8), Use assoc, Dimension(:,:,:), Allocatable
+  Declared  
+  Defined   
+  Referenced     273
+  Referenced in contained procedure
+
+GRID26                                    Module MG_CONSTANTS_MOD         
+  Real(kind=8), Use assoc, Dimension(:,:,:), Allocatable
+  Declared  
+  Defined   
+  Referenced     277
+  Referenced in contained procedure
+
+GRID27                                    Module MG_CONSTANTS_MOD         
+  Real(kind=8), Use assoc, Dimension(:,:,:), Allocatable
+  Declared  
+  Defined   
+  Referenced     281
+  Referenced in contained procedure
+
+GRID28                                    Module MG_CONSTANTS_MOD         
+  Real(kind=8), Use assoc, Dimension(:,:,:), Allocatable
+  Declared  
+  Defined   
+  Referenced     285
+  Referenced in contained procedure
+
+GRID29                                    Module MG_CONSTANTS_MOD         
+  Real(kind=8), Use assoc, Dimension(:,:,:), Allocatable
+  Declared  
+  Defined   
+  Referenced     289
+  Referenced in contained procedure
+
+GRID3                                     Module MG_CONSTANTS_MOD         
+  Real(kind=8), Use assoc, Dimension(:,:,:), Allocatable
+  Declared  
+  Defined   
+  Referenced     185
+  Referenced in contained procedure
+
+GRID30                                    Module MG_CONSTANTS_MOD         
+  Real(kind=8), Use assoc, Dimension(:,:,:), Allocatable
+  Declared  
+  Defined   
+  Referenced     293
+  Referenced in contained procedure
+
+GRID31                                    Module MG_CONSTANTS_MOD         
+  Real(kind=8), Use assoc, Dimension(:,:,:), Allocatable
+  Declared  
+  Defined   
+  Referenced     297
+  Referenced in contained procedure
+
+GRID32                                    Module MG_CONSTANTS_MOD         
+  Real(kind=8), Use assoc, Dimension(:,:,:), Allocatable
+  Declared  
+  Defined   
+  Referenced     301
+  Referenced in contained procedure
+
+GRID33                                    Module MG_CONSTANTS_MOD         
+  Real(kind=8), Use assoc, Dimension(:,:,:), Allocatable
+  Declared  
+  Defined   
+  Referenced     305
+  Referenced in contained procedure
+
+GRID34                                    Module MG_CONSTANTS_MOD         
+  Real(kind=8), Use assoc, Dimension(:,:,:), Allocatable
+  Declared  
+  Defined   
+  Referenced     309
+  Referenced in contained procedure
+
+GRID35                                    Module MG_CONSTANTS_MOD         
+  Real(kind=8), Use assoc, Dimension(:,:,:), Allocatable
+  Declared  
+  Defined   
+  Referenced     313
+  Referenced in contained procedure
+
+GRID36                                    Module MG_CONSTANTS_MOD         
+  Real(kind=8), Use assoc, Dimension(:,:,:), Allocatable
+  Declared  
+  Defined   
+  Referenced     317
+  Referenced in contained procedure
+
+GRID37                                    Module MG_CONSTANTS_MOD         
+  Real(kind=8), Use assoc, Dimension(:,:,:), Allocatable
+  Declared  
+  Defined   
+  Referenced     321
+  Referenced in contained procedure
+
+GRID38                                    Module MG_CONSTANTS_MOD         
+  Real(kind=8), Use assoc, Dimension(:,:,:), Allocatable
+  Declared  
+  Defined   
+  Referenced     325
+  Referenced in contained procedure
+
+GRID39                                    Module MG_CONSTANTS_MOD         
+  Real(kind=8), Use assoc, Dimension(:,:,:), Allocatable
+  Declared  
+  Defined   
+  Referenced     329
+  Referenced in contained procedure
+
+GRID4                                     Module MG_CONSTANTS_MOD         
+  Real(kind=8), Use assoc, Dimension(:,:,:), Allocatable
+  Declared  
+  Defined   
+  Referenced     189
+  Referenced in contained procedure
+
+GRID40                                    Module MG_CONSTANTS_MOD         
+  Real(kind=8), Use assoc, Dimension(:,:,:), Allocatable
+  Declared  
+  Defined   
+  Referenced     333
+  Referenced in contained procedure
+
+GRID5                                     Module MG_CONSTANTS_MOD         
+  Real(kind=8), Use assoc, Dimension(:,:,:), Allocatable
+  Declared  
+  Defined   
+  Referenced     193
+  Referenced in contained procedure
+
+GRID6                                     Module MG_CONSTANTS_MOD         
+  Real(kind=8), Use assoc, Dimension(:,:,:), Allocatable
+  Declared  
+  Defined   
+  Referenced     197
+  Referenced in contained procedure
+
+GRID7                                     Module MG_CONSTANTS_MOD         
+  Real(kind=8), Use assoc, Dimension(:,:,:), Allocatable
+  Declared  
+  Defined   
+  Referenced     201
+  Referenced in contained procedure
+
+GRID8                                     Module MG_CONSTANTS_MOD         
+  Real(kind=8), Use assoc, Dimension(:,:,:), Allocatable
+  Declared  
+  Defined   
+  Referenced     205
+  Referenced in contained procedure
+
+GRID9                                     Module MG_CONSTANTS_MOD         
+  Real(kind=8), Use assoc, Dimension(:,:,:), Allocatable
+  Declared  
+  Defined   
+  Referenced     209
+  Referenced in contained procedure
+
+I                                         Stack                           
+  Variable, Integer
+  Declared        64
+  Defined   
+  Referenced      79      90     123     134
+
+I                                         Stack                           
+  Variable, Integer(kind=4)
+  Declared       165
+  Defined   
+  Referenced
+
+IERR                                      GET_FACE                        
+  Dummy Argument, Integer, Intent(out)
+  Declared        41      54
+  Defined         70
+  Referenced
+
+IERR                                      MG_GET_FACE                     
+  Dummy Argument, Integer(kind=4), Intent(out)
+  Declared       144     158
+  Defined        171
+  Referenced     177     181     185     189     193     197     201     205     209     213     217     221     225     229     233
+           237     241     245     249     253     257     261     265     269     273     277     281     285     289     293
+           297     301     305     309     313     317     321     325     329     333
+
+IVAR                                      MG_GET_FACE                     
+  Dummy Argument, Integer(kind=4), Intent(in)
+  Declared       144     151
+  Defined   
+  Referenced     173
+
+J                                         Stack                           
+  Variable, Integer
+  Declared        64
+  Defined   
+  Referenced      79      90     101     112
+
+J                                         Stack                           
+  Variable, Integer(kind=4)
+  Declared       165
+  Defined   
+  Referenced
+
+K                                         Stack                           
+  Variable, Integer
+  Declared        64
+  Defined   
+  Referenced     101     112     123     134
+
+MG_CONSTANTS_MOD                                                          
+  Module, Used indirectly (from module MG_UTILS_MOD)
+  Declared  
+  Defined   
+  Referenced
+
+MG_CONSTANTS_MOD                                                          
+  Module
+  Declared  
+  Defined   
+  Referenced      34
+
+MG_GET_FACE                                                               
+  Subroutine, Module procedure
+  Declared       144
+  Defined   
+  Referenced
+
+MG_GET_FACE_MOD                                                           
+  Module
+  Declared        28
+  Defined   
+  Referenced
+
+MG_INT                                    Module MG_CONSTANTS_MOD         
+  Parameter, Integer(kind=1), Use assoc
+  Declared  
+  Defined   
+  Referenced     150     154     157     164
+  Referenced in contained procedure
+
+MG_OPTIONS_MOD                                                            
+  Module, Used indirectly (from module MG_UTILS_MOD)
+  Declared  
+  Defined   
+  Referenced
+
+MG_REAL                                   Module MG_CONSTANTS_MOD         
+  Parameter, Integer(kind=1), Use assoc
+  Declared  
+  Defined   
+  Referenced      56
+  Referenced in contained procedure
+
+MG_UTILS_MOD                                                              
+  Module
+  Declared  
+  Defined   
+  Referenced      35
+
+MPIFCMB5                                  Module MG_CONSTANTS_MOD         
+  Common block 
+  Declared  
+  Defined   
+  Referenced
+
+MPIFCMB9                                  Module MG_CONSTANTS_MOD         
+  Common block 
+  Declared  
+  Defined   
+  Referenced
+
+MPIPRIV1                                  Module MG_CONSTANTS_MOD         
+  Common block 
+  Declared  
+  Defined   
+  Referenced
+
+MPIPRIV2                                  Module MG_CONSTANTS_MOD         
+  Common block 
+  Declared  
+  Defined   
+  Referenced
+
+MPIPRIVC                                  Module MG_CONSTANTS_MOD         
+  Common block 
+  Declared  
+  Defined   
+  Referenced
+
+NORTH                                     Module MG_CONSTANTS_MOD         
+  Parameter, Integer(kind=4), Use assoc
+  Declared  
+  Defined   
+  Referenced     118
+  Referenced in contained procedure
+
+NX                                        Module MG_OPTIONS_MOD           
+  Integer, Use assoc
+  Declared  
+  Defined   
+  Referenced      78      79      83      89      90      94     101     122     123     127     133     134     138
+  Referenced in contained procedure
+
+NY                                        Module MG_OPTIONS_MOD           
+  Integer, Use assoc
+  Declared  
+  Defined   
+  Referenced      77      83      88      94     100     101     105     111     112     116     123
+  Referenced in contained procedure
+
+NZ                                        Module MG_OPTIONS_MOD           
+  Integer, Use assoc
+  Declared  
+  Defined   
+  Referenced      90      99     105     110     116     121     127     132     138
+  Referenced in contained procedure
+
+OFFSET                                    GET_FACE                        
+  Dummy Argument, Integer, Intent(inout)
+  Declared        41      51
+  Defined         83      94     105     116     127     138
+  Referenced      79      90     101     112     123     134
+
+OFFSET                                    MG_GET_FACE                     
+  Dummy Argument, Integer(kind=4), Intent(inout)
+  Declared       144     155
+  Defined   
+  Referenced     177     181     185     189     193     197     201     205     209     213     217     221     225     229     233
+           237     241     245     249     253     257     261     265     269     273     277     281     285     289     293
+           297     301     305     309     313     317     321     325     329     333
+
+RECV_BUFFER_BACK                          Module MG_CONSTANTS_MOD         
+  Real(kind=8), Use assoc, Dimension(:), Allocatable
+  Declared  
+  Defined   
+  Referenced      79
+  Referenced in contained procedure
+
+RECV_BUFFER_EAST                          Module MG_CONSTANTS_MOD         
+  Real(kind=8), Use assoc, Dimension(:), Allocatable
+  Declared  
+  Defined   
+  Referenced     101
+  Referenced in contained procedure
+
+RECV_BUFFER_FRONT                         Module MG_CONSTANTS_MOD         
+  Real(kind=8), Use assoc, Dimension(:), Allocatable
+  Declared  
+  Defined   
+  Referenced      90
+  Referenced in contained procedure
+
+RECV_BUFFER_NORTH                         Module MG_CONSTANTS_MOD         
+  Real(kind=8), Use assoc, Dimension(:), Allocatable
+  Declared  
+  Defined   
+  Referenced     123
+  Referenced in contained procedure
+
+RECV_BUFFER_SOUTH                         Module MG_CONSTANTS_MOD         
+  Real(kind=8), Use assoc, Dimension(:), Allocatable
+  Declared  
+  Defined   
+  Referenced     134
+  Referenced in contained procedure
+
+RECV_BUFFER_WEST                          Module MG_CONSTANTS_MOD         
+  Real(kind=8), Use assoc, Dimension(:), Allocatable
+  Declared  
+  Defined   
+  Referenced     112
+  Referenced in contained procedure
+
+SOUTH                                     Module MG_CONSTANTS_MOD         
+  Parameter, Integer(kind=4), Use assoc
+  Declared  
+  Defined   
+  Referenced     129
+  Referenced in contained procedure
+
+WEST                                      Module MG_CONSTANTS_MOD         
+  Parameter, Integer(kind=4), Use assoc
+  Declared  
+  Defined   
+  Referenced     107
+  Referenced in contained procedure
+
+WHICH                                     GET_FACE                        
+  Dummy Argument, Integer, Intent(in)
+  Declared        41      48
+  Defined   
+  Referenced      72
+
+WHICH                                     MG_GET_FACE                     
+  Dummy Argument, Integer(kind=4), Intent(in)
+  Declared       144     152
+  Defined   
+  Referenced     177     181     185     189     193     197     201     205     209     213     217     221     225     229     233
+           237     241     245     249     253     257     261     265     269     273     277     281     285     289     293
+           297     301     305     309     313     317     321     325     329     333
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+                     C o m m o n   B l o c k   R e p o r t
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Blk  Program Unit                     Messages
+---  ------------                     --------
+/MPIFCMB5/                            Length: 4 bytes
+
+     MG_GET_FACE_MOD                  Block is used from MG_CONSTANTS_MOD
+
+Blk  Program Unit                     Messages
+---  ------------                     --------
+/MPIFCMB9/                            Length: 4 bytes
+
+     MG_GET_FACE_MOD                  Block is used from MG_CONSTANTS_MOD
+
+Blk  Program Unit                     Messages
+---  ------------                     --------
+/MPIPRIV1/                            Length: 28 bytes
+
+     MG_GET_FACE_MOD                  Block is used from MG_CONSTANTS_MOD
+
+Blk  Program Unit                     Messages
+---  ------------                     --------
+/MPIPRIV2/                            Length: 24 bytes
+
+     MG_GET_FACE_MOD                  Block is used from MG_CONSTANTS_MOD
+
+Blk  Program Unit                     Messages
+---  ------------                     --------
+/MPIPRIVC/                            Length: 2 bytes
+
+     MG_GET_FACE_MOD                  Block is used from MG_CONSTANTS_MOD
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+                         E x t e r n a l   R e p o r t
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Name  Messages
+----  --------
+GET_FACE in MG_GET_FACE_MOD
+      Defined as:  Subroutine (line 41, file MG_GET_FACE.F)
+
+      Interface:   None
+
+      Called By:   MG_GET_FACE in MG_GET_FACE_MOD (Line 177, file MG_GET_FACE.F)
+                   MG_GET_FACE in MG_GET_FACE_MOD (Line 181, file MG_GET_FACE.F)
+                   MG_GET_FACE in MG_GET_FACE_MOD (Line 185, file MG_GET_FACE.F)
+                   MG_GET_FACE in MG_GET_FACE_MOD (Line 189, file MG_GET_FACE.F)
+                   MG_GET_FACE in MG_GET_FACE_MOD (Line 193, file MG_GET_FACE.F)
+                   MG_GET_FACE in MG_GET_FACE_MOD (Line 197, file MG_GET_FACE.F)
+                   MG_GET_FACE in MG_GET_FACE_MOD (Line 201, file MG_GET_FACE.F)
+                   MG_GET_FACE in MG_GET_FACE_MOD (Line 205, file MG_GET_FACE.F)
+                   MG_GET_FACE in MG_GET_FACE_MOD (Line 209, file MG_GET_FACE.F)
+                   MG_GET_FACE in MG_GET_FACE_MOD (Line 213, file MG_GET_FACE.F)
+                   MG_GET_FACE in MG_GET_FACE_MOD (Line 217, file MG_GET_FACE.F)
+                   MG_GET_FACE in MG_GET_FACE_MOD (Line 221, file MG_GET_FACE.F)
+                   MG_GET_FACE in MG_GET_FACE_MOD (Line 225, file MG_GET_FACE.F)
+                   MG_GET_FACE in MG_GET_FACE_MOD (Line 229, file MG_GET_FACE.F)
+                   MG_GET_FACE in MG_GET_FACE_MOD (Line 233, file MG_GET_FACE.F)
+                   MG_GET_FACE in MG_GET_FACE_MOD (Line 237, file MG_GET_FACE.F)
+                   MG_GET_FACE in MG_GET_FACE_MOD (Line 241, file MG_GET_FACE.F)
+                   MG_GET_FACE in MG_GET_FACE_MOD (Line 245, file MG_GET_FACE.F)
+                   MG_GET_FACE in MG_GET_FACE_MOD (Line 249, file MG_GET_FACE.F)
+                   MG_GET_FACE in MG_GET_FACE_MOD (Line 253, file MG_GET_FACE.F)
+                   MG_GET_FACE in MG_GET_FACE_MOD (Line 257, file MG_GET_FACE.F)
+                   MG_GET_FACE in MG_GET_FACE_MOD (Line 261, file MG_GET_FACE.F)
+                   MG_GET_FACE in MG_GET_FACE_MOD (Line 265, file MG_GET_FACE.F)
+                   MG_GET_FACE in MG_GET_FACE_MOD (Line 269, file MG_GET_FACE.F)
+                   MG_GET_FACE in MG_GET_FACE_MOD (Line 273, file MG_GET_FACE.F)
+                   MG_GET_FACE in MG_GET_FACE_MOD (Line 277, file MG_GET_FACE.F)
+                   MG_GET_FACE in MG_GET_FACE_MOD (Line 281, file MG_GET_FACE.F)
+                   MG_GET_FACE in MG_GET_FACE_MOD (Line 285, file MG_GET_FACE.F)
+                   MG_GET_FACE in MG_GET_FACE_MOD (Line 289, file MG_GET_FACE.F)
+                   MG_GET_FACE in MG_GET_FACE_MOD (Line 293, file MG_GET_FACE.F)
+                   MG_GET_FACE in MG_GET_FACE_MOD (Line 297, file MG_GET_FACE.F)
+                   MG_GET_FACE in MG_GET_FACE_MOD (Line 301, file MG_GET_FACE.F)
+                   MG_GET_FACE in MG_GET_FACE_MOD (Line 305, file MG_GET_FACE.F)
+                   MG_GET_FACE in MG_GET_FACE_MOD (Line 309, file MG_GET_FACE.F)
+                   MG_GET_FACE in MG_GET_FACE_MOD (Line 313, file MG_GET_FACE.F)
+                   MG_GET_FACE in MG_GET_FACE_MOD (Line 317, file MG_GET_FACE.F)
+                   MG_GET_FACE in MG_GET_FACE_MOD (Line 321, file MG_GET_FACE.F)
+                   MG_GET_FACE in MG_GET_FACE_MOD (Line 325, file MG_GET_FACE.F)
+                   MG_GET_FACE in MG_GET_FACE_MOD (Line 329, file MG_GET_FACE.F)
+                   MG_GET_FACE in MG_GET_FACE_MOD (Line 333, file MG_GET_FACE.F)
+
+Name  Messages
+----  --------
+MG_ASSERT in MG_UTILS_MOD
+      Defined as:  No definitions.
+
+                   No calls.  It is not called and does not use any procedure.
+
+      Interface:   None
+
+Name  Messages
+----  --------
+MG_COMPUTE_STDDEV in MG_UTILS_MOD
+      Defined as:  No definitions.
+
+                   No calls.  It is not called and does not use any procedure.
+
+      Interface:   None
+
+Name  Messages
+----  --------
+MG_CONSTANTS_MOD
+      Defined as:  No definitions.
+
+      Used By:     MG_GET_FACE_MOD
+                   MG_GET_FACE_MOD  (indirectly)
+
+Name  Messages
+----  --------
+MG_GET_FACE in MG_GET_FACE_MOD
+      Defined as:  Subroutine (line 144, file MG_GET_FACE.F)
+
+      Interface:   None
+
+      Calls:       GET_FACE in MG_GET_FACE_MOD (Line 177, file MG_GET_FACE.F)
+                   GET_FACE in MG_GET_FACE_MOD (Line 181, file MG_GET_FACE.F)
+                   GET_FACE in MG_GET_FACE_MOD (Line 185, file MG_GET_FACE.F)
+                   GET_FACE in MG_GET_FACE_MOD (Line 189, file MG_GET_FACE.F)
+                   GET_FACE in MG_GET_FACE_MOD (Line 193, file MG_GET_FACE.F)
+                   GET_FACE in MG_GET_FACE_MOD (Line 197, file MG_GET_FACE.F)
+                   GET_FACE in MG_GET_FACE_MOD (Line 201, file MG_GET_FACE.F)
+                   GET_FACE in MG_GET_FACE_MOD (Line 205, file MG_GET_FACE.F)
+                   GET_FACE in MG_GET_FACE_MOD (Line 209, file MG_GET_FACE.F)
+                   GET_FACE in MG_GET_FACE_MOD (Line 213, file MG_GET_FACE.F)
+                   GET_FACE in MG_GET_FACE_MOD (Line 217, file MG_GET_FACE.F)
+                   GET_FACE in MG_GET_FACE_MOD (Line 221, file MG_GET_FACE.F)
+                   GET_FACE in MG_GET_FACE_MOD (Line 225, file MG_GET_FACE.F)
+                   GET_FACE in MG_GET_FACE_MOD (Line 229, file MG_GET_FACE.F)
+                   GET_FACE in MG_GET_FACE_MOD (Line 233, file MG_GET_FACE.F)
+                   GET_FACE in MG_GET_FACE_MOD (Line 237, file MG_GET_FACE.F)
+                   GET_FACE in MG_GET_FACE_MOD (Line 241, file MG_GET_FACE.F)
+                   GET_FACE in MG_GET_FACE_MOD (Line 245, file MG_GET_FACE.F)
+                   GET_FACE in MG_GET_FACE_MOD (Line 249, file MG_GET_FACE.F)
+                   GET_FACE in MG_GET_FACE_MOD (Line 253, file MG_GET_FACE.F)
+                   GET_FACE in MG_GET_FACE_MOD (Line 257, file MG_GET_FACE.F)
+                   GET_FACE in MG_GET_FACE_MOD (Line 261, file MG_GET_FACE.F)
+                   GET_FACE in MG_GET_FACE_MOD (Line 265, file MG_GET_FACE.F)
+                   GET_FACE in MG_GET_FACE_MOD (Line 269, file MG_GET_FACE.F)
+                   GET_FACE in MG_GET_FACE_MOD (Line 273, file MG_GET_FACE.F)
+                   GET_FACE in MG_GET_FACE_MOD (Line 277, file MG_GET_FACE.F)
+                   GET_FACE in MG_GET_FACE_MOD (Line 281, file MG_GET_FACE.F)
+                   GET_FACE in MG_GET_FACE_MOD (Line 285, file MG_GET_FACE.F)
+                   GET_FACE in MG_GET_FACE_MOD (Line 289, file MG_GET_FACE.F)
+                   GET_FACE in MG_GET_FACE_MOD (Line 293, file MG_GET_FACE.F)
+                   GET_FACE in MG_GET_FACE_MOD (Line 297, file MG_GET_FACE.F)
+                   GET_FACE in MG_GET_FACE_MOD (Line 301, file MG_GET_FACE.F)
+                   GET_FACE in MG_GET_FACE_MOD (Line 305, file MG_GET_FACE.F)
+                   GET_FACE in MG_GET_FACE_MOD (Line 309, file MG_GET_FACE.F)
+                   GET_FACE in MG_GET_FACE_MOD (Line 313, file MG_GET_FACE.F)
+                   GET_FACE in MG_GET_FACE_MOD (Line 317, file MG_GET_FACE.F)
+                   GET_FACE in MG_GET_FACE_MOD (Line 321, file MG_GET_FACE.F)
+                   GET_FACE in MG_GET_FACE_MOD (Line 325, file MG_GET_FACE.F)
+                   GET_FACE in MG_GET_FACE_MOD (Line 329, file MG_GET_FACE.F)
+                   GET_FACE in MG_GET_FACE_MOD (Line 333, file MG_GET_FACE.F)
+
+Name  Messages
+----  --------
+MG_GET_FACE_MOD
+      Defined as:  Module (line 28, file MG_GET_FACE.F)
+
+        Uses:      MG_CONSTANTS_MOD
+                   MG_UTILS_MOD
+                   MG_OPTIONS_MOD  (indirectly)
+                   MG_CONSTANTS_MOD  (indirectly)
+
+Name  Messages
+----  --------
+MG_GRID_DEALLOC in MG_UTILS_MOD
+      Defined as:  No definitions.
+
+                   No calls.  It is not called and does not use any procedure.
+
+      Interface:   None
+
+Name  Messages
+----  --------
+MG_GRID_INIT in MG_UTILS_MOD
+      Defined as:  No definitions.
+
+                   No calls.  It is not called and does not use any procedure.
+
+      Interface:   None
+
+Name  Messages
+----  --------
+MG_INIT in MG_UTILS_MOD
+      Defined as:  No definitions.
+
+                   No calls.  It is not called and does not use any procedure.
+
+      Interface:   None
+
+Name  Messages
+----  --------
+MG_INIT_GRID in MG_UTILS_MOD
+      Defined as:  No definitions.
+
+                   No calls.  It is not called and does not use any procedure.
+
+      Interface:   None
+
+Name  Messages
+----  --------
+MG_INSERT_SPIKE in MG_UTILS_MOD
+      Defined as:  No definitions.
+
+                   No calls.  It is not called and does not use any procedure.
+
+      Interface:   None
+
+Name  Messages
+----  --------
+MG_OPTIONS_MOD
+      Defined as:  No definitions.
+
+      Used By:     MG_GET_FACE_MOD  (indirectly)
+
+Name  Messages
+----  --------
+MG_PRINT_HEADER in MG_UTILS_MOD
+      Defined as:  No definitions.
+
+                   No calls.  It is not called and does not use any procedure.
+
+      Interface:   None
+
+Name  Messages
+----  --------
+MG_TIMER in MG_UTILS_MOD
+      Defined as:  No definitions.
+
+                   No calls.  It is not called and does not use any procedure.
+
+      Interface:   None
+
+Name  Messages
+----  --------
+MG_UTILS_MOD
+      Defined as:  No definitions.
+
+      Used By:     MG_GET_FACE_MOD
+
+Name  Messages
+----  --------
+MPI_COMM_DUP_FN
+      Defined as:  No definitions.
+
+                   No calls.  It is not called and does not use any procedure.
+
+Name  Messages
+----  --------
+MPI_COMM_NULL_COPY_FN
+      Defined as:  No definitions.
+
+                   No calls.  It is not called and does not use any procedure.
+
+Name  Messages
+----  --------
+MPI_COMM_NULL_DELETE_FN
+      Defined as:  No definitions.
+
+                   No calls.  It is not called and does not use any procedure.
+
+Name  Messages
+----  --------
+MPI_CONVERSION_FN_NULL
+      Defined as:  No definitions.
+
+                   No calls.  It is not called and does not use any procedure.
+
+Name  Messages
+----  --------
+MPI_DUP_FN
+      Defined as:  No definitions.
+
+                   No calls.  It is not called and does not use any procedure.
+
+Name  Messages
+----  --------
+MPI_NULL_COPY_FN
+      Defined as:  No definitions.
+
+                   No calls.  It is not called and does not use any procedure.
+
+Name  Messages
+----  --------
+MPI_NULL_DELETE_FN
+      Defined as:  No definitions.
+
+                   No calls.  It is not called and does not use any procedure.
+
+Name  Messages
+----  --------
+MPI_TYPE_DUP_FN
+      Defined as:  No definitions.
+
+                   No calls.  It is not called and does not use any procedure.
+
+Name  Messages
+----  --------
+MPI_TYPE_NULL_COPY_FN
+      Defined as:  No definitions.
+
+                   No calls.  It is not called and does not use any procedure.
+
+Name  Messages
+----  --------
+MPI_TYPE_NULL_DELETE_FN
+      Defined as:  No definitions.
+
+                   No calls.  It is not called and does not use any procedure.
+
+Name  Messages
+----  --------
+MPI_WIN_DUP_FN
+      Defined as:  No definitions.
+
+                   No calls.  It is not called and does not use any procedure.
+
+Name  Messages
+----  --------
+MPI_WIN_NULL_COPY_FN
+      Defined as:  No definitions.
+
+                   No calls.  It is not called and does not use any procedure.
+
+Name  Messages
+----  --------
+MPI_WIN_NULL_DELETE_FN
+      Defined as:  No definitions.
+
+                   No calls.  It is not called and does not use any procedure.
+
+Name  Messages
+----  --------
+MPI_WTICK
+      Defined as:  No definitions.
+
+                   No calls.  It is not called and does not use any procedure.
+
+      Interface:   None
+
+Name  Messages
+----  --------
+MPI_WTIME
+      Defined as:  No definitions.
+
+                   No calls.  It is not called and does not use any procedure.
+
+      Interface:   None
+
+Name  Messages
+----  --------
+PMPI_WTICK
+      Defined as:  No definitions.
+
+                   No calls.  It is not called and does not use any procedure.
+
+      Interface:   None
+
+Name  Messages
+----  --------
+PMPI_WTIME
+      Defined as:  No definitions.
+
+                   No calls.  It is not called and does not use any procedure.
+
+      Interface:   None
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%

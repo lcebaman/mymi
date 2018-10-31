@@ -1,0 +1,3138 @@
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+                          S u m m a r y   R e p o r t
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Compilation
+-----------
+File     : /lus/scratch/p02128/work/MiniGhost/source/MG_CONSTANTS.F
+Compiled : 10/31/18  05:23:29
+Compiler : Version 8.7.6
+Ftnlx    : Version 8503 (libcif 85008)
+Target   : x86-64
+Command  : ftn_driver.exe -hcpu=broadwell -hstatic -D__CRAYXC
+           -D__CRAY_BROADWELL -D__CRAYXT_COMPUTE_LINUX_TARGET -hnetwork=aries
+           -D_MG_MPI -D_MG_INT4 -D_MG_REAL8 -ffree -hlist=a -c MG_CONSTANTS.F
+           -I/opt/cray/pe/cce/8.7.6/cce/x86_64/include/craylibs -I/usr/include
+           -I/usr/include -I/opt/cray/pe/mpt/7.7.3/gni/mpich-cray/8.6/include
+           -I/opt/cray/pe/libsci/18.07.1/CRAY/8.6/x86_64/include
+           -I/opt/cray/rca/2.2.18-6.0.7.0_33.3__g2aa4f39.ari/include
+           -I/opt/cray/pe/pmi/5.0.14/include
+           -I/opt/cray/xpmem/2.2.15-6.0.7.0_35.11__g7549d06.ari/include
+           -I/opt/cray/dmapp/7.1.1-6.0.7.0_34.3__g5a674e0.ari/include
+           -I/opt/cray/gni-headers/5.0.12.0-6.0.7.0_24.1__g3b1768f.ari/include
+           -I/opt/cray/ugni/6.0.14.0-6.0.7.0_23.1__gea11d3d.ari/include
+           -I/opt/cray/udreg/2.3.2-6.0.7.0_33.18__g5196236.ari/include
+           -I/opt/cray/alps/6.6.43-6.0.7.0_26.4__ga796da3.ari/include
+           -I/opt/cray/wlm_detect/1.3.3-6.0.7.0_47.2__g7109084.ari/include
+           -I/opt/cray/krca/2.2.4-6.0.7.0_32.3__g8505b97.ari/include
+           -I/opt/cray-hss-devel/8.0.0/include
+Program
+  Units  : MG_CONSTANTS_MOD
+
+ftnlx report
+------------
+Source   : /lus/scratch/p02128/work/MiniGhost/source/MG_CONSTANTS.F
+Date     : 10/31/2018  05:23:29
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+                          O p t i o n s   R e p o r t
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Options :  -O cache2,scalar2,thread2,vector2,mpi0,modinline,ipa3,noaggress
+           -O autoprefetch,noautothread,fusion2,nomsgs,nonegmsgs,nooverindex
+           -O pattern,shortcircuit2,unroll2,nozeroinc
+           -h noadd_paren,align_arrays,nobounds,caf,noconcurrent,nocontiguous
+           -h nocontiguous_assumed_shape,fma,nofp_trap,nofunc_trace,noomp_analyz
+           e
+           -h noomp_trace,nopat_trace
+           -h safe_addr,thread_do_concurrent,fp2=approx,flex_mp=default         
+           -h alias=default:standard_restrict         
+           -h static (or -static)
+           -h omp,noacc
+           -h cpu=x86-64,broadwell
+           -h network=aries
+           -K trap=none
+           -s default32
+           -eh
+           -d abcdefgijmopqsvwzACEFIPQRST0
+           -e nBDZ 
+           -f free
+           -m3
+           -S /lus/scratch/tmp/pe_4878/MG_CONSTANTS_1.s
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+                          S o u r c e   L i s t i n g
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+
+     %%%    L o o p m a r k   L e g e n d    %%%
+
+     Primary Loop Type        Modifiers
+     ------- ---- ----        ---------
+     A - Pattern matched      a - atomic memory operation
+                              b - blocked
+     C - Collapsed            c - conditional and/or computed
+     D - Deleted               
+     E - Cloned                
+     F - Flat - No calls      f - fused
+     G - Accelerated          g - partitioned
+     I - Inlined              i - interchanged
+     M - Multithreaded        m - partitioned
+                              n - non-blocking remote transfer
+                              p - partial
+     R - Rerolling            r - unrolled
+                              s - shortloop
+     V - Vectorized           w - unwound
+
+     + - More messages listed at end of listing
+     ------------------------------------------
+
+
+    1.        ! ************************************************************************
+    2.        !
+    3.        !               miniGhost: stencil computations with boundary exchange.
+    4.        !                 Copyright (2012) Sandia Corporation
+    5.        !
+    6.        ! Under terms of Contract DE-AC04-94AL85000, there is a non-exclusive
+    7.        ! license for use of this work by or on behalf of the U.S. Government.
+    8.        !
+    9.        ! This library is free software; you can redistribute it and/or modify
+   10.        ! it under the terms of the GNU Lesser General Public License as
+   11.        ! published by the Free Software Foundation; either version 2.1 of the
+   12.        ! License, or (at your option) any later version.
+   13.        !
+   14.        ! This library is distributed in the hope that it will be useful, but
+   15.        ! WITHOUT ANY WARRANTY; without even the implied warranty of
+   16.        ! MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+   17.        ! Lesser General Public License for more details.
+   18.        !
+   19.        ! You should have received a copy of the GNU Lesser General Public
+   20.        ! License along with this library; if not, write to the Free Software
+   21.        ! Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307
+   22.        ! USA
+   23.        ! Questions? Contact Richard F. Barrett (rfbarre@sandia.gov) or
+   24.        !                    Michael A. Heroux (maherou@sandia.gov)
+   25.        !
+   26.        ! ************************************************************************
+   27.         
+   28.        MODULE MG_CONSTANTS_MOD
+   29.        
+   30.           ! Purpose
+   31.           ! =======
+   32.           ! Declarations of various constant values used throughout miniGhost.
+   33.        
+   34.           IMPLICIT NONE
+   35.        
+   36.        #if defined _MG_MPI
+   37.           include 'mpif.h'
+   38.        #endif
+   39.        
+   40.           ! Default types should be used unless otherwise required (e.g. MPI_Wtime is REAL8).
+   41.           ! Fortran datatype parameters
+   42.        
+   43.           INTEGER(KIND=1_4), PARAMETER :: MG_INT4 = 4 
+   44.           INTEGER(KIND=1_4), PARAMETER :: MG_INT8 = 8
+   45.        
+   46.           INTEGER(KIND=1_4), PARAMETER :: MG_REAL4 = 4
+   47.           INTEGER(KIND=1_4), PARAMETER :: MG_REAL8 = 8
+   48.        
+   49.        #if defined ( _MG_INT4 )
+   50.           INTEGER(KIND=1_4), PARAMETER :: MG_INT  = 4
+   51.        #elif defined ( _MG_INT8 )
+   52.    D      INTEGER(KIND=1_4), PARAMETER :: MG_INT = 8
+   53.        #else
+   54.    D      Set INTEGER precision: -D_INT4 or -D_INT8. Default (INT4) was over-ridden?
+   55.        #endif
+   56.        
+   57.        #if defined ( _MG_REAL4 )
+   58.    D      INTEGER(KIND=1_4), PARAMETER :: MG_REAL = 4
+   59.        #elif defined ( _MG_REAL8 )
+   60.           INTEGER(KIND=1_4), PARAMETER :: MG_REAL = 8
+   61.        #else
+   62.    D      Set REAL precision: -D_REAL4 or -D_REAL8. Default (REAL8) was over-ridden?
+   63.        #endif
+   64.        
+   65.        #if defined _MG_MPI
+   66.        #if defined ( _MG_INT4 )
+   67.           INTEGER(MG_INT4), PARAMETER :: MG_MPI_INT = MPI_INTEGER4
+   68.        #elif defined ( _MG_INT8 )
+   69.    D      INTEGER(MG_INT4), PARAMETER :: MG_MPI_INT = MPI_INTEGER8
+   70.        #endif
+   71.        
+   72.        #if defined ( _MG_REAL4 )
+   73.    D      INTEGER(MG_INT4), PARAMETER :: MG_MPI_REAL = MPI_REAL4
+   74.        #elif defined ( _MG_REAL8 )
+   75.           INTEGER(MG_INT4), PARAMETER :: MG_MPI_REAL = MPI_REAL8
+   76.        #endif
+   77.        #endif
+   78.        
+   79.           REAL(KIND=MG_REAL), PARAMETER ::        &
+   80.              EPS           = 1.0E-4,              &
+   81.              GIGA          = 1000000000.0,        &
+   82.              ONE_THOUSAND  = 1000.0,              &
+   83.              ZERO          = 0.0
+   84.        
+   85.           ! ---------
+   86.           ! Variables
+   87.           ! ---------
+   88.        
+   89.           INTEGER(KIND=MG_INT) ::          &
+   90.        
+   91.              GLOBAL_NX,                    &  ! Global dimensions.
+   92.              GLOBAL_NY,                    &
+   93.              GLOBAL_NZ,                    &
+   94.        
+   95.              MY_GLOBAL_NX_START,           &
+   96.              MY_GLOBAL_NY_START,           &
+   97.              MY_GLOBAL_NZ_START,           &  ! Global location.
+   98.              MY_GLOBAL_NX_END,             &
+   99.              MY_GLOBAL_NY_END,             &
+  100.              MY_GLOBAL_NZ_END,             &  ! Global location.
+  101.              NUM_NEIGHS,                   &  ! Number of parallel process (rank) neighbors.
+  102.              NUM_SUM_GRID,                 &  ! Number of variables globally summed each time step.
+  103.        
+  104.              ! Parallel env parameters.
+  105.              MYPE,                         &  ! MPI rank.
+  106.              NUMPES,                       &  ! Number of MPI ranks.
+  107.              MPI_COMM_MG,                  &  ! Duplicate of MPI_COMM_WORLD
+  108.              MYPX, MYPY, MYPZ                 ! Processor position in the processor grid.
+  109.        
+  110.           REAL(KIND=MG_REAL) ::            &
+  111.        
+  112.              ERROR_TOL                        ! Error tolerance.
+  113.        
+  114.           LOGICAL, DIMENSION(:), ALLOCATABLE :: &
+  115.              GRIDS_TO_SUM                     ! List of GRID arrays to sum.
+  116.        
+  117.           INTEGER(KIND=MG_INT), DIMENSION(:,:), ALLOCATABLE ::   &
+  118.              SPIKE_LOC                        ! Location of spike.
+  119.        
+  120.           REAL(KIND=MG_REAL),   DIMENSION(:), ALLOCATABLE ::   &
+  121.        
+  122.              FLUX_OUT,                     &  ! Keeps track of heat dissapation out of physical domain.
+  123.              SOURCE_TOTAL                     ! Keeps track of heat inserted into each variable.
+  124.        
+  125.           REAL(KIND=MG_REAL),   DIMENSION(:,:), ALLOCATABLE ::   &
+  126.              SPIKES                           ! Heat spike to be inserted.
+  127.        
+  128.           REAL(KIND=MG_REAL),   DIMENSION(:,:,:),  ALLOCATABLE ::   &
+  129.              GRID1,  GRID2,  GRID3,  GRID4,  GRID5,  GRID6,  GRID7,  GRID8,  GRID9,  GRID10,     & !
+  130.              GRID11, GRID12, GRID13, GRID14, GRID15, GRID16, GRID17, GRID18, GRID19, GRID20,     & !
+  131.              GRID21, GRID22, GRID23, GRID24, GRID25, GRID26, GRID27, GRID28, GRID29, GRID30,     & !
+  132.              GRID31, GRID32, GRID33, GRID34, GRID35, GRID36, GRID37, GRID38, GRID39, GRID40,     & !
+  133.              WORK
+  134.        
+  135.           INTEGER(KIND=MG_INT), PARAMETER :: &
+  136.        
+  137.              ROOT_PE = 0,                    &
+  138.        
+  139.              NORTH = 1,                      &
+  140.              SOUTH = 2,                      &
+  141.              EAST  = 3,                      &
+  142.              WEST  = 4,                      &
+  143.              BACK  = 5,                      &
+  144.              FRONT = 6,                      &
+  145.        
+  146.              MAX_NUM_NEIGHBORS = 6
+  147.        
+  148.           INTEGER(KIND=MG_INT), PARAMETER ::  &
+  149.        
+  150.              DIR_NORTH_SOUTH = 11,            &
+  151.              DIR_EAST_WEST   = 13,            &
+  152.              DIR_BACK_FRONT  = 15
+  153.        
+  154.           INTEGER(KIND=MG_INT), SAVE :: &
+  155.        
+  156.              COUNT_NORTH = 0,            &
+  157.              COUNT_SOUTH = 0,            &
+  158.              COUNT_EAST  = 0,            &
+  159.              COUNT_WEST  = 0,            &
+  160.              COUNT_BACK  = 0,            &
+  161.              COUNT_FRONT = 0
+  162.        
+  163.           ! ------------------------------
+  164.           ! Message buffer workspace, etc.
+  165.           ! ------------------------------
+  166.        
+  167.           INTEGER(KIND=MG_INT) ::       &
+  168.        
+  169.              TSTEP,                      &  ! Time step counter.
+  170.        
+  171.              MAX_NUM_SENDS,              &
+  172.              MAX_NUM_RECVS,              &
+  173.        
+  174.              NUM_RECVS,                  &  ! Number of recvs posted.
+  175.              NUM_SENDS,                  &
+  176.        
+  177.              COUNT_RECV_BACK,            &
+  178.              COUNT_RECV_FRONT,           &
+  179.              COUNT_RECV_EAST,            &
+  180.              COUNT_RECV_WEST,            &
+  181.              COUNT_RECV_NORTH,           &
+  182.              COUNT_RECV_SOUTH,           &
+  183.        
+  184.              COUNT_SEND_BACK,            &
+  185.              COUNT_SEND_FRONT,           &
+  186.              COUNT_SEND_EAST,            &
+  187.              COUNT_SEND_WEST,            &
+  188.              COUNT_SEND_NORTH,           &
+  189.              COUNT_SEND_SOUTH,           &
+  190.        
+  191.              RECV_BUFFER_NORTH_SIZE,     &
+  192.              RECV_BUFFER_SOUTH_SIZE,     &
+  193.              RECV_BUFFER_EAST_SIZE,      &
+  194.              RECV_BUFFER_WEST_SIZE,      &
+  195.              RECV_BUFFER_BACK_SIZE,      &
+  196.              RECV_BUFFER_FRONT_SIZE,     &
+  197.        
+  198.              SEND_BUFFER_SIZE,           & ! For blocking protocol
+  199.        
+  200.              SEND_BUFFER_NORTH_SIZE,     & ! For nonblocking protocol
+  201.              SEND_BUFFER_SOUTH_SIZE,     & ! For nonblocking protocol
+  202.              SEND_BUFFER_EAST_SIZE,      & ! For nonblocking protocol
+  203.              SEND_BUFFER_WEST_SIZE,      & ! For nonblocking protocol
+  204.              SEND_BUFFER_BACK_SIZE,      & ! For nonblocking protocol
+  205.              SEND_BUFFER_FRONT_SIZE,     & ! For nonblocking protocol
+  206.        
+  207.              MSG_REQ_OFFSET                ! For BSPMA and SVAF
+  208.        
+  209.           INTEGER(KIND=MG_INT),   DIMENSION(:), ALLOCATABLE ::      &
+  210.        
+  211.              MSG_REQS,                    &
+  212.              MSG_TAGS,                    &
+  213.              NEIGHBORS,                   &
+  214.              NEIGHBORS_ORIG,              &  ! Temporary storage for DIAG exchanges. May be needed for AMR?
+  215.              OFFSET_RECV_BUFFER,          &
+  216.        
+  217.              VAR_PTR
+  218.        
+  219.           REAL(KIND=MG_REAL),   DIMENSION(:), ALLOCATABLE ::      &
+  220.        
+  221.              RECV_BUFFER_BACK,            &
+  222.              RECV_BUFFER_FRONT,           &
+  223.              RECV_BUFFER_EAST,            &
+  224.              RECV_BUFFER_WEST,            &
+  225.              RECV_BUFFER_NORTH,           &
+  226.              RECV_BUFFER_SOUTH,           &
+  227.        
+  228.              SEND_BUFFER,                 & ! For blocking protocol
+  229.        
+  230.              SEND_BUFFER_BACK,            & ! For nonblocking protocol
+  231.              SEND_BUFFER_FRONT,           & ! For nonblocking protocol
+  232.              SEND_BUFFER_EAST,            & ! For nonblocking protocol
+  233.              SEND_BUFFER_WEST,            & ! For nonblocking protocol
+  234.              SEND_BUFFER_NORTH,           & ! For nonblocking protocol
+  235.              SEND_BUFFER_SOUTH              ! For nonblocking protocol
+  236.        
+  237.        END MODULE MG_CONSTANTS_MOD
+
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+             C r o s s   R e f e r e n c e   for   MG_CONSTANTS_MOD
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Name                                      Storage/Owner                   
+----                                      -------------                   
+
+BACK                                                                      
+  Parameter, Integer(kind=4)
+  Declared       143
+  Defined   
+  Referenced
+
+COUNT_BACK                                Static offset=0                 
+  Integer(kind=4), Initialized, Save
+  Declared       160
+  Defined   
+  Referenced
+
+COUNT_EAST                                Static offset=64                
+  Integer(kind=4), Initialized, Save
+  Declared       158
+  Defined   
+  Referenced
+
+COUNT_FRONT                               Static offset=128               
+  Integer(kind=4), Initialized, Save
+  Declared       161
+  Defined   
+  Referenced
+
+COUNT_NORTH                               Static offset=192               
+  Integer(kind=4), Initialized, Save
+  Declared       156
+  Defined   
+  Referenced
+
+COUNT_RECV_BACK                           Static offset=0                 
+  Integer(kind=4)
+  Declared       177
+  Defined   
+  Referenced
+
+COUNT_RECV_EAST                           Static offset=64                
+  Integer(kind=4)
+  Declared       179
+  Defined   
+  Referenced
+
+COUNT_RECV_FRONT                          Static offset=128               
+  Integer(kind=4)
+  Declared       178
+  Defined   
+  Referenced
+
+COUNT_RECV_NORTH                          Static offset=192               
+  Integer(kind=4)
+  Declared       181
+  Defined   
+  Referenced
+
+COUNT_RECV_SOUTH                          Static offset=256               
+  Integer(kind=4)
+  Declared       182
+  Defined   
+  Referenced
+
+COUNT_RECV_WEST                           Static offset=320               
+  Integer(kind=4)
+  Declared       180
+  Defined   
+  Referenced
+
+COUNT_SEND_BACK                           Static offset=384               
+  Integer(kind=4)
+  Declared       184
+  Defined   
+  Referenced
+
+COUNT_SEND_EAST                           Static offset=448               
+  Integer(kind=4)
+  Declared       186
+  Defined   
+  Referenced
+
+COUNT_SEND_FRONT                          Static offset=512               
+  Integer(kind=4)
+  Declared       185
+  Defined   
+  Referenced
+
+COUNT_SEND_NORTH                          Static offset=576               
+  Integer(kind=4)
+  Declared       188
+  Defined   
+  Referenced
+
+COUNT_SEND_SOUTH                          Static offset=640               
+  Integer(kind=4)
+  Declared       189
+  Defined   
+  Referenced
+
+COUNT_SEND_WEST                           Static offset=704               
+  Integer(kind=4)
+  Declared       187
+  Defined   
+  Referenced
+
+COUNT_SOUTH                               Static offset=256               
+  Integer(kind=4), Initialized, Save
+  Declared       157
+  Defined   
+  Referenced
+
+COUNT_WEST                                Static offset=320               
+  Integer(kind=4), Initialized, Save
+  Declared       159
+  Defined   
+  Referenced
+
+DIR_BACK_FRONT                                                            
+  Parameter, Integer(kind=4)
+  Declared       152
+  Defined   
+  Referenced
+
+DIR_EAST_WEST                                                             
+  Parameter, Integer(kind=4)
+  Declared       151
+  Defined   
+  Referenced
+
+DIR_NORTH_SOUTH                                                           
+  Parameter, Integer(kind=4)
+  Declared       150
+  Defined   
+  Referenced
+
+EAST                                                                      
+  Parameter, Integer(kind=4)
+  Declared       141
+  Defined   
+  Referenced
+
+EPS                                                                       
+  Parameter, Real(kind=8)
+  Declared        80
+  Defined   
+  Referenced
+
+ERROR_TOL                                 Static offset=768               
+  Real(kind=8)
+  Declared       112
+  Defined   
+  Referenced
+
+FLUX_OUT                                  Heap                            
+  Real(kind=8), Dimension(:), Allocatable
+  Declared       122
+  Defined   
+  Referenced
+
+FRONT                                                                     
+  Parameter, Integer(kind=4)
+  Declared       144
+  Defined   
+  Referenced
+
+GIGA                                                                      
+  Parameter, Real(kind=8)
+  Declared        81
+  Defined   
+  Referenced
+
+GLOBAL_NX                                 Static offset=832               
+  Integer(kind=4)
+  Declared        91
+  Defined   
+  Referenced
+
+GLOBAL_NY                                 Static offset=896               
+  Integer(kind=4)
+  Declared        92
+  Defined   
+  Referenced
+
+GLOBAL_NZ                                 Static offset=960               
+  Integer(kind=4)
+  Declared        93
+  Defined   
+  Referenced
+
+GRID1                                     Heap                            
+  Real(kind=8), Dimension(:,:,:), Allocatable
+  Declared       129
+  Defined   
+  Referenced
+
+GRID10                                    Heap                            
+  Real(kind=8), Dimension(:,:,:), Allocatable
+  Declared       129
+  Defined   
+  Referenced
+
+GRID11                                    Heap                            
+  Real(kind=8), Dimension(:,:,:), Allocatable
+  Declared       130
+  Defined   
+  Referenced
+
+GRID12                                    Heap                            
+  Real(kind=8), Dimension(:,:,:), Allocatable
+  Declared       130
+  Defined   
+  Referenced
+
+GRID13                                    Heap                            
+  Real(kind=8), Dimension(:,:,:), Allocatable
+  Declared       130
+  Defined   
+  Referenced
+
+GRID14                                    Heap                            
+  Real(kind=8), Dimension(:,:,:), Allocatable
+  Declared       130
+  Defined   
+  Referenced
+
+GRID15                                    Heap                            
+  Real(kind=8), Dimension(:,:,:), Allocatable
+  Declared       130
+  Defined   
+  Referenced
+
+GRID16                                    Heap                            
+  Real(kind=8), Dimension(:,:,:), Allocatable
+  Declared       130
+  Defined   
+  Referenced
+
+GRID17                                    Heap                            
+  Real(kind=8), Dimension(:,:,:), Allocatable
+  Declared       130
+  Defined   
+  Referenced
+
+GRID18                                    Heap                            
+  Real(kind=8), Dimension(:,:,:), Allocatable
+  Declared       130
+  Defined   
+  Referenced
+
+GRID19                                    Heap                            
+  Real(kind=8), Dimension(:,:,:), Allocatable
+  Declared       130
+  Defined   
+  Referenced
+
+GRID2                                     Heap                            
+  Real(kind=8), Dimension(:,:,:), Allocatable
+  Declared       129
+  Defined   
+  Referenced
+
+GRID20                                    Heap                            
+  Real(kind=8), Dimension(:,:,:), Allocatable
+  Declared       130
+  Defined   
+  Referenced
+
+GRID21                                    Heap                            
+  Real(kind=8), Dimension(:,:,:), Allocatable
+  Declared       131
+  Defined   
+  Referenced
+
+GRID22                                    Heap                            
+  Real(kind=8), Dimension(:,:,:), Allocatable
+  Declared       131
+  Defined   
+  Referenced
+
+GRID23                                    Heap                            
+  Real(kind=8), Dimension(:,:,:), Allocatable
+  Declared       131
+  Defined   
+  Referenced
+
+GRID24                                    Heap                            
+  Real(kind=8), Dimension(:,:,:), Allocatable
+  Declared       131
+  Defined   
+  Referenced
+
+GRID25                                    Heap                            
+  Real(kind=8), Dimension(:,:,:), Allocatable
+  Declared       131
+  Defined   
+  Referenced
+
+GRID26                                    Heap                            
+  Real(kind=8), Dimension(:,:,:), Allocatable
+  Declared       131
+  Defined   
+  Referenced
+
+GRID27                                    Heap                            
+  Real(kind=8), Dimension(:,:,:), Allocatable
+  Declared       131
+  Defined   
+  Referenced
+
+GRID28                                    Heap                            
+  Real(kind=8), Dimension(:,:,:), Allocatable
+  Declared       131
+  Defined   
+  Referenced
+
+GRID29                                    Heap                            
+  Real(kind=8), Dimension(:,:,:), Allocatable
+  Declared       131
+  Defined   
+  Referenced
+
+GRID3                                     Heap                            
+  Real(kind=8), Dimension(:,:,:), Allocatable
+  Declared       129
+  Defined   
+  Referenced
+
+GRID30                                    Heap                            
+  Real(kind=8), Dimension(:,:,:), Allocatable
+  Declared       131
+  Defined   
+  Referenced
+
+GRID31                                    Heap                            
+  Real(kind=8), Dimension(:,:,:), Allocatable
+  Declared       132
+  Defined   
+  Referenced
+
+GRID32                                    Heap                            
+  Real(kind=8), Dimension(:,:,:), Allocatable
+  Declared       132
+  Defined   
+  Referenced
+
+GRID33                                    Heap                            
+  Real(kind=8), Dimension(:,:,:), Allocatable
+  Declared       132
+  Defined   
+  Referenced
+
+GRID34                                    Heap                            
+  Real(kind=8), Dimension(:,:,:), Allocatable
+  Declared       132
+  Defined   
+  Referenced
+
+GRID35                                    Heap                            
+  Real(kind=8), Dimension(:,:,:), Allocatable
+  Declared       132
+  Defined   
+  Referenced
+
+GRID36                                    Heap                            
+  Real(kind=8), Dimension(:,:,:), Allocatable
+  Declared       132
+  Defined   
+  Referenced
+
+GRID37                                    Heap                            
+  Real(kind=8), Dimension(:,:,:), Allocatable
+  Declared       132
+  Defined   
+  Referenced
+
+GRID38                                    Heap                            
+  Real(kind=8), Dimension(:,:,:), Allocatable
+  Declared       132
+  Defined   
+  Referenced
+
+GRID39                                    Heap                            
+  Real(kind=8), Dimension(:,:,:), Allocatable
+  Declared       132
+  Defined   
+  Referenced
+
+GRID4                                     Heap                            
+  Real(kind=8), Dimension(:,:,:), Allocatable
+  Declared       129
+  Defined   
+  Referenced
+
+GRID40                                    Heap                            
+  Real(kind=8), Dimension(:,:,:), Allocatable
+  Declared       132
+  Defined   
+  Referenced
+
+GRID5                                     Heap                            
+  Real(kind=8), Dimension(:,:,:), Allocatable
+  Declared       129
+  Defined   
+  Referenced
+
+GRID6                                     Heap                            
+  Real(kind=8), Dimension(:,:,:), Allocatable
+  Declared       129
+  Defined   
+  Referenced
+
+GRID7                                     Heap                            
+  Real(kind=8), Dimension(:,:,:), Allocatable
+  Declared       129
+  Defined   
+  Referenced
+
+GRID8                                     Heap                            
+  Real(kind=8), Dimension(:,:,:), Allocatable
+  Declared       129
+  Defined   
+  Referenced
+
+GRID9                                     Heap                            
+  Real(kind=8), Dimension(:,:,:), Allocatable
+  Declared       129
+  Defined   
+  Referenced
+
+GRIDS_TO_SUM                              Heap                            
+  Logical, Dimension(:), Allocatable
+  Declared       115
+  Defined   
+  Referenced
+
+MAX_NUM_NEIGHBORS                                                         
+  Parameter, Integer(kind=4)
+  Declared       146
+  Defined   
+  Referenced
+
+MAX_NUM_RECVS                             Static offset=1024              
+  Integer(kind=4)
+  Declared       172
+  Defined   
+  Referenced
+
+MAX_NUM_SENDS                             Static offset=1088              
+  Integer(kind=4)
+  Declared       171
+  Defined   
+  Referenced
+
+MG_CONSTANTS_MOD                                                          
+  Module
+  Declared        28
+  Defined   
+  Referenced
+
+MG_INT                                                                    
+  Parameter, Integer(kind=1)
+  Declared        50
+  Defined   
+  Referenced      89     117     135     148     154     167     209
+
+MG_INT4                                                                   
+  Parameter, Integer(kind=1)
+  Declared        43
+  Defined   
+  Referenced      67      75
+
+MG_INT8                                                                   
+  Parameter, Integer(kind=1)
+  Declared        44
+  Defined   
+  Referenced
+
+MG_MPI_INT                                                                
+  Parameter, Integer(kind=4)
+  Declared        67
+  Defined   
+  Referenced
+
+MG_MPI_REAL                                                               
+  Parameter, Integer(kind=4)
+  Declared        75
+  Defined   
+  Referenced
+
+MG_REAL                                                                   
+  Parameter, Integer(kind=1)
+  Declared        60
+  Defined   
+  Referenced      79     110     120     125     128     219
+
+MG_REAL4                                                                  
+  Parameter, Integer(kind=1)
+  Declared        46
+  Defined   
+  Referenced
+
+MG_REAL8                                                                  
+  Parameter, Integer(kind=1)
+  Declared        47
+  Defined   
+  Referenced
+
+MPIFCMB5                                                                  
+  Common block 
+  Declared       550     552
+  Defined   
+  Referenced
+
+MPIFCMB9                                                                  
+  Common block 
+  Declared       551     553
+  Defined   
+  Referenced
+
+MPIPRIV1                                                                  
+  Common block 
+  Declared       555     558
+  Defined   
+  Referenced
+
+MPIPRIV2                                                                  
+  Common block 
+  Declared       557     558
+  Defined   
+  Referenced
+
+MPIPRIVC                                                                  
+  Common block 
+  Declared       560     561
+  Defined   
+  Referenced
+
+MPI_2DOUBLE_PRECISION                                                     
+  Parameter, Integer
+  Declared       296     297
+  Defined   
+  Referenced
+
+MPI_2INT                                                                  
+  Parameter, Integer
+  Declared       380     381
+  Defined   
+  Referenced
+
+MPI_2INTEGER                                                              
+  Parameter, Integer
+  Declared       294     295
+  Defined   
+  Referenced
+
+MPI_2REAL                                                                 
+  Parameter, Integer
+  Declared       298     299
+  Defined   
+  Referenced
+
+MPI_ADDRESS_KIND                                                          
+  Parameter, Integer
+  Declared       332     333
+  Defined   
+  Referenced
+
+MPI_AINT                                                                  
+  Parameter, Integer
+  Declared       410     411
+  Defined   
+  Referenced
+
+MPI_ANY_SOURCE                                                            
+  Parameter, Integer
+  Declared       262     263
+  Defined   
+  Referenced
+
+MPI_ANY_TAG                                                               
+  Parameter, Integer
+  Declared       264     265
+  Defined   
+  Referenced
+
+MPI_APPNUM                                                                
+  Parameter, Integer
+  Declared       226     227
+  Defined   
+  Referenced
+
+MPI_ARGVS_NULL                            /MPIPRIVC/ offset=0             
+  Character(1), Dimension(1,1)
+  Declared        16     560
+  Defined   
+  Referenced
+
+MPI_ARGV_NULL                             /MPIPRIVC/ offset=8             
+  Character(1), Dimension(1)
+  Declared        17     560
+  Defined   
+  Referenced
+
+MPI_ASYNC_PROTECTS_NONBLOCKING                                            
+  Parameter, Logical
+  Declared       532     533
+  Defined   
+  Referenced
+
+MPI_BAND                                                                  
+  Parameter, Integer
+  Declared       170     171
+  Defined   
+  Referenced
+
+MPI_BOR                                                                   
+  Parameter, Integer
+  Declared       174     175
+  Defined   
+  Referenced
+
+MPI_BOTTOM                                /MPIPRIV1/ offset=0             
+  Integer
+  Declared       534     555
+  Defined   
+  Referenced
+
+MPI_BSEND_OVERHEAD                                                        
+  Parameter, Integer
+  Declared       258     259
+  Defined   
+  Referenced
+
+MPI_BXOR                                                                  
+  Parameter, Integer
+  Declared       178     179
+  Defined   
+  Referenced
+
+MPI_BYTE                                                                  
+  Parameter, Integer
+  Declared       302     303
+  Defined   
+  Referenced
+
+MPI_CART                                                                  
+  Parameter, Integer
+  Declared       270     271
+  Defined   
+  Referenced
+
+MPI_CHAR                                                                  
+  Parameter, Integer
+  Declared       340     341
+  Defined   
+  Referenced
+
+MPI_CHARACTER                                                             
+  Parameter, Integer
+  Declared       300     301
+  Defined   
+  Referenced
+
+MPI_COMBINER_CONTIGUOUS                                                   
+  Parameter, Integer
+  Declared       428     429
+  Defined   
+  Referenced
+
+MPI_COMBINER_DARRAY                                                       
+  Parameter, Integer
+  Declared       450     451
+  Defined   
+  Referenced
+
+MPI_COMBINER_DUP                                                          
+  Parameter, Integer
+  Declared       426     427
+  Defined   
+  Referenced
+
+MPI_COMBINER_F90_COMPLEX                                                  
+  Parameter, Integer
+  Declared       454     455
+  Defined   
+  Referenced
+
+MPI_COMBINER_F90_INTEGER                                                  
+  Parameter, Integer
+  Declared       456     457
+  Defined   
+  Referenced
+
+MPI_COMBINER_F90_REAL                                                     
+  Parameter, Integer
+  Declared       452     453
+  Defined   
+  Referenced
+
+MPI_COMBINER_HINDEXED                                                     
+  Parameter, Integer
+  Declared       440     441
+  Defined   
+  Referenced
+
+MPI_COMBINER_HINDEXED_BLOCK                                               
+  Parameter, Integer
+  Declared       460     461
+  Defined   
+  Referenced
+
+MPI_COMBINER_HINDEXED_INTEGER                                             
+  Parameter, Integer
+  Declared       438     439
+  Defined   
+  Referenced
+
+MPI_COMBINER_HVECTOR                                                      
+  Parameter, Integer
+  Declared       434     435
+  Defined   
+  Referenced
+
+MPI_COMBINER_HVECTOR_INTEGER                                              
+  Parameter, Integer
+  Declared       432     433
+  Defined   
+  Referenced
+
+MPI_COMBINER_INDEXED                                                      
+  Parameter, Integer
+  Declared       436     437
+  Defined   
+  Referenced
+
+MPI_COMBINER_INDEXED_BLOCK                                                
+  Parameter, Integer
+  Declared       442     443
+  Defined   
+  Referenced
+
+MPI_COMBINER_NAMED                                                        
+  Parameter, Integer
+  Declared       424     425
+  Defined   
+  Referenced
+
+MPI_COMBINER_RESIZED                                                      
+  Parameter, Integer
+  Declared       458     459
+  Defined   
+  Referenced
+
+MPI_COMBINER_STRUCT                                                       
+  Parameter, Integer
+  Declared       446     447
+  Defined   
+  Referenced
+
+MPI_COMBINER_STRUCT_INTEGER                                               
+  Parameter, Integer
+  Declared       444     445
+  Defined   
+  Referenced
+
+MPI_COMBINER_SUBARRAY                                                     
+  Parameter, Integer
+  Declared       448     449
+  Defined   
+  Referenced
+
+MPI_COMBINER_VECTOR                                                       
+  Parameter, Integer
+  Declared       430     431
+  Defined   
+  Referenced
+
+MPI_COMM_DUP_FN                                                           
+  Procedure
+  Declared       539
+  Defined   
+  Referenced
+
+MPI_COMM_MG                               Static offset=1152              
+  Integer(kind=4)
+  Declared       107
+  Defined   
+  Referenced
+
+MPI_COMM_NULL                                                             
+  Parameter, Integer
+  Declared       194     195
+  Defined   
+  Referenced
+
+MPI_COMM_NULL_COPY_FN                                                     
+  Procedure
+  Declared       540
+  Defined   
+  Referenced
+
+MPI_COMM_NULL_DELETE_FN                                                   
+  Procedure
+  Declared       539
+  Defined   
+  Referenced
+
+MPI_COMM_SELF                                                             
+  Parameter, Integer
+  Declared       190     191
+  Defined   
+  Referenced
+
+MPI_COMM_TYPE_SHARED                                                      
+  Parameter, Integer
+  Declared       478     479
+  Defined   
+  Referenced
+
+MPI_COMM_WORLD                                                            
+  Parameter, Integer
+  Declared       188     189
+  Defined   
+  Referenced
+
+MPI_COMPLEX                                                               
+  Parameter, Integer
+  Declared       282     283
+  Defined   
+  Referenced
+
+MPI_COMPLEX16                                                             
+  Parameter, Integer
+  Declared       328     329
+  Defined   
+  Referenced
+
+MPI_COMPLEX32                                                             
+  Parameter, Integer
+  Declared       330     331
+  Defined   
+  Referenced
+
+MPI_COMPLEX8                                                              
+  Parameter, Integer
+  Declared       326     327
+  Defined   
+  Referenced
+
+MPI_CONGRUENT                                                             
+  Parameter, Integer
+  Declared       142     143
+  Defined   
+  Referenced
+
+MPI_CONVERSION_FN_NULL                                                    
+  Procedure
+  Declared       545
+  Defined   
+  Referenced
+
+MPI_COUNT                                                                 
+  Parameter, Integer
+  Declared       414     415
+  Defined   
+  Referenced
+
+MPI_COUNT_KIND                                                            
+  Parameter, Integer
+  Declared       336     337
+  Defined   
+  Referenced
+
+MPI_CXX_BOOL                                                              
+  Parameter, Integer
+  Declared       416     417
+  Defined   
+  Referenced
+
+MPI_CXX_DOUBLE_COMPLEX                                                    
+  Parameter, Integer
+  Declared       420     421
+  Defined   
+  Referenced
+
+MPI_CXX_FLOAT_COMPLEX                                                     
+  Parameter, Integer
+  Declared       418     419
+  Defined   
+  Referenced
+
+MPI_CXX_LONG_DOUBLE_COMPLEX                                               
+  Parameter, Integer
+  Declared       422     423
+  Defined   
+  Referenced
+
+MPI_C_BOOL                                                                
+  Parameter, Integer
+  Declared       400     401
+  Defined   
+  Referenced
+
+MPI_C_COMPLEX                                                             
+  Parameter, Integer
+  Declared       404     405
+  Defined   
+  Referenced
+
+MPI_C_DOUBLE_COMPLEX                                                      
+  Parameter, Integer
+  Declared       406     407
+  Defined   
+  Referenced
+
+MPI_C_FLOAT_COMPLEX                                                       
+  Parameter, Integer
+  Declared       402     403
+  Defined   
+  Referenced
+
+MPI_C_LONG_DOUBLE_COMPLEX                                                 
+  Parameter, Integer
+  Declared       408     409
+  Defined   
+  Referenced
+
+MPI_DATATYPE_NULL                                                         
+  Parameter, Integer
+  Declared       204     205
+  Defined   
+  Referenced     319     325     331     365     383     409
+
+MPI_DISPLACEMENT_CURRENT                                                  
+  Parameter, Integer*8
+  Declared       528     529
+  Defined   
+  Referenced
+
+MPI_DISTRIBUTE_BLOCK                                                      
+  Parameter, Integer
+  Declared       520     521
+  Defined   
+  Referenced
+
+MPI_DISTRIBUTE_CYCLIC                                                     
+  Parameter, Integer
+  Declared       522     523
+  Defined   
+  Referenced
+
+MPI_DISTRIBUTE_DFLT_DARG                                                  
+  Parameter, Integer
+  Declared       526     527
+  Defined   
+  Referenced
+
+MPI_DISTRIBUTE_NONE                                                       
+  Parameter, Integer
+  Declared       524     525
+  Defined   
+  Referenced
+
+MPI_DIST_GRAPH                                                            
+  Parameter, Integer
+  Declared       272     273
+  Defined   
+  Referenced
+
+MPI_DOUBLE                                                                
+  Parameter, Integer
+  Declared       362     363
+  Defined   
+  Referenced
+
+MPI_DOUBLE_COMPLEX                                                        
+  Parameter, Integer
+  Declared       284     285
+  Defined   
+  Referenced
+
+MPI_DOUBLE_INT                                                            
+  Parameter, Integer
+  Declared       374     375
+  Defined   
+  Referenced
+
+MPI_DOUBLE_PRECISION                                                      
+  Parameter, Integer
+  Declared       290     291
+  Defined   
+  Referenced
+
+MPI_DUP_FN                                                                
+  Procedure
+  Declared       536
+  Defined   
+  Referenced
+
+MPI_ERRCODES_IGNORE                       /MPIPRIV2/ offset=160           
+  Integer, Dimension(1)
+  Declared        15     557
+  Defined   
+  Referenced
+
+MPI_ERRHANDLER_NULL                                                       
+  Parameter, Integer
+  Declared       208     209
+  Defined   
+  Referenced
+
+MPI_ERROR                                                                 
+  Parameter, Integer
+  Declared         9      10
+  Defined   
+  Referenced
+
+MPI_ERRORS_ARE_FATAL                                                      
+  Parameter, Integer
+  Declared       136     137
+  Defined   
+  Referenced
+
+MPI_ERRORS_RETURN                                                         
+  Parameter, Integer
+  Declared       138     139
+  Defined   
+  Referenced
+
+MPI_ERR_ACCESS                                                            
+  Parameter, Integer
+  Declared        72      73
+  Defined   
+  Referenced
+
+MPI_ERR_AMODE                                                             
+  Parameter, Integer
+  Declared       124     125
+  Defined   
+  Referenced
+
+MPI_ERR_ARG                                                               
+  Parameter, Integer
+  Declared        92      93
+  Defined   
+  Referenced
+
+MPI_ERR_ASSERT                                                            
+  Parameter, Integer
+  Declared        38      39
+  Defined   
+  Referenced
+
+MPI_ERR_BAD_FILE                                                          
+  Parameter, Integer
+  Declared        60      61
+  Defined   
+  Referenced
+
+MPI_ERR_BASE                                                              
+  Parameter, Integer
+  Declared        84      85
+  Defined   
+  Referenced
+
+MPI_ERR_BUFFER                                                            
+  Parameter, Integer
+  Declared        98      99
+  Defined   
+  Referenced
+
+MPI_ERR_COMM                                                              
+  Parameter, Integer
+  Declared        44      45
+  Defined   
+  Referenced
+
+MPI_ERR_CONVERSION                                                        
+  Parameter, Integer
+  Declared        76      77
+  Defined   
+  Referenced
+
+MPI_ERR_COUNT                                                             
+  Parameter, Integer
+  Declared        22      23
+  Defined   
+  Referenced
+
+MPI_ERR_DIMS                                                              
+  Parameter, Integer
+  Declared       128     129
+  Defined   
+  Referenced
+
+MPI_ERR_DISP                                                              
+  Parameter, Integer
+  Declared       102     103
+  Defined   
+  Referenced
+
+MPI_ERR_DUP_DATAREP                                                       
+  Parameter, Integer
+  Declared        30      31
+  Defined   
+  Referenced
+
+MPI_ERR_FILE                                                              
+  Parameter, Integer
+  Declared        80      81
+  Defined   
+  Referenced
+
+MPI_ERR_FILE_EXISTS                                                       
+  Parameter, Integer
+  Declared        40      41
+  Defined   
+  Referenced
+
+MPI_ERR_FILE_IN_USE                                                       
+  Parameter, Integer
+  Declared       118     119
+  Defined   
+  Referenced
+
+MPI_ERR_GROUP                                                             
+  Parameter, Integer
+  Declared       106     107
+  Defined   
+  Referenced
+
+MPI_ERR_INFO                                                              
+  Parameter, Integer
+  Declared       114     115
+  Defined   
+  Referenced
+
+MPI_ERR_INFO_KEY                                                          
+  Parameter, Integer
+  Declared        90      91
+  Defined   
+  Referenced
+
+MPI_ERR_INFO_NOKEY                                                        
+  Parameter, Integer
+  Declared        36      37
+  Defined   
+  Referenced
+
+MPI_ERR_INFO_VALUE                                                        
+  Parameter, Integer
+  Declared        54      55
+  Defined   
+  Referenced
+
+MPI_ERR_INTERN                                                            
+  Parameter, Integer
+  Declared       134     135
+  Defined   
+  Referenced
+
+MPI_ERR_IN_STATUS                                                         
+  Parameter, Integer
+  Declared        88      89
+  Defined   
+  Referenced
+
+MPI_ERR_IO                                                                
+  Parameter, Integer
+  Declared        68      69
+  Defined   
+  Referenced
+
+MPI_ERR_KEYVAL                                                            
+  Parameter, Integer
+  Declared        46      47
+  Defined   
+  Referenced
+
+MPI_ERR_LASTCODE                                                          
+  Parameter, Integer
+  Declared       100     101
+  Defined   
+  Referenced
+
+MPI_ERR_LOCKTYPE                                                          
+  Parameter, Integer
+  Declared        26      27
+  Defined   
+  Referenced
+
+MPI_ERR_NAME                                                              
+  Parameter, Integer
+  Declared        48      49
+  Defined   
+  Referenced
+
+MPI_ERR_NOT_SAME                                                          
+  Parameter, Integer
+  Declared       112     113
+  Defined   
+  Referenced
+
+MPI_ERR_NO_MEM                                                            
+  Parameter, Integer
+  Declared        58      59
+  Defined   
+  Referenced
+
+MPI_ERR_NO_SPACE                                                          
+  Parameter, Integer
+  Declared        74      75
+  Defined   
+  Referenced
+
+MPI_ERR_NO_SUCH_FILE                                                      
+  Parameter, Integer
+  Declared       130     131
+  Defined   
+  Referenced
+
+MPI_ERR_OP                                                                
+  Parameter, Integer
+  Declared        28      29
+  Defined   
+  Referenced
+
+MPI_ERR_OTHER                                                             
+  Parameter, Integer
+  Declared        20      21
+  Defined   
+  Referenced
+
+MPI_ERR_PENDING                                                           
+  Parameter, Integer
+  Declared        42      43
+  Defined   
+  Referenced
+
+MPI_ERR_PORT                                                              
+  Parameter, Integer
+  Declared       104     105
+  Defined   
+  Referenced
+
+MPI_ERR_QUOTA                                                             
+  Parameter, Integer
+  Declared        62      63
+  Defined   
+  Referenced
+
+MPI_ERR_RANK                                                              
+  Parameter, Integer
+  Declared       126     127
+  Defined   
+  Referenced
+
+MPI_ERR_READ_ONLY                                                         
+  Parameter, Integer
+  Declared        94      95
+  Defined   
+  Referenced
+
+MPI_ERR_REQUEST                                                           
+  Parameter, Integer
+  Declared        50      51
+  Defined   
+  Referenced
+
+MPI_ERR_RMA_ATTACH                                                        
+  Parameter, Integer
+  Declared       120     121
+  Defined   
+  Referenced
+
+MPI_ERR_RMA_CONFLICT                                                      
+  Parameter, Integer
+  Declared        86      87
+  Defined   
+  Referenced
+
+MPI_ERR_RMA_FLAVOR                                                        
+  Parameter, Integer
+  Declared        70      71
+  Defined   
+  Referenced
+
+MPI_ERR_RMA_RANGE                                                         
+  Parameter, Integer
+  Declared       132     133
+  Defined   
+  Referenced
+
+MPI_ERR_RMA_SHARED                                                        
+  Parameter, Integer
+  Declared        82      83
+  Defined   
+  Referenced
+
+MPI_ERR_RMA_SYNC                                                          
+  Parameter, Integer
+  Declared        56      57
+  Defined   
+  Referenced
+
+MPI_ERR_ROOT                                                              
+  Parameter, Integer
+  Declared        64      65
+  Defined   
+  Referenced
+
+MPI_ERR_SERVICE                                                           
+  Parameter, Integer
+  Declared        66      67
+  Defined   
+  Referenced
+
+MPI_ERR_SIZE                                                              
+  Parameter, Integer
+  Declared        96      97
+  Defined   
+  Referenced
+
+MPI_ERR_SPAWN                                                             
+  Parameter, Integer
+  Declared        24      25
+  Defined   
+  Referenced
+
+MPI_ERR_TAG                                                               
+  Parameter, Integer
+  Declared       110     111
+  Defined   
+  Referenced
+
+MPI_ERR_TOPOLOGY                                                          
+  Parameter, Integer
+  Declared       108     109
+  Defined   
+  Referenced
+
+MPI_ERR_TRUNCATE                                                          
+  Parameter, Integer
+  Declared        34      35
+  Defined   
+  Referenced
+
+MPI_ERR_TYPE                                                              
+  Parameter, Integer
+  Declared        52      53
+  Defined   
+  Referenced
+
+MPI_ERR_UNKNOWN                                                           
+  Parameter, Integer
+  Declared       116     117
+  Defined   
+  Referenced
+
+MPI_ERR_UNSUPPORTED_DATAREP                                               
+  Parameter, Integer
+  Declared        32      33
+  Defined   
+  Referenced
+
+MPI_ERR_UNSUPPORTED_OPERATION                                             
+  Parameter, Integer
+  Declared       122     123
+  Defined   
+  Referenced
+
+MPI_ERR_WIN                                                               
+  Parameter, Integer
+  Declared        78      79
+  Defined   
+  Referenced
+
+MPI_FILE_NULL                                                             
+  Parameter, Integer
+  Declared       198     199
+  Defined   
+  Referenced
+
+MPI_FLOAT                                                                 
+  Parameter, Integer
+  Declared       360     361
+  Defined   
+  Referenced
+
+MPI_FLOAT_INT                                                             
+  Parameter, Integer
+  Declared       372     373
+  Defined   
+  Referenced
+
+MPI_GRAPH                                                                 
+  Parameter, Integer
+  Declared       268     269
+  Defined   
+  Referenced
+
+MPI_GROUP_EMPTY                                                           
+  Parameter, Integer
+  Declared       192     193
+  Defined   
+  Referenced
+
+MPI_GROUP_NULL                                                            
+  Parameter, Integer
+  Declared       200     201
+  Defined   
+  Referenced
+
+MPI_HOST                                                                  
+  Parameter, Integer
+  Declared       216     217
+  Defined   
+  Referenced
+
+MPI_IDENT                                                                 
+  Parameter, Integer
+  Declared       140     141
+  Defined   
+  Referenced
+
+MPI_INFO_ENV                                                              
+  Parameter, Integer
+  Declared       212     213
+  Defined   
+  Referenced
+
+MPI_INFO_NULL                                                             
+  Parameter, Integer
+  Declared       210     211
+  Defined   
+  Referenced
+
+MPI_INT                                                                   
+  Parameter, Integer
+  Declared       352     353
+  Defined   
+  Referenced
+
+MPI_INT16_T                                                               
+  Parameter, Integer
+  Declared       386     387
+  Defined   
+  Referenced
+
+MPI_INT32_T                                                               
+  Parameter, Integer
+  Declared       388     389
+  Defined   
+  Referenced
+
+MPI_INT64_T                                                               
+  Parameter, Integer
+  Declared       390     391
+  Defined   
+  Referenced
+
+MPI_INT8_T                                                                
+  Parameter, Integer
+  Declared       384     385
+  Defined   
+  Referenced
+
+MPI_INTEGER                                                               
+  Parameter, Integer
+  Declared       292     293
+  Defined   
+  Referenced
+
+MPI_INTEGER1                                                              
+  Parameter, Integer
+  Declared       310     311
+  Defined   
+  Referenced
+
+MPI_INTEGER16                                                             
+  Parameter, Integer
+  Declared       318     319
+  Defined   
+  Referenced
+
+MPI_INTEGER2                                                              
+  Parameter, Integer
+  Declared       312     313
+  Defined   
+  Referenced
+
+MPI_INTEGER4                                                              
+  Parameter, Integer
+  Declared       314     315
+  Defined   
+  Referenced      67
+
+MPI_INTEGER8                                                              
+  Parameter, Integer
+  Declared       316     317
+  Defined   
+  Referenced
+
+MPI_INTEGER_KIND                                                          
+  Parameter, Integer
+  Declared       338     339
+  Defined   
+  Referenced
+
+MPI_IN_PLACE                              /MPIPRIV1/ offset=32            
+  Integer
+  Declared       534     555
+  Defined   
+  Referenced
+
+MPI_IO                                                                    
+  Parameter, Integer
+  Declared       218     219
+  Defined   
+  Referenced
+
+MPI_KEYVAL_INVALID                                                        
+  Parameter, Integer
+  Declared       256     257
+  Defined   
+  Referenced
+
+MPI_LAND                                                                  
+  Parameter, Integer
+  Declared       168     169
+  Defined   
+  Referenced
+
+MPI_LASTUSEDCODE                                                          
+  Parameter, Integer
+  Declared       224     225
+  Defined   
+  Referenced
+
+MPI_LB                                                                    
+  Parameter, Integer
+  Declared       306     307
+  Defined   
+  Referenced
+
+MPI_LOCK_EXCLUSIVE                                                        
+  Parameter, Integer
+  Declared       278     279
+  Defined   
+  Referenced
+
+MPI_LOCK_SHARED                                                           
+  Parameter, Integer
+  Declared       280     281
+  Defined   
+  Referenced
+
+MPI_LOGICAL                                                               
+  Parameter, Integer
+  Declared       286     287
+  Defined   
+  Referenced
+
+MPI_LONG                                                                  
+  Parameter, Integer
+  Declared       356     357
+  Defined   
+  Referenced
+
+MPI_LONG_DOUBLE                                                           
+  Parameter, Integer
+  Declared       364     365
+  Defined   
+  Referenced
+
+MPI_LONG_DOUBLE_INT                                                       
+  Parameter, Integer
+  Declared       382     383
+  Defined   
+  Referenced
+
+MPI_LONG_INT                                                              
+  Parameter, Integer
+  Declared       376     377
+  Defined   
+  Referenced
+
+MPI_LONG_LONG                                                             
+  Parameter, Integer
+  Declared       370     371
+  Defined   
+  Referenced
+
+MPI_LONG_LONG_INT                                                         
+  Parameter, Integer
+  Declared       366     367
+  Defined   
+  Referenced
+
+MPI_LOR                                                                   
+  Parameter, Integer
+  Declared       172     173
+  Defined   
+  Referenced
+
+MPI_LXOR                                                                  
+  Parameter, Integer
+  Declared       176     177
+  Defined   
+  Referenced
+
+MPI_MAX                                                                   
+  Parameter, Integer
+  Declared       160     161
+  Defined   
+  Referenced
+
+MPI_MAXLOC                                                                
+  Parameter, Integer
+  Declared       182     183
+  Defined   
+  Referenced
+
+MPI_MAX_DATAREP_STRING                                                    
+  Parameter, Integer
+  Declared       250     251
+  Defined   
+  Referenced
+
+MPI_MAX_ERROR_STRING                                                      
+  Parameter, Integer
+  Declared       238     239
+  Defined   
+  Referenced
+
+MPI_MAX_INFO_KEY                                                          
+  Parameter, Integer
+  Declared       244     245
+  Defined   
+  Referenced
+
+MPI_MAX_INFO_VAL                                                          
+  Parameter, Integer
+  Declared       246     247
+  Defined   
+  Referenced
+
+MPI_MAX_LIBRARY_VERSION_STRING                                            
+  Parameter, Integer
+  Declared       252     253
+  Defined   
+  Referenced
+
+MPI_MAX_OBJECT_NAME                                                       
+  Parameter, Integer
+  Declared       242     243
+  Defined   
+  Referenced
+
+MPI_MAX_PORT_NAME                                                         
+  Parameter, Integer
+  Declared       240     241
+  Defined   
+  Referenced
+
+MPI_MAX_PROCESSOR_NAME                                                    
+  Parameter, Integer
+  Declared       248     249
+  Defined   
+  Referenced
+
+MPI_MESSAGE_NO_PROC                                                       
+  Parameter, Integer
+  Declared       482     483
+  Defined   
+  Referenced
+
+MPI_MESSAGE_NULL                                                          
+  Parameter, Integer
+  Declared       480     481
+  Defined   
+  Referenced
+
+MPI_MIN                                                                   
+  Parameter, Integer
+  Declared       162     163
+  Defined   
+  Referenced
+
+MPI_MINLOC                                                                
+  Parameter, Integer
+  Declared       180     181
+  Defined   
+  Referenced
+
+MPI_MODE_APPEND                                                           
+  Parameter, Integer
+  Declared       506     507
+  Defined   
+  Referenced
+
+MPI_MODE_CREATE                                                           
+  Parameter, Integer
+  Declared       502     503
+  Defined   
+  Referenced
+
+MPI_MODE_DELETE_ON_CLOSE                                                  
+  Parameter, Integer
+  Declared       498     499
+  Defined   
+  Referenced
+
+MPI_MODE_EXCL                                                             
+  Parameter, Integer
+  Declared       504     505
+  Defined   
+  Referenced
+
+MPI_MODE_NOCHECK                                                          
+  Parameter, Integer
+  Declared       468     469
+  Defined   
+  Referenced
+
+MPI_MODE_NOPRECEDE                                                        
+  Parameter, Integer
+  Declared       474     475
+  Defined   
+  Referenced
+
+MPI_MODE_NOPUT                                                            
+  Parameter, Integer
+  Declared       472     473
+  Defined   
+  Referenced
+
+MPI_MODE_NOSTORE                                                          
+  Parameter, Integer
+  Declared       470     471
+  Defined   
+  Referenced
+
+MPI_MODE_NOSUCCEED                                                        
+  Parameter, Integer
+  Declared       476     477
+  Defined   
+  Referenced
+
+MPI_MODE_RDONLY                                                           
+  Parameter, Integer
+  Declared       492     493
+  Defined   
+  Referenced
+
+MPI_MODE_RDWR                                                             
+  Parameter, Integer
+  Declared       494     495
+  Defined   
+  Referenced
+
+MPI_MODE_SEQUENTIAL                                                       
+  Parameter, Integer
+  Declared       508     509
+  Defined   
+  Referenced
+
+MPI_MODE_UNIQUE_OPEN                                                      
+  Parameter, Integer
+  Declared       500     501
+  Defined   
+  Referenced
+
+MPI_MODE_WRONLY                                                           
+  Parameter, Integer
+  Declared       496     497
+  Defined   
+  Referenced
+
+MPI_NO_OP                                                                 
+  Parameter, Integer
+  Declared       186     187
+  Defined   
+  Referenced
+
+MPI_NULL_COPY_FN                                                          
+  Procedure
+  Declared       536
+  Defined   
+  Referenced
+
+MPI_NULL_DELETE_FN                                                        
+  Procedure
+  Declared       536
+  Defined   
+  Referenced
+
+MPI_OFFSET                                                                
+  Parameter, Integer
+  Declared       412     413
+  Defined   
+  Referenced
+
+MPI_OFFSET_KIND                                                           
+  Parameter, Integer
+  Declared       334     335
+  Defined   
+  Referenced
+
+MPI_OP_NULL                                                               
+  Parameter, Integer
+  Declared       202     203
+  Defined   
+  Referenced
+
+MPI_ORDER_C                                                               
+  Parameter, Integer
+  Declared       516     517
+  Defined   
+  Referenced
+
+MPI_ORDER_FORTRAN                                                         
+  Parameter, Integer
+  Declared       518     519
+  Defined   
+  Referenced
+
+MPI_PACKED                                                                
+  Parameter, Integer
+  Declared       308     309
+  Defined   
+  Referenced
+
+MPI_PROC_NULL                                                             
+  Parameter, Integer
+  Declared       260     261
+  Defined   
+  Referenced
+
+MPI_PROD                                                                  
+  Parameter, Integer
+  Declared       166     167
+  Defined   
+  Referenced
+
+MPI_REAL                                                                  
+  Parameter, Integer
+  Declared       288     289
+  Defined   
+  Referenced
+
+MPI_REAL16                                                                
+  Parameter, Integer
+  Declared       324     325
+  Defined   
+  Referenced
+
+MPI_REAL4                                                                 
+  Parameter, Integer
+  Declared       320     321
+  Defined   
+  Referenced
+
+MPI_REAL8                                                                 
+  Parameter, Integer
+  Declared       322     323
+  Defined   
+  Referenced      75
+
+MPI_REPLACE                                                               
+  Parameter, Integer
+  Declared       184     185
+  Defined   
+  Referenced
+
+MPI_REQUEST_NULL                                                          
+  Parameter, Integer
+  Declared       206     207
+  Defined   
+  Referenced
+
+MPI_ROOT                                                                  
+  Parameter, Integer
+  Declared       266     267
+  Defined   
+  Referenced
+
+MPI_SEEK_CUR                                                              
+  Parameter, Integer
+  Declared       512     513
+  Defined   
+  Referenced
+
+MPI_SEEK_END                                                              
+  Parameter, Integer
+  Declared       514     515
+  Defined   
+  Referenced
+
+MPI_SEEK_SET                                                              
+  Parameter, Integer
+  Declared       510     511
+  Defined   
+  Referenced
+
+MPI_SHORT                                                                 
+  Parameter, Integer
+  Declared       348     349
+  Defined   
+  Referenced
+
+MPI_SHORT_INT                                                             
+  Parameter, Integer
+  Declared       378     379
+  Defined   
+  Referenced
+
+MPI_SIGNED_CHAR                                                           
+  Parameter, Integer
+  Declared       342     343
+  Defined   
+  Referenced
+
+MPI_SIMILAR                                                               
+  Parameter, Integer
+  Declared       144     145
+  Defined   
+  Referenced
+
+MPI_SOURCE                                                                
+  Parameter, Integer
+  Declared         9      10
+  Defined   
+  Referenced
+
+MPI_STATUSES_IGNORE                       /MPIPRIV2/ offset=0             
+  Integer, Dimension(5,1)
+  Declared        14     557
+  Defined   
+  Referenced
+
+MPI_STATUS_IGNORE                         /MPIPRIV1/ offset=64            
+  Integer, Dimension(5)
+  Declared        13     555
+  Defined   
+  Referenced
+
+MPI_STATUS_SIZE                                                           
+  Parameter, Integer
+  Declared        11      12
+  Defined   
+  Referenced      13      14
+
+MPI_SUBARRAYS_SUPPORTED                                                   
+  Parameter, Logical
+  Declared       530     531
+  Defined   
+  Referenced
+
+MPI_SUBVERSION                                                            
+  Parameter, Integer
+  Declared       276     277
+  Defined   
+  Referenced
+
+MPI_SUCCESS                                                               
+  Parameter, Integer
+  Declared        18      19
+  Defined   
+  Referenced
+
+MPI_SUM                                                                   
+  Parameter, Integer
+  Declared       164     165
+  Defined   
+  Referenced
+
+MPI_TAG                                                                   
+  Parameter, Integer
+  Declared         9      10
+  Defined   
+  Referenced
+
+MPI_TAG_UB                                                                
+  Parameter, Integer
+  Declared       214     215
+  Defined   
+  Referenced
+
+MPI_THREAD_FUNNELED                                                       
+  Parameter, Integer
+  Declared       486     487
+  Defined   
+  Referenced
+
+MPI_THREAD_MULTIPLE                                                       
+  Parameter, Integer
+  Declared       490     491
+  Defined   
+  Referenced
+
+MPI_THREAD_SERIALIZED                                                     
+  Parameter, Integer
+  Declared       488     489
+  Defined   
+  Referenced
+
+MPI_THREAD_SINGLE                                                         
+  Parameter, Integer
+  Declared       484     485
+  Defined   
+  Referenced
+
+MPI_TYPECLASS_COMPLEX                                                     
+  Parameter, Integer
+  Declared       466     467
+  Defined   
+  Referenced
+
+MPI_TYPECLASS_INTEGER                                                     
+  Parameter, Integer
+  Declared       464     465
+  Defined   
+  Referenced
+
+MPI_TYPECLASS_REAL                                                        
+  Parameter, Integer
+  Declared       462     463
+  Defined   
+  Referenced
+
+MPI_TYPE_DUP_FN                                                           
+  Procedure
+  Declared       543
+  Defined   
+  Referenced
+
+MPI_TYPE_NULL_COPY_FN                                                     
+  Procedure
+  Declared       544
+  Defined   
+  Referenced
+
+MPI_TYPE_NULL_DELETE_FN                                                   
+  Procedure
+  Declared       543
+  Defined   
+  Referenced
+
+MPI_UB                                                                    
+  Parameter, Integer
+  Declared       304     305
+  Defined   
+  Referenced
+
+MPI_UINT16_T                                                              
+  Parameter, Integer
+  Declared       394     395
+  Defined   
+  Referenced
+
+MPI_UINT32_T                                                              
+  Parameter, Integer
+  Declared       396     397
+  Defined   
+  Referenced
+
+MPI_UINT64_T                                                              
+  Parameter, Integer
+  Declared       398     399
+  Defined   
+  Referenced
+
+MPI_UINT8_T                                                               
+  Parameter, Integer
+  Declared       392     393
+  Defined   
+  Referenced
+
+MPI_UNDEFINED                                                             
+  Parameter, Integer
+  Declared       254     255
+  Defined   
+  Referenced
+
+MPI_UNEQUAL                                                               
+  Parameter, Integer
+  Declared       146     147
+  Defined   
+  Referenced
+
+MPI_UNIVERSE_SIZE                                                         
+  Parameter, Integer
+  Declared       222     223
+  Defined   
+  Referenced
+
+MPI_UNSIGNED                                                              
+  Parameter, Integer
+  Declared       354     355
+  Defined   
+  Referenced
+
+MPI_UNSIGNED_CHAR                                                         
+  Parameter, Integer
+  Declared       344     345
+  Defined   
+  Referenced
+
+MPI_UNSIGNED_LONG                                                         
+  Parameter, Integer
+  Declared       358     359
+  Defined   
+  Referenced
+
+MPI_UNSIGNED_LONG_LONG                                                    
+  Parameter, Integer
+  Declared       368     369
+  Defined   
+  Referenced
+
+MPI_UNSIGNED_SHORT                                                        
+  Parameter, Integer
+  Declared       350     351
+  Defined   
+  Referenced
+
+MPI_UNWEIGHTED                            /MPIFCMB5/ offset=0             
+  Integer
+  Declared       534     550
+  Defined   
+  Referenced
+
+MPI_VERSION                                                               
+  Parameter, Integer
+  Declared       274     275
+  Defined   
+  Referenced
+
+MPI_WCHAR                                                                 
+  Parameter, Integer
+  Declared       346     347
+  Defined   
+  Referenced
+
+MPI_WEIGHTS_EMPTY                         /MPIFCMB9/ offset=0             
+  Integer
+  Declared       535     551
+  Defined   
+  Referenced
+
+MPI_WIN_BASE                                                              
+  Parameter, Integer
+  Declared       228     229
+  Defined   
+  Referenced
+
+MPI_WIN_CREATE_FLAVOR                                                     
+  Parameter, Integer
+  Declared       234     235
+  Defined   
+  Referenced
+
+MPI_WIN_DISP_UNIT                                                         
+  Parameter, Integer
+  Declared       232     233
+  Defined   
+  Referenced
+
+MPI_WIN_DUP_FN                                                            
+  Procedure
+  Declared       541
+  Defined   
+  Referenced
+
+MPI_WIN_FLAVOR_ALLOCATE                                                   
+  Parameter, Integer
+  Declared       150     151
+  Defined   
+  Referenced
+
+MPI_WIN_FLAVOR_CREATE                                                     
+  Parameter, Integer
+  Declared       148     149
+  Defined   
+  Referenced
+
+MPI_WIN_FLAVOR_DYNAMIC                                                    
+  Parameter, Integer
+  Declared       152     153
+  Defined   
+  Referenced
+
+MPI_WIN_FLAVOR_SHARED                                                     
+  Parameter, Integer
+  Declared       154     155
+  Defined   
+  Referenced
+
+MPI_WIN_MODEL                                                             
+  Parameter, Integer
+  Declared       236     237
+  Defined   
+  Referenced
+
+MPI_WIN_NULL                                                              
+  Parameter, Integer
+  Declared       196     197
+  Defined   
+  Referenced
+
+MPI_WIN_NULL_COPY_FN                                                      
+  Procedure
+  Declared       542
+  Defined   
+  Referenced
+
+MPI_WIN_NULL_DELETE_FN                                                    
+  Procedure
+  Declared       541
+  Defined   
+  Referenced
+
+MPI_WIN_SEPARATE                                                          
+  Parameter, Integer
+  Declared       156     157
+  Defined   
+  Referenced
+
+MPI_WIN_SIZE                                                              
+  Parameter, Integer
+  Declared       230     231
+  Defined   
+  Referenced
+
+MPI_WIN_UNIFIED                                                           
+  Parameter, Integer
+  Declared       158     159
+  Defined   
+  Referenced
+
+MPI_WTICK                                                                 
+  Function, Real*8, result(MPI_WTICK), External
+  Declared       537     546
+  Defined   
+  Referenced
+
+MPI_WTIME                                                                 
+  Function, Real*8, result(MPI_WTIME), External
+  Declared       537     546
+  Defined   
+  Referenced
+
+MPI_WTIME_IS_GLOBAL                                                       
+  Parameter, Integer
+  Declared       220     221
+  Defined   
+  Referenced
+
+MSG_REQS                                  Heap                            
+  Integer(kind=4), Dimension(:), Allocatable
+  Declared       211
+  Defined   
+  Referenced
+
+MSG_REQ_OFFSET                            Static offset=1216              
+  Integer(kind=4)
+  Declared       207
+  Defined   
+  Referenced
+
+MSG_TAGS                                  Heap                            
+  Integer(kind=4), Dimension(:), Allocatable
+  Declared       212
+  Defined   
+  Referenced
+
+MYPE                                      Static offset=1280              
+  Integer(kind=4)
+  Declared       105
+  Defined   
+  Referenced
+
+MYPX                                      Static offset=1344              
+  Integer(kind=4)
+  Declared       108
+  Defined   
+  Referenced
+
+MYPY                                      Static offset=1408              
+  Integer(kind=4)
+  Declared       108
+  Defined   
+  Referenced
+
+MYPZ                                      Static offset=1472              
+  Integer(kind=4)
+  Declared       108
+  Defined   
+  Referenced
+
+MY_GLOBAL_NX_END                          Static offset=1536              
+  Integer(kind=4)
+  Declared        98
+  Defined   
+  Referenced
+
+MY_GLOBAL_NX_START                        Static offset=1600              
+  Integer(kind=4)
+  Declared        95
+  Defined   
+  Referenced
+
+MY_GLOBAL_NY_END                          Static offset=1664              
+  Integer(kind=4)
+  Declared        99
+  Defined   
+  Referenced
+
+MY_GLOBAL_NY_START                        Static offset=1728              
+  Integer(kind=4)
+  Declared        96
+  Defined   
+  Referenced
+
+MY_GLOBAL_NZ_END                          Static offset=1792              
+  Integer(kind=4)
+  Declared       100
+  Defined   
+  Referenced
+
+MY_GLOBAL_NZ_START                        Static offset=1856              
+  Integer(kind=4)
+  Declared        97
+  Defined   
+  Referenced
+
+NEIGHBORS                                 Heap                            
+  Integer(kind=4), Dimension(:), Allocatable
+  Declared       213
+  Defined   
+  Referenced
+
+NEIGHBORS_ORIG                            Heap                            
+  Integer(kind=4), Dimension(:), Allocatable
+  Declared       214
+  Defined   
+  Referenced
+
+NORTH                                                                     
+  Parameter, Integer(kind=4)
+  Declared       139
+  Defined   
+  Referenced
+
+NUMPES                                    Static offset=1920              
+  Integer(kind=4)
+  Declared       106
+  Defined   
+  Referenced
+
+NUM_NEIGHS                                Static offset=1984              
+  Integer(kind=4)
+  Declared       101
+  Defined   
+  Referenced
+
+NUM_RECVS                                 Static offset=2048              
+  Integer(kind=4)
+  Declared       174
+  Defined   
+  Referenced
+
+NUM_SENDS                                 Static offset=2112              
+  Integer(kind=4)
+  Declared       175
+  Defined   
+  Referenced
+
+NUM_SUM_GRID                              Static offset=2176              
+  Integer(kind=4)
+  Declared       102
+  Defined   
+  Referenced
+
+OFFSET_RECV_BUFFER                        Heap                            
+  Integer(kind=4), Dimension(:), Allocatable
+  Declared       215
+  Defined   
+  Referenced
+
+ONE_THOUSAND                                                              
+  Parameter, Real(kind=8)
+  Declared        82
+  Defined   
+  Referenced
+
+PMPI_WTICK                                                                
+  Function, Real*8, result(PMPI_WTICK), External
+  Declared       538     547
+  Defined   
+  Referenced
+
+PMPI_WTIME                                                                
+  Function, Real*8, result(PMPI_WTIME), External
+  Declared       538     547
+  Defined   
+  Referenced
+
+RECV_BUFFER_BACK                          Heap                            
+  Real(kind=8), Dimension(:), Allocatable
+  Declared       221
+  Defined   
+  Referenced
+
+RECV_BUFFER_BACK_SIZE                     Static offset=2240              
+  Integer(kind=4)
+  Declared       195
+  Defined   
+  Referenced
+
+RECV_BUFFER_EAST                          Heap                            
+  Real(kind=8), Dimension(:), Allocatable
+  Declared       223
+  Defined   
+  Referenced
+
+RECV_BUFFER_EAST_SIZE                     Static offset=2304              
+  Integer(kind=4)
+  Declared       193
+  Defined   
+  Referenced
+
+RECV_BUFFER_FRONT                         Heap                            
+  Real(kind=8), Dimension(:), Allocatable
+  Declared       222
+  Defined   
+  Referenced
+
+RECV_BUFFER_FRONT_SIZE                    Static offset=2368              
+  Integer(kind=4)
+  Declared       196
+  Defined   
+  Referenced
+
+RECV_BUFFER_NORTH                         Heap                            
+  Real(kind=8), Dimension(:), Allocatable
+  Declared       225
+  Defined   
+  Referenced
+
+RECV_BUFFER_NORTH_SIZE                    Static offset=2432              
+  Integer(kind=4)
+  Declared       191
+  Defined   
+  Referenced
+
+RECV_BUFFER_SOUTH                         Heap                            
+  Real(kind=8), Dimension(:), Allocatable
+  Declared       226
+  Defined   
+  Referenced
+
+RECV_BUFFER_SOUTH_SIZE                    Static offset=2496              
+  Integer(kind=4)
+  Declared       192
+  Defined   
+  Referenced
+
+RECV_BUFFER_WEST                          Heap                            
+  Real(kind=8), Dimension(:), Allocatable
+  Declared       224
+  Defined   
+  Referenced
+
+RECV_BUFFER_WEST_SIZE                     Static offset=2560              
+  Integer(kind=4)
+  Declared       194
+  Defined   
+  Referenced
+
+ROOT_PE                                                                   
+  Parameter, Integer(kind=4)
+  Declared       137
+  Defined   
+  Referenced
+
+SEND_BUFFER                               Heap                            
+  Real(kind=8), Dimension(:), Allocatable
+  Declared       228
+  Defined   
+  Referenced
+
+SEND_BUFFER_BACK                          Heap                            
+  Real(kind=8), Dimension(:), Allocatable
+  Declared       230
+  Defined   
+  Referenced
+
+SEND_BUFFER_BACK_SIZE                     Static offset=2624              
+  Integer(kind=4)
+  Declared       204
+  Defined   
+  Referenced
+
+SEND_BUFFER_EAST                          Heap                            
+  Real(kind=8), Dimension(:), Allocatable
+  Declared       232
+  Defined   
+  Referenced
+
+SEND_BUFFER_EAST_SIZE                     Static offset=2688              
+  Integer(kind=4)
+  Declared       202
+  Defined   
+  Referenced
+
+SEND_BUFFER_FRONT                         Heap                            
+  Real(kind=8), Dimension(:), Allocatable
+  Declared       231
+  Defined   
+  Referenced
+
+SEND_BUFFER_FRONT_SIZE                    Static offset=2752              
+  Integer(kind=4)
+  Declared       205
+  Defined   
+  Referenced
+
+SEND_BUFFER_NORTH                         Heap                            
+  Real(kind=8), Dimension(:), Allocatable
+  Declared       234
+  Defined   
+  Referenced
+
+SEND_BUFFER_NORTH_SIZE                    Static offset=2816              
+  Integer(kind=4)
+  Declared       200
+  Defined   
+  Referenced
+
+SEND_BUFFER_SIZE                          Static offset=2880              
+  Integer(kind=4)
+  Declared       198
+  Defined   
+  Referenced
+
+SEND_BUFFER_SOUTH                         Heap                            
+  Real(kind=8), Dimension(:), Allocatable
+  Declared       235
+  Defined   
+  Referenced
+
+SEND_BUFFER_SOUTH_SIZE                    Static offset=2944              
+  Integer(kind=4)
+  Declared       201
+  Defined   
+  Referenced
+
+SEND_BUFFER_WEST                          Heap                            
+  Real(kind=8), Dimension(:), Allocatable
+  Declared       233
+  Defined   
+  Referenced
+
+SEND_BUFFER_WEST_SIZE                     Static offset=3008              
+  Integer(kind=4)
+  Declared       203
+  Defined   
+  Referenced
+
+SOURCE_TOTAL                              Heap                            
+  Real(kind=8), Dimension(:), Allocatable
+  Declared       123
+  Defined   
+  Referenced
+
+SOUTH                                                                     
+  Parameter, Integer(kind=4)
+  Declared       140
+  Defined   
+  Referenced
+
+SPIKES                                    Heap                            
+  Real(kind=8), Dimension(:,:), Allocatable
+  Declared       126
+  Defined   
+  Referenced
+
+SPIKE_LOC                                 Heap                            
+  Integer(kind=4), Dimension(:,:), Allocatable
+  Declared       118
+  Defined   
+  Referenced
+
+TSTEP                                     Static offset=3072              
+  Integer(kind=4)
+  Declared       169
+  Defined   
+  Referenced
+
+VAR_PTR                                   Heap                            
+  Integer(kind=4), Dimension(:), Allocatable
+  Declared       217
+  Defined   
+  Referenced
+
+WEST                                                                      
+  Parameter, Integer(kind=4)
+  Declared       142
+  Defined   
+  Referenced
+
+WORK                                      Heap                            
+  Real(kind=8), Dimension(:,:,:), Allocatable
+  Declared       133
+  Defined   
+  Referenced
+
+ZERO                                                                      
+  Parameter, Real(kind=8)
+  Declared        83
+  Defined   
+  Referenced
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+                     C o m m o n   B l o c k   R e p o r t
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Blk  Program Unit                     Messages
+---  ------------                     --------
+/MPIFCMB5/                            Length: 4 bytes
+
+     MG_CONSTANTS_MOD                 
+
+Blk  Program Unit                     Messages
+---  ------------                     --------
+/MPIFCMB9/                            Length: 4 bytes
+
+     MG_CONSTANTS_MOD                 
+
+Blk  Program Unit                     Messages
+---  ------------                     --------
+/MPIPRIV1/                            Length: 28 bytes
+
+     MG_CONSTANTS_MOD                 
+
+Blk  Program Unit                     Messages
+---  ------------                     --------
+/MPIPRIV2/                            Length: 24 bytes
+
+     MG_CONSTANTS_MOD                 
+
+Blk  Program Unit                     Messages
+---  ------------                     --------
+/MPIPRIVC/                            Length: 2 bytes
+
+     MG_CONSTANTS_MOD                 
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+                         E x t e r n a l   R e p o r t
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Name  Messages
+----  --------
+MG_CONSTANTS_MOD
+      Defined as:  Module (line 28, file MG_CONSTANTS.F)
+
+                   Does not use any module and is not used by any procedure.
+
+Name  Messages
+----  --------
+MPI_COMM_DUP_FN
+      Defined as:  No definitions.
+
+                   No calls.  It is not called and does not use any procedure.
+
+Name  Messages
+----  --------
+MPI_COMM_NULL_COPY_FN
+      Defined as:  No definitions.
+
+                   No calls.  It is not called and does not use any procedure.
+
+Name  Messages
+----  --------
+MPI_COMM_NULL_DELETE_FN
+      Defined as:  No definitions.
+
+                   No calls.  It is not called and does not use any procedure.
+
+Name  Messages
+----  --------
+MPI_CONVERSION_FN_NULL
+      Defined as:  No definitions.
+
+                   No calls.  It is not called and does not use any procedure.
+
+Name  Messages
+----  --------
+MPI_DUP_FN
+      Defined as:  No definitions.
+
+                   No calls.  It is not called and does not use any procedure.
+
+Name  Messages
+----  --------
+MPI_NULL_COPY_FN
+      Defined as:  No definitions.
+
+                   No calls.  It is not called and does not use any procedure.
+
+Name  Messages
+----  --------
+MPI_NULL_DELETE_FN
+      Defined as:  No definitions.
+
+                   No calls.  It is not called and does not use any procedure.
+
+Name  Messages
+----  --------
+MPI_TYPE_DUP_FN
+      Defined as:  No definitions.
+
+                   No calls.  It is not called and does not use any procedure.
+
+Name  Messages
+----  --------
+MPI_TYPE_NULL_COPY_FN
+      Defined as:  No definitions.
+
+                   No calls.  It is not called and does not use any procedure.
+
+Name  Messages
+----  --------
+MPI_TYPE_NULL_DELETE_FN
+      Defined as:  No definitions.
+
+                   No calls.  It is not called and does not use any procedure.
+
+Name  Messages
+----  --------
+MPI_WIN_DUP_FN
+      Defined as:  No definitions.
+
+                   No calls.  It is not called and does not use any procedure.
+
+Name  Messages
+----  --------
+MPI_WIN_NULL_COPY_FN
+      Defined as:  No definitions.
+
+                   No calls.  It is not called and does not use any procedure.
+
+Name  Messages
+----  --------
+MPI_WIN_NULL_DELETE_FN
+      Defined as:  No definitions.
+
+                   No calls.  It is not called and does not use any procedure.
+
+Name  Messages
+----  --------
+MPI_WTICK
+      Defined as:  No definitions.
+
+                   No calls.  It is not called and does not use any procedure.
+
+      Interface:   None
+
+Name  Messages
+----  --------
+MPI_WTIME
+      Defined as:  No definitions.
+
+                   No calls.  It is not called and does not use any procedure.
+
+      Interface:   None
+
+Name  Messages
+----  --------
+PMPI_WTICK
+      Defined as:  No definitions.
+
+                   No calls.  It is not called and does not use any procedure.
+
+      Interface:   None
+
+Name  Messages
+----  --------
+PMPI_WTIME
+      Defined as:  No definitions.
+
+                   No calls.  It is not called and does not use any procedure.
+
+      Interface:   None
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%

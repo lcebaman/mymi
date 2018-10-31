@@ -1,0 +1,1188 @@
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+                          S u m m a r y   R e p o r t
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Compilation
+-----------
+File     : /lus/scratch/p02128/work/MiniGhost/source/MG_IRECV.F
+Compiled : 10/31/18  05:23:39
+Compiler : Version 8.7.6
+Ftnlx    : Version 8503 (libcif 85008)
+Target   : x86-64
+Command  : ftn_driver.exe -hcpu=broadwell -hstatic -D__CRAYXC
+           -D__CRAY_BROADWELL -D__CRAYXT_COMPUTE_LINUX_TARGET -hnetwork=aries
+           -D_MG_MPI -D_MG_INT4 -D_MG_REAL8 -ffree -hlist=a -c MG_IRECV.F
+           -I/opt/cray/pe/cce/8.7.6/cce/x86_64/include/craylibs -I/usr/include
+           -I/usr/include -I/opt/cray/pe/mpt/7.7.3/gni/mpich-cray/8.6/include
+           -I/opt/cray/pe/libsci/18.07.1/CRAY/8.6/x86_64/include
+           -I/opt/cray/rca/2.2.18-6.0.7.0_33.3__g2aa4f39.ari/include
+           -I/opt/cray/pe/pmi/5.0.14/include
+           -I/opt/cray/xpmem/2.2.15-6.0.7.0_35.11__g7549d06.ari/include
+           -I/opt/cray/dmapp/7.1.1-6.0.7.0_34.3__g5a674e0.ari/include
+           -I/opt/cray/gni-headers/5.0.12.0-6.0.7.0_24.1__g3b1768f.ari/include
+           -I/opt/cray/ugni/6.0.14.0-6.0.7.0_23.1__gea11d3d.ari/include
+           -I/opt/cray/udreg/2.3.2-6.0.7.0_33.18__g5196236.ari/include
+           -I/opt/cray/alps/6.6.43-6.0.7.0_26.4__ga796da3.ari/include
+           -I/opt/cray/wlm_detect/1.3.3-6.0.7.0_47.2__g7109084.ari/include
+           -I/opt/cray/krca/2.2.4-6.0.7.0_32.3__g8505b97.ari/include
+           -I/opt/cray-hss-devel/8.0.0/include
+Program
+  Units  : MG_IRECV_MOD
+
+ftnlx report
+------------
+Source   : /lus/scratch/p02128/work/MiniGhost/source/MG_IRECV.F
+Date     : 10/31/2018  05:23:39
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+                          O p t i o n s   R e p o r t
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Options :  -O cache2,scalar2,thread2,vector2,mpi0,modinline,ipa3,noaggress
+           -O autoprefetch,noautothread,fusion2,nomsgs,nonegmsgs,nooverindex
+           -O pattern,shortcircuit2,unroll2,nozeroinc
+           -h noadd_paren,align_arrays,nobounds,caf,noconcurrent,nocontiguous
+           -h nocontiguous_assumed_shape,fma,nofp_trap,nofunc_trace,noomp_analyz
+           e
+           -h noomp_trace,nopat_trace
+           -h safe_addr,thread_do_concurrent,fp2=approx,flex_mp=default         
+           -h alias=default:standard_restrict         
+           -h static (or -static)
+           -h omp,noacc
+           -h cpu=x86-64,broadwell
+           -h network=aries
+           -K trap=none
+           -s default32
+           -eh
+           -d abcdefgijmopqsvwzACEFIPQRST0
+           -e nBDZ 
+           -f free
+           -m3
+           -S /lus/scratch/tmp/pe_5173/MG_IRECV_1.s
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+                          S o u r c e   L i s t i n g
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+
+     %%%    L o o p m a r k   L e g e n d    %%%
+
+     Primary Loop Type        Modifiers
+     ------- ---- ----        ---------
+     A - Pattern matched      a - atomic memory operation
+                              b - blocked
+     C - Collapsed            c - conditional and/or computed
+     D - Deleted               
+     E - Cloned                
+     F - Flat - No calls      f - fused
+     G - Accelerated          g - partitioned
+     I - Inlined              i - interchanged
+     M - Multithreaded        m - partitioned
+                              n - non-blocking remote transfer
+                              p - partial
+     R - Rerolling            r - unrolled
+                              s - shortloop
+     V - Vectorized           w - unwound
+
+     + - More messages listed at end of listing
+     ------------------------------------------
+
+
+    1.     ! ************************************************************************
+    2.     !
+    3.     !               miniGhost: stencil computations with boundary exchange.
+    4.     !                 Copyright (2012) Sandia Corporation
+    5.     !
+    6.     ! Under terms of Contract DE-AC04-94AL85000, there is a non-exclusive
+    7.     ! license for use of this work by or on behalf of the U.S. Government.
+    8.     !
+    9.     ! This library is free software; you can redistribute it and/or modify
+   10.     ! it under the terms of the GNU Lesser General Public License as
+   11.     ! published by the Free Software Foundation; either version 2.1 of the
+   12.     ! License, or (at your option) any later version.
+   13.     !
+   14.     ! This library is distributed in the hope that it will be useful, but
+   15.     ! WITHOUT ANY WARRANTY; without even the implied warranty of
+   16.     ! MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+   17.     ! Lesser General Public License for more details.
+   18.     !
+   19.     ! You should have received a copy of the GNU Lesser General Public
+   20.     ! License along with this library; if not, write to the Free Software
+   21.     ! Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307
+   22.     ! USA
+   23.     ! Questions? Contact Richard F. Barrett (rfbarre@sandia.gov) or
+   24.     !                    Michael A. Heroux (maherou@sandia.gov)
+   25.     !
+   26.     ! ************************************************************************
+   27.     
+   28.     MODULE MG_IRECV_MOD
+   29.     
+   30.        ! Purpose
+   31.        ! =======
+   32.        ! Receiving of neighbor boundary data using MPI non-blocking functionality.
+   33.     
+   34.        USE MG_CONSTANTS_MOD
+   35.        USE MG_UTILS_MOD
+   36.        USE MG_PROFILING_MOD
+   37.     
+   38.        IMPLICIT NONE
+   39.     
+   40.     CONTAINS
+   41.        
+   42.        SUBROUTINE MG_IRECV ( IERR )
+   43.        
+   44.           ! ---------------------
+   45.           ! Argument Declarations
+   46.           ! ---------------------
+   47.     
+   48.           INTEGER, INTENT(OUT) :: &
+   49.              IERR           ! Return status
+   50.     
+   51.           ! ------------------
+   52.           ! Local Declarations
+   53.           ! ------------------
+   54.     
+   55.           REAL(KIND=MG_REAL8) ::      &
+   56.              TIME_START,              &
+   57.              TIME_START_DIR
+   58.     
+   59.           ! ---------------------
+   60.           ! Executable Statements
+   61.           ! ---------------------
+   62.        
+   63.           IERR = 0
+   64.     
+   65.           IF ( NUMPES == 1 ) &
+   66.              RETURN
+   67.     
+   68.     #if defined _MG_MPI
+   69.     
+   70.  +        TIME_START = MG_TIMER()
+   71.     
+   72.           ! --------------
+   73.           ! Post receives:
+   74.           ! --------------
+   75.     
+   76.           NUM_RECVS = 0
+   77.     
+   78.           COUNT_RECV_NORTH = RECV_BUFFER_NORTH_SIZE
+   79.           COUNT_RECV_SOUTH = RECV_BUFFER_SOUTH_SIZE
+   80.           COUNT_RECV_EAST  = RECV_BUFFER_EAST_SIZE
+   81.           COUNT_RECV_WEST  = RECV_BUFFER_WEST_SIZE
+   82.           COUNT_RECV_BACK  = RECV_BUFFER_BACK_SIZE
+   83.           COUNT_RECV_FRONT = RECV_BUFFER_FRONT_SIZE
+   84.     
+   85.           ! Back boundary
+   86.        
+   87.           IF ( NEIGHBORS(BACK) /= -1 ) THEN
+   88.     
+   89.  +           TIME_START_DIR = MG_TIMER ()
+   90.              NUM_RECVS = NUM_RECVS + 1
+   91.  +           CALL MPI_IRECV ( RECV_BUFFER_BACK, COUNT_RECV_BACK, MG_MPI_REAL, &
+   92.                               NEIGHBORS(BACK), MSG_TAGS(FRONT),              &
+   93.                               MPI_COMM_MG, MSG_REQS(BACK), IERR )
+   94.  +           MG_PERF%TIME_RECV_Z_PE = MG_PERF%TIME_RECV_Z_PE + MG_TIMER () - &
+   95.                                       TIME_START_DIR
+   96.     
+   97.              MG_PERF%RECV_COUNT  = MG_PERF%RECV_COUNT + COUNT_RECV_BACK
+   98.              IF ( COUNT_RECV_BACK > MG_PERF%RECV_COUNT_MAX ) THEN
+   99.                 MG_PERF%RECV_COUNT_MAX = COUNT_RECV_BACK
+  100.              END IF
+  101.              IF ( COUNT_RECV_BACK < MG_PERF%RECV_COUNT_MIN ) THEN
+  102.                 MG_PERF%RECV_COUNT_MIN = COUNT_RECV_BACK
+  103.              END IF
+  104.     
+  105.           END IF
+  106.        
+  107.           ! Front boundary
+  108.        
+  109.           IF ( NEIGHBORS(FRONT) /= -1 ) THEN
+  110.     
+  111.  +           TIME_START_DIR = MG_TIMER ()
+  112.              NUM_RECVS = NUM_RECVS + 1
+  113.  +           CALL MPI_IRECV ( RECV_BUFFER_FRONT, COUNT_RECV_FRONT, MG_MPI_REAL,   &
+  114.                               NEIGHBORS(FRONT), MSG_TAGS(BACK),                &
+  115.                               MPI_COMM_MG, MSG_REQS(FRONT), IERR )
+  116.  +           MG_PERF%TIME_RECV_Z_PE = MG_PERF%TIME_RECV_Z_PE + MG_TIMER () - &
+  117.                                       TIME_START_DIR
+  118.     
+  119.              MG_PERF%RECV_COUNT  = MG_PERF%RECV_COUNT + COUNT_RECV_FRONT
+  120.              IF ( COUNT_RECV_FRONT > MG_PERF%RECV_COUNT_MAX ) THEN
+  121.                 MG_PERF%RECV_COUNT_MAX = COUNT_RECV_FRONT
+  122.              END IF
+  123.              IF ( COUNT_RECV_FRONT < MG_PERF%RECV_COUNT_MIN ) THEN
+  124.                 MG_PERF%RECV_COUNT_MIN = COUNT_RECV_FRONT
+  125.              END IF
+  126.     
+  127.           END IF
+  128.        
+  129.           ! East boundary
+  130.        
+  131.           IF ( NEIGHBORS(EAST) /= -1 ) THEN
+  132.     
+  133.  +           TIME_START_DIR = MG_TIMER ()
+  134.              NUM_RECVS = NUM_RECVS + 1
+  135.  +           CALL MPI_IRECV ( RECV_BUFFER_EAST, COUNT_RECV_EAST, MG_MPI_REAL, &
+  136.                               NEIGHBORS(EAST), MSG_TAGS(WEST),              &
+  137.                               MPI_COMM_MG, MSG_REQS(EAST), IERR )
+  138.  +           MG_PERF%TIME_RECV_X_PE = MG_PERF%TIME_RECV_X_PE + MG_TIMER () - &
+  139.                                       TIME_START_DIR
+  140.     
+  141.              MG_PERF%RECV_COUNT  = MG_PERF%RECV_COUNT + COUNT_RECV_EAST
+  142.              IF ( COUNT_RECV_EAST > MG_PERF%RECV_COUNT_MAX ) THEN
+  143.                 MG_PERF%RECV_COUNT_MAX = COUNT_RECV_EAST
+  144.              END IF
+  145.              IF ( COUNT_RECV_EAST < MG_PERF%RECV_COUNT_MIN ) THEN
+  146.                 MG_PERF%RECV_COUNT_MIN = COUNT_RECV_EAST
+  147.              END IF
+  148.     
+  149.           END IF
+  150.        
+  151.           ! West boundary
+  152.        
+  153.           IF ( NEIGHBORS(WEST) /= -1 ) THEN
+  154.     
+  155.  +           TIME_START_DIR = MG_TIMER ()
+  156.              NUM_RECVS = NUM_RECVS + 1
+  157.  +           CALL MPI_IRECV ( RECV_BUFFER_WEST, COUNT_RECV_WEST, MG_MPI_REAL, &
+  158.                               NEIGHBORS(WEST), MSG_TAGS(EAST),                &
+  159.                               MPI_COMM_MG, MSG_REQS(WEST), IERR )
+  160.  +           MG_PERF%TIME_RECV_X_PE = MG_PERF%TIME_RECV_X_PE + MG_TIMER () - &
+  161.                                       TIME_START_DIR
+  162.     
+  163.              MG_PERF%RECV_COUNT  = MG_PERF%RECV_COUNT + COUNT_RECV_WEST
+  164.              IF ( COUNT_RECV_WEST > MG_PERF%RECV_COUNT_MAX ) THEN
+  165.                 MG_PERF%RECV_COUNT_MAX = COUNT_RECV_WEST
+  166.              END IF
+  167.              IF ( COUNT_RECV_WEST < MG_PERF%RECV_COUNT_MIN ) THEN
+  168.                 MG_PERF%RECV_COUNT_MIN = COUNT_RECV_WEST
+  169.              END IF
+  170.     
+  171.           END IF
+  172.        
+  173.           ! North boundary
+  174.        
+  175.           IF ( NEIGHBORS(NORTH) /= -1 ) THEN
+  176.     
+  177.  +           TIME_START_DIR = MG_TIMER ()
+  178.              NUM_RECVS = NUM_RECVS + 1
+  179.  +           CALL MPI_IRECV ( RECV_BUFFER_NORTH, COUNT_RECV_NORTH, MG_MPI_REAL,   &
+  180.                               NEIGHBORS(NORTH), MSG_TAGS(SOUTH),                &
+  181.                               MPI_COMM_MG, MSG_REQS(NORTH), IERR )
+  182.  +           MG_PERF%TIME_RECV_Y_PE = MG_PERF%TIME_RECV_Y_PE + MG_TIMER () - &
+  183.                                       TIME_START_DIR
+  184.     
+  185.              MG_PERF%RECV_COUNT  = MG_PERF%RECV_COUNT + COUNT_RECV_NORTH
+  186.              IF ( COUNT_RECV_NORTH > MG_PERF%RECV_COUNT_MAX ) THEN
+  187.                 MG_PERF%RECV_COUNT_MAX = COUNT_RECV_NORTH
+  188.              END IF
+  189.              IF ( COUNT_RECV_NORTH < MG_PERF%RECV_COUNT_MIN ) THEN
+  190.                 MG_PERF%RECV_COUNT_MIN = COUNT_RECV_NORTH
+  191.              END IF
+  192.     
+  193.           END IF
+  194.        
+  195.           ! South boundary
+  196.        
+  197.           IF ( NEIGHBORS(SOUTH) /= -1 ) THEN
+  198.     
+  199.  +           TIME_START_DIR = MG_TIMER ()
+  200.              NUM_RECVS = NUM_RECVS + 1
+  201.  +           CALL MPI_IRECV ( RECV_BUFFER_SOUTH, COUNT_RECV_SOUTH, MG_MPI_REAL, &
+  202.                               NEIGHBORS(SOUTH), MSG_TAGS(NORTH),                &
+  203.                               MPI_COMM_MG, MSG_REQS(SOUTH), IERR )
+  204.  +           MG_PERF%TIME_RECV_Y_PE = MG_PERF%TIME_RECV_Y_PE + MG_TIMER () - &
+  205.                                       TIME_START_DIR
+  206.     
+  207.              MG_PERF%RECV_COUNT  = MG_PERF%RECV_COUNT + COUNT_RECV_SOUTH
+  208.              IF ( COUNT_RECV_SOUTH > MG_PERF%RECV_COUNT_MAX ) THEN
+  209.                 MG_PERF%RECV_COUNT_MAX = COUNT_RECV_SOUTH
+  210.              END IF
+  211.              IF ( COUNT_RECV_SOUTH < MG_PERF%RECV_COUNT_MIN ) THEN
+  212.                 MG_PERF%RECV_COUNT_MIN = COUNT_RECV_SOUTH
+  213.              END IF
+  214.     
+  215.           END IF
+  216.     
+  217.  +        MG_PERF%TIME_RECV_PE = MG_PERF%TIME_RECV_PE + MG_TIMER() - TIME_START
+  218.     
+  219.           MG_PERF%NUM_RECVS = MG_PERF%NUM_RECVS + NUM_RECVS
+  220.     
+  221.     #endif _MPI
+  222.     
+  223.           RETURN
+  224.     
+  225.        END SUBROUTINE MG_IRECV
+  226.        
+  227.     END MODULE MG_IRECV_MOD
+
+ftn-3118 ftn: IPA MG_IRECV, File = MG_IRECV.F, Line = 70, Column = 20 
+  "mg_timer" (called from "mg_irecv") was not inlined because the call site will not flatten.  "mpi_wtime_" is missing.
+
+ftn-3118 ftn: IPA MG_IRECV, File = MG_IRECV.F, Line = 89, Column = 27 
+  "mg_timer" (called from "mg_irecv") was not inlined because the call site will not flatten.  "mpi_wtime_" is missing.
+
+ftn-3021 ftn: IPA MG_IRECV, File = MG_IRECV.F, Line = 91, Column = 15 
+  "mpi_irecv" (called from "mg_irecv") was not inlined because the compiler was unable to locate the routine.
+
+ftn-3118 ftn: IPA MG_IRECV, File = MG_IRECV.F, Line = 94, Column = 60 
+  "mg_timer" (called from "mg_irecv") was not inlined because the call site will not flatten.  "mpi_wtime_" is missing.
+
+ftn-3118 ftn: IPA MG_IRECV, File = MG_IRECV.F, Line = 111, Column = 27 
+  "mg_timer" (called from "mg_irecv") was not inlined because the call site will not flatten.  "mpi_wtime_" is missing.
+
+ftn-3021 ftn: IPA MG_IRECV, File = MG_IRECV.F, Line = 113, Column = 15 
+  "mpi_irecv" (called from "mg_irecv") was not inlined because the compiler was unable to locate the routine.
+
+ftn-3118 ftn: IPA MG_IRECV, File = MG_IRECV.F, Line = 116, Column = 60 
+  "mg_timer" (called from "mg_irecv") was not inlined because the call site will not flatten.  "mpi_wtime_" is missing.
+
+ftn-3118 ftn: IPA MG_IRECV, File = MG_IRECV.F, Line = 133, Column = 27 
+  "mg_timer" (called from "mg_irecv") was not inlined because the call site will not flatten.  "mpi_wtime_" is missing.
+
+ftn-3021 ftn: IPA MG_IRECV, File = MG_IRECV.F, Line = 135, Column = 15 
+  "mpi_irecv" (called from "mg_irecv") was not inlined because the compiler was unable to locate the routine.
+
+ftn-3118 ftn: IPA MG_IRECV, File = MG_IRECV.F, Line = 138, Column = 60 
+  "mg_timer" (called from "mg_irecv") was not inlined because the call site will not flatten.  "mpi_wtime_" is missing.
+
+ftn-3118 ftn: IPA MG_IRECV, File = MG_IRECV.F, Line = 155, Column = 27 
+  "mg_timer" (called from "mg_irecv") was not inlined because the call site will not flatten.  "mpi_wtime_" is missing.
+
+ftn-3021 ftn: IPA MG_IRECV, File = MG_IRECV.F, Line = 157, Column = 15 
+  "mpi_irecv" (called from "mg_irecv") was not inlined because the compiler was unable to locate the routine.
+
+ftn-3118 ftn: IPA MG_IRECV, File = MG_IRECV.F, Line = 160, Column = 60 
+  "mg_timer" (called from "mg_irecv") was not inlined because the call site will not flatten.  "mpi_wtime_" is missing.
+
+ftn-3118 ftn: IPA MG_IRECV, File = MG_IRECV.F, Line = 177, Column = 27 
+  "mg_timer" (called from "mg_irecv") was not inlined because the call site will not flatten.  "mpi_wtime_" is missing.
+
+ftn-3021 ftn: IPA MG_IRECV, File = MG_IRECV.F, Line = 179, Column = 15 
+  "mpi_irecv" (called from "mg_irecv") was not inlined because the compiler was unable to locate the routine.
+
+ftn-3118 ftn: IPA MG_IRECV, File = MG_IRECV.F, Line = 182, Column = 60 
+  "mg_timer" (called from "mg_irecv") was not inlined because the call site will not flatten.  "mpi_wtime_" is missing.
+
+ftn-3118 ftn: IPA MG_IRECV, File = MG_IRECV.F, Line = 199, Column = 27 
+  "mg_timer" (called from "mg_irecv") was not inlined because the call site will not flatten.  "mpi_wtime_" is missing.
+
+ftn-3021 ftn: IPA MG_IRECV, File = MG_IRECV.F, Line = 201, Column = 15 
+  "mpi_irecv" (called from "mg_irecv") was not inlined because the compiler was unable to locate the routine.
+
+ftn-3118 ftn: IPA MG_IRECV, File = MG_IRECV.F, Line = 204, Column = 60 
+  "mg_timer" (called from "mg_irecv") was not inlined because the call site will not flatten.  "mpi_wtime_" is missing.
+
+ftn-3118 ftn: IPA MG_IRECV, File = MG_IRECV.F, Line = 217, Column = 53 
+  "mg_timer" (called from "mg_irecv") was not inlined because the call site will not flatten.  "mpi_wtime_" is missing.
+
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+               C r o s s   R e f e r e n c e   for   MG_IRECV_MOD
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Name                                      Storage/Owner                   
+----                                      -------------                   
+
+BACK                                      Module MG_CONSTANTS_MOD         
+  Parameter, Integer(kind=4), Use assoc
+  Declared  
+  Defined   
+  Referenced      87      92      93     114
+  Referenced in contained procedure
+
+COUNT_RECV_BACK                           Module MG_CONSTANTS_MOD         
+  Integer(kind=4), Use assoc
+  Declared  
+  Defined         82
+  Referenced      91      97      98      99     101     102
+  Referenced in contained procedure
+
+COUNT_RECV_EAST                           Module MG_CONSTANTS_MOD         
+  Integer(kind=4), Use assoc
+  Declared  
+  Defined         80
+  Referenced     135     141     142     143     145     146
+  Referenced in contained procedure
+
+COUNT_RECV_FRONT                          Module MG_CONSTANTS_MOD         
+  Integer(kind=4), Use assoc
+  Declared  
+  Defined         83
+  Referenced     113     119     120     121     123     124
+  Referenced in contained procedure
+
+COUNT_RECV_NORTH                          Module MG_CONSTANTS_MOD         
+  Integer(kind=4), Use assoc
+  Declared  
+  Defined         78
+  Referenced     179     185     186     187     189     190
+  Referenced in contained procedure
+
+COUNT_RECV_SOUTH                          Module MG_CONSTANTS_MOD         
+  Integer(kind=4), Use assoc
+  Declared  
+  Defined         79
+  Referenced     201     207     208     209     211     212
+  Referenced in contained procedure
+
+COUNT_RECV_WEST                           Module MG_CONSTANTS_MOD         
+  Integer(kind=4), Use assoc
+  Declared  
+  Defined         81
+  Referenced     157     163     164     165     167     168
+  Referenced in contained procedure
+
+EAST                                      Module MG_CONSTANTS_MOD         
+  Parameter, Integer(kind=4), Use assoc
+  Declared  
+  Defined   
+  Referenced     131     136     137     158
+  Referenced in contained procedure
+
+FRONT                                     Module MG_CONSTANTS_MOD         
+  Parameter, Integer(kind=4), Use assoc
+  Declared  
+  Defined   
+  Referenced      92     109     114     115
+  Referenced in contained procedure
+
+IERR                                      MG_IRECV                        
+  Dummy Argument, Integer, Intent(out)
+  Declared        42      49
+  Defined         63
+  Referenced      93     115     137     159     181     203
+
+MG_CONSTANTS_MOD                                                          
+  Module, Used indirectly (from module MG_UTILS_MOD)
+  Declared  
+  Defined   
+  Referenced
+
+MG_CONSTANTS_MOD                                                          
+  Module
+  Declared  
+  Defined   
+  Referenced      34
+
+MG_CONSTANTS_MOD                                                          
+  Module, Used indirectly (from module MG_PROFILING_MOD)
+  Declared  
+  Defined   
+  Referenced
+
+MG_ENV_MOD                                                                
+  Module, Used indirectly (from module MG_PROFILING_MOD)
+  Declared  
+  Defined   
+  Referenced
+
+MG_IRECV                                                                  
+  Subroutine, Module procedure
+  Declared        42
+  Defined   
+  Referenced
+
+MG_IRECV_MOD                                                              
+  Module
+  Declared        28
+  Defined   
+  Referenced
+
+MG_MPI_REAL                               Module MG_CONSTANTS_MOD         
+  Parameter, Integer(kind=4), Use assoc
+  Declared  
+  Defined   
+  Referenced      91     113     135     157     179     201
+  Referenced in contained procedure
+
+MG_OPTIONS_MOD                                                            
+  Module, Used indirectly (from module MG_PROFILING_MOD)
+  Declared  
+  Defined   
+  Referenced
+
+MG_OPTIONS_MOD                                                            
+  Module, Used indirectly (from module MG_UTILS_MOD)
+  Declared  
+  Defined   
+  Referenced
+
+MG_PERF                                   Module MG_PROFILING_MOD         
+  TYPE(PERF_CHECK), Use assoc
+  Declared  
+  Defined         94      97      99     102     116     119     121     124     138     141     143     146     160     163     165
+           168     182     185     187     190     204     207     209     212     217     219
+  Referenced      98     101     120     123     142     145     164     167     186     189     208     211
+  Referenced in contained procedure
+
+MG_PROFILING_MOD                                                          
+  Module
+  Declared  
+  Defined   
+  Referenced      36
+
+MG_REAL8                                  Module MG_CONSTANTS_MOD         
+  Parameter, Integer(kind=1), Use assoc
+  Declared  
+  Defined   
+  Referenced      55
+  Referenced in contained procedure
+
+MG_TIMER                                  Module MG_UTILS_MOD             
+  Function, Double Precision, result(MG_TIMER), Module procedure
+  Declared  
+  Defined   
+  Referenced      70      89      94     111     116     133     138     155     160     177     182     199     204     217
+
+MG_TIMER                                  Module MG_UTILS_MOD             
+  Function, Double Precision, result(MG_TIMER), Module procedure
+  Declared  
+  Defined   
+  Referenced      70      89      94     111     116     133     138     155     160     177     182     199     204     217
+
+MG_UTILS_MOD                                                              
+  Module, Used indirectly (from module MG_PROFILING_MOD)
+  Declared  
+  Defined   
+  Referenced
+
+MG_UTILS_MOD                                                              
+  Module
+  Declared  
+  Defined   
+  Referenced      35
+
+MPIFCMB5                                  Module MG_CONSTANTS_MOD         
+  Common block 
+  Declared  
+  Defined   
+  Referenced
+
+MPIFCMB9                                  Module MG_CONSTANTS_MOD         
+  Common block 
+  Declared  
+  Defined   
+  Referenced
+
+MPIPRIV1                                  Module MG_CONSTANTS_MOD         
+  Common block 
+  Declared  
+  Defined   
+  Referenced
+
+MPIPRIV2                                  Module MG_CONSTANTS_MOD         
+  Common block 
+  Declared  
+  Defined   
+  Referenced
+
+MPIPRIVC                                  Module MG_CONSTANTS_MOD         
+  Common block 
+  Declared  
+  Defined   
+  Referenced
+
+MPI_COMM_MG                               Module MG_CONSTANTS_MOD         
+  Integer(kind=4), Use assoc
+  Declared  
+  Defined   
+  Referenced      93     115     137     159     181     203
+  Referenced in contained procedure
+
+MPI_IRECV                                                                 
+  Subroutine, External
+  Declared  
+  Defined   
+  Referenced      91      91     113     113     135     135     157     157     179     179     201     201
+
+MSG_REQS                                  Module MG_CONSTANTS_MOD         
+  Integer(kind=4), Use assoc, Dimension(:), Allocatable
+  Declared  
+  Defined   
+  Referenced      93     115     137     159     181     203
+  Referenced in contained procedure
+
+MSG_TAGS                                  Module MG_CONSTANTS_MOD         
+  Integer(kind=4), Use assoc, Dimension(:), Allocatable
+  Declared  
+  Defined   
+  Referenced      92     114     136     158     180     202
+  Referenced in contained procedure
+
+NEIGHBORS                                 Module MG_CONSTANTS_MOD         
+  Integer(kind=4), Use assoc, Dimension(:), Allocatable
+  Declared  
+  Defined   
+  Referenced      87      92     109     114     131     136     153     158     175     180     197     202
+  Referenced in contained procedure
+
+NORTH                                     Module MG_CONSTANTS_MOD         
+  Parameter, Integer(kind=4), Use assoc
+  Declared  
+  Defined   
+  Referenced     175     180     181     202
+  Referenced in contained procedure
+
+NUMPES                                    Module MG_CONSTANTS_MOD         
+  Integer(kind=4), Use assoc
+  Declared  
+  Defined   
+  Referenced      65
+  Referenced in contained procedure
+
+NUM_RECVS                                 Structure offset=448            
+  Integer(kind=8), Component of PERF_CHECK
+  Declared  
+  Defined   
+  Referenced     219
+
+NUM_RECVS                                 Module MG_CONSTANTS_MOD         
+  Integer(kind=4), Use assoc
+  Declared  
+  Defined         76      90     112     134     156     178     200
+  Referenced     219
+  Referenced in contained procedure
+
+RECV_BUFFER_BACK                          Module MG_CONSTANTS_MOD         
+  Real(kind=8), Use assoc, Dimension(:), Allocatable
+  Declared  
+  Defined   
+  Referenced      91
+  Referenced in contained procedure
+
+RECV_BUFFER_BACK_SIZE                     Module MG_CONSTANTS_MOD         
+  Integer(kind=4), Use assoc
+  Declared  
+  Defined   
+  Referenced      82
+  Referenced in contained procedure
+
+RECV_BUFFER_EAST                          Module MG_CONSTANTS_MOD         
+  Real(kind=8), Use assoc, Dimension(:), Allocatable
+  Declared  
+  Defined   
+  Referenced     135
+  Referenced in contained procedure
+
+RECV_BUFFER_EAST_SIZE                     Module MG_CONSTANTS_MOD         
+  Integer(kind=4), Use assoc
+  Declared  
+  Defined   
+  Referenced      80
+  Referenced in contained procedure
+
+RECV_BUFFER_FRONT                         Module MG_CONSTANTS_MOD         
+  Real(kind=8), Use assoc, Dimension(:), Allocatable
+  Declared  
+  Defined   
+  Referenced     113
+  Referenced in contained procedure
+
+RECV_BUFFER_FRONT_SIZE                    Module MG_CONSTANTS_MOD         
+  Integer(kind=4), Use assoc
+  Declared  
+  Defined   
+  Referenced      83
+  Referenced in contained procedure
+
+RECV_BUFFER_NORTH                         Module MG_CONSTANTS_MOD         
+  Real(kind=8), Use assoc, Dimension(:), Allocatable
+  Declared  
+  Defined   
+  Referenced     179
+  Referenced in contained procedure
+
+RECV_BUFFER_NORTH_SIZE                    Module MG_CONSTANTS_MOD         
+  Integer(kind=4), Use assoc
+  Declared  
+  Defined   
+  Referenced      78
+  Referenced in contained procedure
+
+RECV_BUFFER_SOUTH                         Module MG_CONSTANTS_MOD         
+  Real(kind=8), Use assoc, Dimension(:), Allocatable
+  Declared  
+  Defined   
+  Referenced     201
+  Referenced in contained procedure
+
+RECV_BUFFER_SOUTH_SIZE                    Module MG_CONSTANTS_MOD         
+  Integer(kind=4), Use assoc
+  Declared  
+  Defined   
+  Referenced      79
+  Referenced in contained procedure
+
+RECV_BUFFER_WEST                          Module MG_CONSTANTS_MOD         
+  Real(kind=8), Use assoc, Dimension(:), Allocatable
+  Declared  
+  Defined   
+  Referenced     157
+  Referenced in contained procedure
+
+RECV_BUFFER_WEST_SIZE                     Module MG_CONSTANTS_MOD         
+  Integer(kind=4), Use assoc
+  Declared  
+  Defined   
+  Referenced      81
+  Referenced in contained procedure
+
+RECV_COUNT                                Structure offset=512            
+  Integer(kind=8), Component of PERF_CHECK
+  Declared  
+  Defined   
+  Referenced      97     119     141     163     185     207
+
+RECV_COUNT_MAX                            Structure offset=576            
+  Integer(kind=8), Component of PERF_CHECK
+  Declared  
+  Defined   
+  Referenced      98      99     120     121     142     143     164     165     186     187     208     209
+
+RECV_COUNT_MIN                            Structure offset=640            
+  Integer(kind=8), Component of PERF_CHECK
+  Declared  
+  Defined   
+  Referenced     101     102     123     124     145     146     167     168     189     190     211     212
+
+SOUTH                                     Module MG_CONSTANTS_MOD         
+  Parameter, Integer(kind=4), Use assoc
+  Declared  
+  Defined   
+  Referenced     180     197     202     203
+  Referenced in contained procedure
+
+TIME_RECV_PE                              Structure offset=1472           
+  Real(kind=8), Component of PERF_CHECK
+  Declared  
+  Defined   
+  Referenced     217
+
+TIME_RECV_X_PE                            Structure offset=2176           
+  Real(kind=8), Component of PERF_CHECK
+  Declared  
+  Defined   
+  Referenced     138     160
+
+TIME_RECV_Y_PE                            Structure offset=2496           
+  Real(kind=8), Component of PERF_CHECK
+  Declared  
+  Defined   
+  Referenced     182     204
+
+TIME_RECV_Z_PE                            Structure offset=2816           
+  Real(kind=8), Component of PERF_CHECK
+  Declared  
+  Defined   
+  Referenced      94     116
+
+TIME_START                                Stack                           
+  Variable, Real(kind=8)
+  Declared        56
+  Defined         70
+  Referenced     217
+
+TIME_START_DIR                            Stack                           
+  Variable, Real(kind=8)
+  Declared        57
+  Defined         89     111     133     155     177     199
+  Referenced      95     117     139     161     183     205
+
+WEST                                      Module MG_CONSTANTS_MOD         
+  Parameter, Integer(kind=4), Use assoc
+  Declared  
+  Defined   
+  Referenced     136     153     158     159
+  Referenced in contained procedure
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+                     C o m m o n   B l o c k   R e p o r t
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Blk  Program Unit                     Messages
+---  ------------                     --------
+/MPIFCMB5/                            Length: 4 bytes
+
+     MG_IRECV_MOD                     Block is used from MG_CONSTANTS_MOD
+
+Blk  Program Unit                     Messages
+---  ------------                     --------
+/MPIFCMB9/                            Length: 4 bytes
+
+     MG_IRECV_MOD                     Block is used from MG_CONSTANTS_MOD
+
+Blk  Program Unit                     Messages
+---  ------------                     --------
+/MPIPRIV1/                            Length: 28 bytes
+
+     MG_IRECV_MOD                     Block is used from MG_CONSTANTS_MOD
+
+Blk  Program Unit                     Messages
+---  ------------                     --------
+/MPIPRIV2/                            Length: 24 bytes
+
+     MG_IRECV_MOD                     Block is used from MG_CONSTANTS_MOD
+
+Blk  Program Unit                     Messages
+---  ------------                     --------
+/MPIPRIVC/                            Length: 2 bytes
+
+     MG_IRECV_MOD                     Block is used from MG_CONSTANTS_MOD
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+                         E x t e r n a l   R e p o r t
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Name  Messages
+----  --------
+ENV in MG_ENV_MOD
+      Defined as:  No definitions.
+
+                   No calls.  It is not called and does not use any procedure.
+
+      Interface:   None
+
+Name  Messages
+----  --------
+MG_ASSERT in MG_UTILS_MOD
+      Defined as:  No definitions.
+
+                   No calls.  It is not called and does not use any procedure.
+
+      Interface:   None
+
+Name  Messages
+----  --------
+MG_COMPUTE_STDDEV in MG_UTILS_MOD
+      Defined as:  No definitions.
+
+                   No calls.  It is not called and does not use any procedure.
+
+      Interface:   None
+
+Name  Messages
+----  --------
+MG_CONSTANTS_MOD
+      Defined as:  No definitions.
+
+      Used By:     MG_IRECV_MOD
+                   MG_IRECV_MOD  (indirectly)
+                   MG_IRECV_MOD  (indirectly)
+
+Name  Messages
+----  --------
+MG_ENV_MOD
+      Defined as:  No definitions.
+
+      Used By:     MG_IRECV_MOD  (indirectly)
+
+Name  Messages
+----  --------
+MG_GRID_DEALLOC in MG_UTILS_MOD
+      Defined as:  No definitions.
+
+                   No calls.  It is not called and does not use any procedure.
+
+      Interface:   None
+
+Name  Messages
+----  --------
+MG_GRID_INIT in MG_UTILS_MOD
+      Defined as:  No definitions.
+
+                   No calls.  It is not called and does not use any procedure.
+
+      Interface:   None
+
+Name  Messages
+----  --------
+MG_INIT in MG_UTILS_MOD
+      Defined as:  No definitions.
+
+                   No calls.  It is not called and does not use any procedure.
+
+      Interface:   None
+
+Name  Messages
+----  --------
+MG_INIT_GRID in MG_UTILS_MOD
+      Defined as:  No definitions.
+
+                   No calls.  It is not called and does not use any procedure.
+
+      Interface:   None
+
+Name  Messages
+----  --------
+MG_INSERT_SPIKE in MG_UTILS_MOD
+      Defined as:  No definitions.
+
+                   No calls.  It is not called and does not use any procedure.
+
+      Interface:   None
+
+Name  Messages
+----  --------
+MG_IRECV in MG_IRECV_MOD
+      Defined as:  Subroutine (line 42, file MG_IRECV.F)
+
+      Interface:   None
+
+      Calls:       MG_TIMER in MG_UTILS_MOD (Line 70, file MG_IRECV.F)
+                   MG_TIMER in MG_UTILS_MOD (Line 89, file MG_IRECV.F)
+                   MG_TIMER in MG_UTILS_MOD (Line 94, file MG_IRECV.F)
+                   MG_TIMER in MG_UTILS_MOD (Line 111, file MG_IRECV.F)
+                   MG_TIMER in MG_UTILS_MOD (Line 116, file MG_IRECV.F)
+                   MG_TIMER in MG_UTILS_MOD (Line 133, file MG_IRECV.F)
+                   MG_TIMER in MG_UTILS_MOD (Line 138, file MG_IRECV.F)
+                   MG_TIMER in MG_UTILS_MOD (Line 155, file MG_IRECV.F)
+                   MG_TIMER in MG_UTILS_MOD (Line 160, file MG_IRECV.F)
+                   MG_TIMER in MG_UTILS_MOD (Line 177, file MG_IRECV.F)
+                   MG_TIMER in MG_UTILS_MOD (Line 182, file MG_IRECV.F)
+                   MG_TIMER in MG_UTILS_MOD (Line 199, file MG_IRECV.F)
+                   MG_TIMER in MG_UTILS_MOD (Line 204, file MG_IRECV.F)
+                   MG_TIMER in MG_UTILS_MOD (Line 217, file MG_IRECV.F)
+                   MPI_IRECV (Line 91, file MG_IRECV.F)
+                   MPI_IRECV (Line 113, file MG_IRECV.F)
+                   MPI_IRECV (Line 135, file MG_IRECV.F)
+                   MPI_IRECV (Line 157, file MG_IRECV.F)
+                   MPI_IRECV (Line 179, file MG_IRECV.F)
+                   MPI_IRECV (Line 201, file MG_IRECV.F)
+
+Name  Messages
+----  --------
+MG_IRECV_MOD
+      Defined as:  Module (line 28, file MG_IRECV.F)
+
+        Uses:      MG_CONSTANTS_MOD
+                   MG_UTILS_MOD
+                   MG_OPTIONS_MOD  (indirectly)
+                   MG_CONSTANTS_MOD  (indirectly)
+                   MG_PROFILING_MOD
+                   MG_OPTIONS_MOD  (indirectly)
+                   MG_ENV_MOD  (indirectly)
+                   MG_UTILS_MOD  (indirectly)
+                   MG_CONSTANTS_MOD  (indirectly)
+
+Name  Messages
+----  --------
+MG_OPTIONS_MOD
+      Defined as:  No definitions.
+
+      Used By:     MG_IRECV_MOD  (indirectly)
+                   MG_IRECV_MOD  (indirectly)
+
+Name  Messages
+----  --------
+MG_PERF_INIT in MG_PROFILING_MOD
+      Defined as:  No definitions.
+
+                   No calls.  It is not called and does not use any procedure.
+
+      Interface:   None
+
+Name  Messages
+----  --------
+MG_PERF_REPORT in MG_PROFILING_MOD
+      Defined as:  No definitions.
+
+                   No calls.  It is not called and does not use any procedure.
+
+      Interface:   None
+
+Name  Messages
+----  --------
+MG_PRINT_HEADER in MG_UTILS_MOD
+      Defined as:  No definitions.
+
+                   No calls.  It is not called and does not use any procedure.
+
+      Interface:   None
+
+Name  Messages
+----  --------
+MG_PROFILING_MOD
+      Defined as:  No definitions.
+
+      Used By:     MG_IRECV_MOD
+
+Name  Messages
+----  --------
+MG_TIMER in MG_UTILS_MOD
+      Defined as:  No definitions.
+
+      Interface:   None
+
+      Called By:   MG_IRECV in MG_IRECV_MOD (Line 70, file MG_IRECV.F)
+                   MG_IRECV in MG_IRECV_MOD (Line 89, file MG_IRECV.F)
+                   MG_IRECV in MG_IRECV_MOD (Line 94, file MG_IRECV.F)
+                   MG_IRECV in MG_IRECV_MOD (Line 111, file MG_IRECV.F)
+                   MG_IRECV in MG_IRECV_MOD (Line 116, file MG_IRECV.F)
+                   MG_IRECV in MG_IRECV_MOD (Line 133, file MG_IRECV.F)
+                   MG_IRECV in MG_IRECV_MOD (Line 138, file MG_IRECV.F)
+                   MG_IRECV in MG_IRECV_MOD (Line 155, file MG_IRECV.F)
+                   MG_IRECV in MG_IRECV_MOD (Line 160, file MG_IRECV.F)
+                   MG_IRECV in MG_IRECV_MOD (Line 177, file MG_IRECV.F)
+                   MG_IRECV in MG_IRECV_MOD (Line 182, file MG_IRECV.F)
+                   MG_IRECV in MG_IRECV_MOD (Line 199, file MG_IRECV.F)
+                   MG_IRECV in MG_IRECV_MOD (Line 204, file MG_IRECV.F)
+                   MG_IRECV in MG_IRECV_MOD (Line 217, file MG_IRECV.F)
+
+Name  Messages
+----  --------
+MG_UTILS_MOD
+      Defined as:  No definitions.
+
+      Used By:     MG_IRECV_MOD
+                   MG_IRECV_MOD  (indirectly)
+
+Name  Messages
+----  --------
+MPI_COMM_DUP_FN
+      Defined as:  No definitions.
+
+                   No calls.  It is not called and does not use any procedure.
+
+Name  Messages
+----  --------
+MPI_COMM_NULL_COPY_FN
+      Defined as:  No definitions.
+
+                   No calls.  It is not called and does not use any procedure.
+
+Name  Messages
+----  --------
+MPI_COMM_NULL_DELETE_FN
+      Defined as:  No definitions.
+
+                   No calls.  It is not called and does not use any procedure.
+
+Name  Messages
+----  --------
+MPI_CONVERSION_FN_NULL
+      Defined as:  No definitions.
+
+                   No calls.  It is not called and does not use any procedure.
+
+Name  Messages
+----  --------
+MPI_DUP_FN
+      Defined as:  No definitions.
+
+                   No calls.  It is not called and does not use any procedure.
+
+Name  Messages
+----  --------
+MPI_IRECV
+      Defined as:  No definitions.
+
+      Interface:   None
+
+      Called By:   MG_IRECV in MG_IRECV_MOD (Line 91, file MG_IRECV.F)
+                   MG_IRECV in MG_IRECV_MOD (Line 113, file MG_IRECV.F)
+                   MG_IRECV in MG_IRECV_MOD (Line 135, file MG_IRECV.F)
+                   MG_IRECV in MG_IRECV_MOD (Line 157, file MG_IRECV.F)
+                   MG_IRECV in MG_IRECV_MOD (Line 179, file MG_IRECV.F)
+                   MG_IRECV in MG_IRECV_MOD (Line 201, file MG_IRECV.F)
+
+Name  Messages
+----  --------
+MPI_NULL_COPY_FN
+      Defined as:  No definitions.
+
+                   No calls.  It is not called and does not use any procedure.
+
+Name  Messages
+----  --------
+MPI_NULL_DELETE_FN
+      Defined as:  No definitions.
+
+                   No calls.  It is not called and does not use any procedure.
+
+Name  Messages
+----  --------
+MPI_TYPE_DUP_FN
+      Defined as:  No definitions.
+
+                   No calls.  It is not called and does not use any procedure.
+
+Name  Messages
+----  --------
+MPI_TYPE_NULL_COPY_FN
+      Defined as:  No definitions.
+
+                   No calls.  It is not called and does not use any procedure.
+
+Name  Messages
+----  --------
+MPI_TYPE_NULL_DELETE_FN
+      Defined as:  No definitions.
+
+                   No calls.  It is not called and does not use any procedure.
+
+Name  Messages
+----  --------
+MPI_WIN_DUP_FN
+      Defined as:  No definitions.
+
+                   No calls.  It is not called and does not use any procedure.
+
+Name  Messages
+----  --------
+MPI_WIN_NULL_COPY_FN
+      Defined as:  No definitions.
+
+                   No calls.  It is not called and does not use any procedure.
+
+Name  Messages
+----  --------
+MPI_WIN_NULL_DELETE_FN
+      Defined as:  No definitions.
+
+                   No calls.  It is not called and does not use any procedure.
+
+Name  Messages
+----  --------
+MPI_WTICK
+      Defined as:  No definitions.
+
+                   No calls.  It is not called and does not use any procedure.
+
+      Interface:   None
+
+Name  Messages
+----  --------
+MPI_WTIME
+      Defined as:  No definitions.
+
+                   No calls.  It is not called and does not use any procedure.
+
+      Interface:   None
+
+Name  Messages
+----  --------
+PMPI_WTICK
+      Defined as:  No definitions.
+
+                   No calls.  It is not called and does not use any procedure.
+
+      Interface:   None
+
+Name  Messages
+----  --------
+PMPI_WTIME
+      Defined as:  No definitions.
+
+                   No calls.  It is not called and does not use any procedure.
+
+      Interface:   None
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%

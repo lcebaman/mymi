@@ -1,0 +1,2471 @@
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+                          S u m m a r y   R e p o r t
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Compilation
+-----------
+File     : /lus/scratch/p02128/work/MiniGhost/source/MG_SVAF.F
+Compiled : 10/31/18  05:23:41
+Compiler : Version 8.7.6
+Ftnlx    : Version 8503 (libcif 85008)
+Target   : x86-64
+Command  : ftn_driver.exe -hcpu=broadwell -hstatic -D__CRAYXC
+           -D__CRAY_BROADWELL -D__CRAYXT_COMPUTE_LINUX_TARGET -hnetwork=aries
+           -D_MG_MPI -D_MG_INT4 -D_MG_REAL8 -ffree -hlist=a -c MG_SVAF.F
+           -I/opt/cray/pe/cce/8.7.6/cce/x86_64/include/craylibs -I/usr/include
+           -I/usr/include -I/opt/cray/pe/mpt/7.7.3/gni/mpich-cray/8.6/include
+           -I/opt/cray/pe/libsci/18.07.1/CRAY/8.6/x86_64/include
+           -I/opt/cray/rca/2.2.18-6.0.7.0_33.3__g2aa4f39.ari/include
+           -I/opt/cray/pe/pmi/5.0.14/include
+           -I/opt/cray/xpmem/2.2.15-6.0.7.0_35.11__g7549d06.ari/include
+           -I/opt/cray/dmapp/7.1.1-6.0.7.0_34.3__g5a674e0.ari/include
+           -I/opt/cray/gni-headers/5.0.12.0-6.0.7.0_24.1__g3b1768f.ari/include
+           -I/opt/cray/ugni/6.0.14.0-6.0.7.0_23.1__gea11d3d.ari/include
+           -I/opt/cray/udreg/2.3.2-6.0.7.0_33.18__g5196236.ari/include
+           -I/opt/cray/alps/6.6.43-6.0.7.0_26.4__ga796da3.ari/include
+           -I/opt/cray/wlm_detect/1.3.3-6.0.7.0_47.2__g7109084.ari/include
+           -I/opt/cray/krca/2.2.4-6.0.7.0_32.3__g8505b97.ari/include
+           -I/opt/cray-hss-devel/8.0.0/include
+Program
+  Units  : MG_SVAF_MOD
+
+ftnlx report
+------------
+Source   : /lus/scratch/p02128/work/MiniGhost/source/MG_SVAF.F
+Date     : 10/31/2018  05:23:41
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+                          O p t i o n s   R e p o r t
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Options :  -O cache2,scalar2,thread2,vector2,mpi0,modinline,ipa3,noaggress
+           -O autoprefetch,noautothread,fusion2,nomsgs,nonegmsgs,nooverindex
+           -O pattern,shortcircuit2,unroll2,nozeroinc
+           -h noadd_paren,align_arrays,nobounds,caf,noconcurrent,nocontiguous
+           -h nocontiguous_assumed_shape,fma,nofp_trap,nofunc_trace,noomp_analyz
+           e
+           -h noomp_trace,nopat_trace
+           -h safe_addr,thread_do_concurrent,fp2=approx,flex_mp=default         
+           -h alias=default:standard_restrict         
+           -h static (or -static)
+           -h omp,noacc
+           -h cpu=x86-64,broadwell
+           -h network=aries
+           -K trap=none
+           -s default32
+           -eh
+           -d abcdefgijmopqsvwzACEFIPQRST0
+           -e nBDZ 
+           -f free
+           -m3
+           -S /lus/scratch/tmp/pe_5254/MG_SVAF_1.s
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+                          S o u r c e   L i s t i n g
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+
+     %%%    L o o p m a r k   L e g e n d    %%%
+
+     Primary Loop Type        Modifiers
+     ------- ---- ----        ---------
+     A - Pattern matched      a - atomic memory operation
+                              b - blocked
+     C - Collapsed            c - conditional and/or computed
+     D - Deleted               
+     E - Cloned                
+     F - Flat - No calls      f - fused
+     G - Accelerated          g - partitioned
+     I - Inlined              i - interchanged
+     M - Multithreaded        m - partitioned
+                              n - non-blocking remote transfer
+                              p - partial
+     R - Rerolling            r - unrolled
+                              s - shortloop
+     V - Vectorized           w - unwound
+
+     + - More messages listed at end of listing
+     ------------------------------------------
+
+
+    1.     ! ************************************************************************
+    2.     !
+    3.     !               miniGhost: stencil computations with boundary exchange.
+    4.     !                 Copyright (2012) Sandia Corporation
+    5.     !
+    6.     ! Under terms of Contract DE-AC04-94AL85000, there is a non-exclusive
+    7.     ! license for use of this work by or on behalf of the U.S. Government.
+    8.     !
+    9.     ! This library is free software; you can redistribute it and/or modify
+   10.     ! it under the terms of the GNU Lesser General Public License as
+   11.     ! published by the Free Software Foundation; either version 2.1 of the
+   12.     ! License, or (at your option) any later version.
+   13.     !
+   14.     ! This library is distributed in the hope that it will be useful, but
+   15.     ! WITHOUT ANY WARRANTY; without even the implied warranty of
+   16.     ! MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+   17.     ! Lesser General Public License for more details.
+   18.     !
+   19.     ! You should have received a copy of the GNU Lesser General Public
+   20.     ! License along with this library; if not, write to the Free Software
+   21.     ! Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307
+   22.     ! USA
+   23.     ! Questions? Contact Richard F. Barrett (rfbarre@sandia.gov) or
+   24.     !                    Michael A. Heroux (maherou@sandia.gov)
+   25.     !
+   26.     ! ************************************************************************
+   27.     
+   28.     MODULE MG_SVAF_MOD
+   29.     
+   30.        ! Purpose
+   31.        ! =======
+   32.        ! SVAF boundary exchange for 5- and 7-point stencils:
+   33.        !    pack, send, receive, unpack.
+   34.     
+   35.        USE MG_CONSTANTS_MOD
+   36.        USE MG_UTILS_MOD
+   37.        USE MG_IRECV_MOD
+   38.        USE MG_PACK_MOD
+   39.        USE MG_SEND_SVAF_MOD
+   40.        USE MG_UNPACK_SVAF_MOD
+   41.     
+   42.        IMPLICIT NONE
+   43.     
+   44.        ! Note: Using 0-based indexing on arrays.
+   45.     
+   46.     CONTAINS
+   47.        
+   48.        SUBROUTINE MG_SVAF ( IVAR, IERR )
+   49.        
+   50.           ! -------------------------------------------------------
+   51.           ! Pack all variables for single message to each neighbor.
+   52.           ! -------------------------------------------------------
+   53.     
+   54.           ! ---------------------
+   55.           ! Argument Declarations
+   56.           ! ---------------------
+   57.     
+   58.           INTEGER, INTENT(IN) :: &
+   59.              IVAR           ! Return status
+   60.     
+   61.           INTEGER, INTENT(OUT) :: &
+   62.              IERR           ! Return status
+   63.     
+   64.           ! ------------------
+   65.           ! Local Declarations
+   66.           ! ------------------
+   67.        
+   68.           INTEGER :: &
+   69.              ICOUNT,                      &  ! Message size.
+   70.              ISTAT,                       &  ! MPI return status.
+   71.              IWHICH,                      &  ! MPI_Wait_any SRC process
+   72.              I, J, K, L, M, N,            &  ! Counters
+   73.              NUM_RECVS,                   &
+   74.              NUM_RECVS_OUTSTANDING,       &
+   75.              MSG_REQ_OFFSET,              &
+   76.              OFFSET,                      &
+   77.              OFFSET_LAST,                 &
+   78.              RECV_BUFFER_SIZE,            &
+   79.              SEND_BUFFER_SIZE,            &
+   80.              MSG_REQ(12)
+   81.        
+   82.           ! ---------------------
+   83.           ! Executable Statements
+   84.           ! ---------------------
+   85.     
+   86.           IERR = 0
+   87.     
+   88.           COUNT_SEND_NORTH = 0
+   89.           COUNT_SEND_SOUTH = 0
+   90.           COUNT_SEND_EAST  = 0
+   91.           COUNT_SEND_WEST  = 0
+   92.           COUNT_SEND_BACK  = 0
+   93.           COUNT_SEND_FRONT = 0
+   94.        
+   95.           SELECT CASE ( IVAR )
+   96.     
+   97.              CASE ( 1 )
+   98.  +              CALL MG_IRECV ( IERR )
+   99.  +              CALL MG_PACK ( GRID1, IERR )
+  100.  +              CALL MG_SEND_SVAF ( GRID1, IERR )
+  101.  +              CALL MG_UNPACK_SVAF ( GRID1, IERR )
+  102.              CASE ( 2 )
+  103.  +              CALL MG_IRECV ( IERR )
+  104.  +              CALL MG_PACK ( GRID2, IERR )
+  105.  +              CALL MG_SEND_SVAF ( GRID2, IERR )
+  106.  +              CALL MG_UNPACK_SVAF ( GRID2, IERR )
+  107.              CASE ( 3 )
+  108.  +              CALL MG_IRECV ( IERR )
+  109.  +              CALL MG_PACK ( GRID3, IERR )
+  110.  +              CALL MG_SEND_SVAF ( GRID3, IERR )
+  111.  +              CALL MG_UNPACK_SVAF ( GRID3, IERR )
+  112.              CASE ( 4 )
+  113.  +              CALL MG_IRECV ( IERR )
+  114.  +              CALL MG_PACK ( GRID4, IERR )
+  115.  +              CALL MG_SEND_SVAF ( GRID4, IERR )
+  116.  +              CALL MG_UNPACK_SVAF ( GRID4, IERR )
+  117.              CASE ( 5 )
+  118.  +              CALL MG_IRECV ( IERR )
+  119.  +              CALL MG_PACK ( GRID5, IERR )
+  120.  +              CALL MG_SEND_SVAF ( GRID5, IERR )
+  121.  +              CALL MG_UNPACK_SVAF ( GRID5, IERR )
+  122.              CASE ( 6 )
+  123.  +              CALL MG_IRECV ( IERR )
+  124.  +              CALL MG_PACK ( GRID6, IERR )
+  125.  +              CALL MG_SEND_SVAF ( GRID6, IERR )
+  126.  +              CALL MG_UNPACK_SVAF ( GRID6, IERR )
+  127.              CASE ( 7 )
+  128.  +              CALL MG_IRECV ( IERR )
+  129.  +              CALL MG_PACK ( GRID7, IERR )
+  130.  +              CALL MG_SEND_SVAF ( GRID7, IERR )
+  131.  +              CALL MG_UNPACK_SVAF ( GRID7, IERR )
+  132.              CASE ( 8 )
+  133.  +              CALL MG_IRECV ( IERR )
+  134.  +              CALL MG_PACK ( GRID8, IERR )
+  135.  +              CALL MG_SEND_SVAF ( GRID8, IERR )
+  136.  +              CALL MG_UNPACK_SVAF ( GRID8, IERR )
+  137.              CASE ( 9 )
+  138.  +              CALL MG_IRECV ( IERR )
+  139.  +              CALL MG_PACK ( GRID9, IERR )
+  140.  +              CALL MG_SEND_SVAF ( GRID9, IERR )
+  141.  +              CALL MG_UNPACK_SVAF ( GRID9, IERR )
+  142.              CASE ( 10 )
+  143.  +              CALL MG_IRECV ( IERR )
+  144.  +              CALL MG_PACK ( GRID10, IERR )
+  145.  +              CALL MG_SEND_SVAF ( GRID10, IERR )
+  146.  +              CALL MG_UNPACK_SVAF ( GRID10, IERR )
+  147.                 
+  148.              CASE ( 11 )
+  149.  +              CALL MG_IRECV ( IERR )
+  150.  +              CALL MG_PACK ( GRID11, IERR )
+  151.  +              CALL MG_SEND_SVAF ( GRID11, IERR )
+  152.  +              CALL MG_UNPACK_SVAF ( GRID11, IERR )
+  153.              CASE ( 12 )
+  154.  +              CALL MG_IRECV ( IERR )
+  155.  +              CALL MG_PACK ( GRID12, IERR )
+  156.  +              CALL MG_SEND_SVAF ( GRID12, IERR )
+  157.  +              CALL MG_UNPACK_SVAF ( GRID12, IERR )
+  158.              CASE ( 13 )
+  159.  +              CALL MG_IRECV ( IERR )
+  160.  +              CALL MG_PACK ( GRID13, IERR )
+  161.  +              CALL MG_SEND_SVAF ( GRID13, IERR )
+  162.  +              CALL MG_UNPACK_SVAF ( GRID13, IERR )
+  163.              CASE ( 14 )
+  164.  +              CALL MG_IRECV ( IERR )
+  165.  +              CALL MG_PACK ( GRID14, IERR )
+  166.  +              CALL MG_SEND_SVAF ( GRID14, IERR )
+  167.  +              CALL MG_UNPACK_SVAF ( GRID14, IERR )
+  168.              CASE ( 15 )
+  169.  +              CALL MG_IRECV ( IERR )
+  170.  +              CALL MG_PACK ( GRID15, IERR )
+  171.  +              CALL MG_SEND_SVAF ( GRID15, IERR )
+  172.  +              CALL MG_UNPACK_SVAF ( GRID15, IERR )
+  173.              CASE ( 16 )
+  174.  +              CALL MG_IRECV ( IERR )
+  175.  +              CALL MG_PACK ( GRID16, IERR )
+  176.  +              CALL MG_SEND_SVAF ( GRID16, IERR )
+  177.  +              CALL MG_UNPACK_SVAF ( GRID16, IERR )
+  178.              CASE ( 17 )
+  179.  +              CALL MG_IRECV ( IERR )
+  180.  +              CALL MG_PACK ( GRID17, IERR )
+  181.  +              CALL MG_SEND_SVAF ( GRID17, IERR )
+  182.  +              CALL MG_UNPACK_SVAF ( GRID17, IERR )
+  183.              CASE ( 18 )
+  184.  +              CALL MG_IRECV ( IERR )
+  185.  +              CALL MG_PACK ( GRID18, IERR )
+  186.  +              CALL MG_SEND_SVAF ( GRID18, IERR )
+  187.  +              CALL MG_UNPACK_SVAF ( GRID18, IERR )
+  188.              CASE ( 19 )
+  189.  +              CALL MG_IRECV ( IERR )
+  190.  +              CALL MG_PACK ( GRID19, IERR )
+  191.  +              CALL MG_SEND_SVAF ( GRID19, IERR )
+  192.  +              CALL MG_UNPACK_SVAF ( GRID19, IERR )
+  193.              CASE ( 20 )
+  194.  +              CALL MG_IRECV ( IERR )
+  195.  +              CALL MG_PACK ( GRID20, IERR )
+  196.  +              CALL MG_SEND_SVAF ( GRID20, IERR )
+  197.  +              CALL MG_UNPACK_SVAF ( GRID20, IERR )
+  198.     
+  199.              CASE ( 21 )
+  200.  +              CALL MG_IRECV ( IERR )
+  201.  +              CALL MG_PACK ( GRID21, IERR )
+  202.  +              CALL MG_SEND_SVAF ( GRID21, IERR )
+  203.  +              CALL MG_UNPACK_SVAF ( GRID21, IERR )
+  204.              CASE ( 22 )
+  205.  +              CALL MG_IRECV ( IERR )
+  206.  +              CALL MG_PACK ( GRID22, IERR )
+  207.  +              CALL MG_SEND_SVAF ( GRID22, IERR )
+  208.  +              CALL MG_UNPACK_SVAF ( GRID22, IERR )
+  209.              CASE ( 23 )
+  210.  +              CALL MG_IRECV ( IERR )
+  211.  +              CALL MG_PACK ( GRID23, IERR )
+  212.  +              CALL MG_SEND_SVAF ( GRID23, IERR )
+  213.  +              CALL MG_UNPACK_SVAF ( GRID23, IERR )
+  214.              CASE ( 24 )
+  215.  +              CALL MG_IRECV ( IERR )
+  216.  +              CALL MG_PACK ( GRID24, IERR )
+  217.  +              CALL MG_SEND_SVAF ( GRID24, IERR )
+  218.  +              CALL MG_UNPACK_SVAF ( GRID24, IERR )
+  219.              CASE ( 25 )
+  220.  +              CALL MG_IRECV ( IERR )
+  221.  +              CALL MG_PACK ( GRID25, IERR )
+  222.  +              CALL MG_SEND_SVAF ( GRID25, IERR )
+  223.  +              CALL MG_UNPACK_SVAF ( GRID25, IERR )
+  224.              CASE ( 26 )
+  225.  +              CALL MG_IRECV ( IERR )
+  226.  +              CALL MG_PACK ( GRID26, IERR )
+  227.  +              CALL MG_SEND_SVAF ( GRID26, IERR )
+  228.  +              CALL MG_UNPACK_SVAF ( GRID26, IERR )
+  229.              CASE ( 27 )
+  230.  +              CALL MG_IRECV ( IERR )
+  231.  +              CALL MG_PACK ( GRID27, IERR )
+  232.  +              CALL MG_SEND_SVAF ( GRID27, IERR )
+  233.  +              CALL MG_UNPACK_SVAF ( GRID27, IERR )
+  234.              CASE ( 28 )
+  235.  +              CALL MG_IRECV ( IERR )
+  236.  +              CALL MG_PACK ( GRID28, IERR )
+  237.  +              CALL MG_SEND_SVAF ( GRID28, IERR )
+  238.  +              CALL MG_UNPACK_SVAF ( GRID28, IERR )
+  239.              CASE ( 29 )
+  240.  +              CALL MG_IRECV ( IERR )
+  241.  +              CALL MG_PACK ( GRID29, IERR )
+  242.  +              CALL MG_SEND_SVAF ( GRID29, IERR )
+  243.  +              CALL MG_UNPACK_SVAF ( GRID29, IERR )
+  244.              CASE ( 30 )
+  245.  +              CALL MG_IRECV ( IERR )
+  246.  +              CALL MG_PACK ( GRID30, IERR )
+  247.  +              CALL MG_SEND_SVAF ( GRID30, IERR )
+  248.  +              CALL MG_UNPACK_SVAF ( GRID30, IERR )
+  249.                 
+  250.              CASE ( 31 )
+  251.  +              CALL MG_IRECV ( IERR )
+  252.  +              CALL MG_PACK ( GRID31, IERR )
+  253.  +              CALL MG_SEND_SVAF ( GRID31, IERR )
+  254.  +              CALL MG_UNPACK_SVAF ( GRID31, IERR )
+  255.              CASE ( 32 )
+  256.  +              CALL MG_IRECV ( IERR )
+  257.  +              CALL MG_PACK ( GRID32, IERR )
+  258.  +              CALL MG_SEND_SVAF ( GRID32, IERR )
+  259.  +              CALL MG_UNPACK_SVAF ( GRID32, IERR )
+  260.              CASE ( 33 )
+  261.  +              CALL MG_IRECV ( IERR )
+  262.  +              CALL MG_PACK ( GRID33, IERR )
+  263.  +              CALL MG_SEND_SVAF ( GRID33, IERR )
+  264.  +              CALL MG_UNPACK_SVAF ( GRID33, IERR )
+  265.              CASE ( 34 )
+  266.  +              CALL MG_IRECV ( IERR )
+  267.  +              CALL MG_PACK ( GRID34, IERR )
+  268.  +              CALL MG_SEND_SVAF ( GRID34, IERR )
+  269.  +              CALL MG_UNPACK_SVAF ( GRID34, IERR )
+  270.              CASE ( 35 )
+  271.  +              CALL MG_IRECV ( IERR )
+  272.  +              CALL MG_PACK ( GRID35, IERR )
+  273.  +              CALL MG_SEND_SVAF ( GRID35, IERR )
+  274.  +              CALL MG_UNPACK_SVAF ( GRID35, IERR )
+  275.              CASE ( 36 )
+  276.  +              CALL MG_IRECV ( IERR )
+  277.  +              CALL MG_PACK ( GRID36, IERR )
+  278.  +              CALL MG_SEND_SVAF ( GRID36, IERR )
+  279.  +              CALL MG_UNPACK_SVAF ( GRID36, IERR )
+  280.              CASE ( 37 )
+  281.  +              CALL MG_IRECV ( IERR )
+  282.  +              CALL MG_PACK ( GRID37, IERR )
+  283.  +              CALL MG_SEND_SVAF ( GRID37, IERR )
+  284.  +              CALL MG_UNPACK_SVAF ( GRID37, IERR )
+  285.              CASE ( 38 )
+  286.  +              CALL MG_IRECV ( IERR )
+  287.  +              CALL MG_PACK ( GRID38, IERR )
+  288.  +              CALL MG_SEND_SVAF ( GRID38, IERR )
+  289.  +              CALL MG_UNPACK_SVAF ( GRID38, IERR )
+  290.              CASE ( 39 )
+  291.  +              CALL MG_IRECV ( IERR )
+  292.  +              CALL MG_PACK ( GRID39, IERR )
+  293.  +              CALL MG_SEND_SVAF ( GRID39, IERR )
+  294.  +              CALL MG_UNPACK_SVAF ( GRID39, IERR )
+  295.              CASE ( 40 )
+  296.  +              CALL MG_IRECV ( IERR )
+  297.  +              CALL MG_PACK ( GRID40, IERR )
+  298.  +              CALL MG_SEND_SVAF ( GRID40, IERR )
+  299.  +              CALL MG_UNPACK_SVAF ( GRID40, IERR )
+  300.     
+  301.              CASE DEFAULT
+  302.                 WRITE(*,*) '** Error ** COMM_MG_SVAF: Unknown variable number ', IVAR, '.'
+  303.     
+  304.           END SELECT
+  305.                 
+  306.        END SUBROUTINE MG_SVAF
+ftn-5002 ftn: NOTE MG_SVAF, File = MG_SVAF.F, Line = 306 
+  Local variable "NUM_RECVS" is declared but neither defined nor used.
+
+ftn-5002 ftn: NOTE MG_SVAF, File = MG_SVAF.F, Line = 306 
+  Local variable "N" is declared but neither defined nor used.
+
+ftn-5002 ftn: NOTE MG_SVAF, File = MG_SVAF.F, Line = 306 
+  Local variable "OFFSET" is declared but neither defined nor used.
+
+ftn-5002 ftn: NOTE MG_SVAF, File = MG_SVAF.F, Line = 306 
+  Local variable "RECV_BUFFER_SIZE" is declared but neither defined nor used.
+
+ftn-5002 ftn: NOTE MG_SVAF, File = MG_SVAF.F, Line = 306 
+  Local variable "OFFSET_LAST" is declared but neither defined nor used.
+
+ftn-5002 ftn: NOTE MG_SVAF, File = MG_SVAF.F, Line = 306 
+  Local variable "NUM_RECVS_OUTSTANDING" is declared but neither defined nor used.
+
+ftn-5002 ftn: NOTE MG_SVAF, File = MG_SVAF.F, Line = 306 
+  Local variable "I" is declared but neither defined nor used.
+
+ftn-5002 ftn: NOTE MG_SVAF, File = MG_SVAF.F, Line = 306 
+  Local variable "ICOUNT" is declared but neither defined nor used.
+
+ftn-5002 ftn: NOTE MG_SVAF, File = MG_SVAF.F, Line = 306 
+  Local variable "SEND_BUFFER_SIZE" is declared but neither defined nor used.
+
+ftn-5002 ftn: NOTE MG_SVAF, File = MG_SVAF.F, Line = 306 
+  Local variable "MSG_REQ_OFFSET" is declared but neither defined nor used.
+
+ftn-5002 ftn: NOTE MG_SVAF, File = MG_SVAF.F, Line = 306 
+  Local variable "MSG_REQ" is declared but neither defined nor used.
+
+ftn-5002 ftn: NOTE MG_SVAF, File = MG_SVAF.F, Line = 306 
+  Local variable "M" is declared but neither defined nor used.
+
+ftn-5002 ftn: NOTE MG_SVAF, File = MG_SVAF.F, Line = 306 
+  Local variable "K" is declared but neither defined nor used.
+
+ftn-5002 ftn: NOTE MG_SVAF, File = MG_SVAF.F, Line = 306 
+  Local variable "L" is declared but neither defined nor used.
+
+ftn-5002 ftn: NOTE MG_SVAF, File = MG_SVAF.F, Line = 306 
+  Local variable "J" is declared but neither defined nor used.
+
+ftn-5002 ftn: NOTE MG_SVAF, File = MG_SVAF.F, Line = 306 
+  Local variable "IWHICH" is declared but neither defined nor used.
+
+ftn-5002 ftn: NOTE MG_SVAF, File = MG_SVAF.F, Line = 306 
+  Local variable "ISTAT" is declared but neither defined nor used.
+
+  307.        
+  308.     END MODULE MG_SVAF_MOD
+
+ftn-3118 ftn: IPA MG_SVAF, File = MG_SVAF.F, Line = 98, Column = 18 
+  "mg_irecv" (called from "mg_svaf") was not inlined because the call site will not flatten.  "mpi_wtime_" is missing.
+
+ftn-3118 ftn: IPA MG_SVAF, File = MG_SVAF.F, Line = 99, Column = 18 
+  "mg_pack" (called from "mg_svaf") was not inlined because the call site will not flatten.  "mpi_wtime_" is missing.
+
+ftn-3118 ftn: IPA MG_SVAF, File = MG_SVAF.F, Line = 100, Column = 18 
+  "mg_send_svaf" (called from "mg_svaf") was not inlined because the call site will not flatten.  "mpi_wtime_" is missing.
+
+ftn-3118 ftn: IPA MG_SVAF, File = MG_SVAF.F, Line = 101, Column = 18 
+  "mg_unpack_svaf" (called from "mg_svaf") was not inlined because the call site will not flatten.  "mpi_wtime_" is missing.
+
+ftn-3118 ftn: IPA MG_SVAF, File = MG_SVAF.F, Line = 103, Column = 18 
+  "mg_irecv" (called from "mg_svaf") was not inlined because the call site will not flatten.  "mpi_wtime_" is missing.
+
+ftn-3118 ftn: IPA MG_SVAF, File = MG_SVAF.F, Line = 104, Column = 18 
+  "mg_pack" (called from "mg_svaf") was not inlined because the call site will not flatten.  "mpi_wtime_" is missing.
+
+ftn-3118 ftn: IPA MG_SVAF, File = MG_SVAF.F, Line = 105, Column = 18 
+  "mg_send_svaf" (called from "mg_svaf") was not inlined because the call site will not flatten.  "mpi_wtime_" is missing.
+
+ftn-3118 ftn: IPA MG_SVAF, File = MG_SVAF.F, Line = 106, Column = 18 
+  "mg_unpack_svaf" (called from "mg_svaf") was not inlined because the call site will not flatten.  "mpi_wtime_" is missing.
+
+ftn-3118 ftn: IPA MG_SVAF, File = MG_SVAF.F, Line = 108, Column = 18 
+  "mg_irecv" (called from "mg_svaf") was not inlined because the call site will not flatten.  "mpi_wtime_" is missing.
+
+ftn-3118 ftn: IPA MG_SVAF, File = MG_SVAF.F, Line = 109, Column = 18 
+  "mg_pack" (called from "mg_svaf") was not inlined because the call site will not flatten.  "mpi_wtime_" is missing.
+
+ftn-3118 ftn: IPA MG_SVAF, File = MG_SVAF.F, Line = 110, Column = 18 
+  "mg_send_svaf" (called from "mg_svaf") was not inlined because the call site will not flatten.  "mpi_wtime_" is missing.
+
+ftn-3118 ftn: IPA MG_SVAF, File = MG_SVAF.F, Line = 111, Column = 18 
+  "mg_unpack_svaf" (called from "mg_svaf") was not inlined because the call site will not flatten.  "mpi_wtime_" is missing.
+
+ftn-3118 ftn: IPA MG_SVAF, File = MG_SVAF.F, Line = 113, Column = 18 
+  "mg_irecv" (called from "mg_svaf") was not inlined because the call site will not flatten.  "mpi_wtime_" is missing.
+
+ftn-3118 ftn: IPA MG_SVAF, File = MG_SVAF.F, Line = 114, Column = 18 
+  "mg_pack" (called from "mg_svaf") was not inlined because the call site will not flatten.  "mpi_wtime_" is missing.
+
+ftn-3118 ftn: IPA MG_SVAF, File = MG_SVAF.F, Line = 115, Column = 18 
+  "mg_send_svaf" (called from "mg_svaf") was not inlined because the call site will not flatten.  "mpi_wtime_" is missing.
+
+ftn-3118 ftn: IPA MG_SVAF, File = MG_SVAF.F, Line = 116, Column = 18 
+  "mg_unpack_svaf" (called from "mg_svaf") was not inlined because the call site will not flatten.  "mpi_wtime_" is missing.
+
+ftn-3118 ftn: IPA MG_SVAF, File = MG_SVAF.F, Line = 118, Column = 18 
+  "mg_irecv" (called from "mg_svaf") was not inlined because the call site will not flatten.  "mpi_wtime_" is missing.
+
+ftn-3118 ftn: IPA MG_SVAF, File = MG_SVAF.F, Line = 119, Column = 18 
+  "mg_pack" (called from "mg_svaf") was not inlined because the call site will not flatten.  "mpi_wtime_" is missing.
+
+ftn-3118 ftn: IPA MG_SVAF, File = MG_SVAF.F, Line = 120, Column = 18 
+  "mg_send_svaf" (called from "mg_svaf") was not inlined because the call site will not flatten.  "mpi_wtime_" is missing.
+
+ftn-3118 ftn: IPA MG_SVAF, File = MG_SVAF.F, Line = 121, Column = 18 
+  "mg_unpack_svaf" (called from "mg_svaf") was not inlined because the call site will not flatten.  "mpi_wtime_" is missing.
+
+ftn-3118 ftn: IPA MG_SVAF, File = MG_SVAF.F, Line = 123, Column = 18 
+  "mg_irecv" (called from "mg_svaf") was not inlined because the call site will not flatten.  "mpi_wtime_" is missing.
+
+ftn-3118 ftn: IPA MG_SVAF, File = MG_SVAF.F, Line = 124, Column = 18 
+  "mg_pack" (called from "mg_svaf") was not inlined because the call site will not flatten.  "mpi_wtime_" is missing.
+
+ftn-3118 ftn: IPA MG_SVAF, File = MG_SVAF.F, Line = 125, Column = 18 
+  "mg_send_svaf" (called from "mg_svaf") was not inlined because the call site will not flatten.  "mpi_wtime_" is missing.
+
+ftn-3118 ftn: IPA MG_SVAF, File = MG_SVAF.F, Line = 126, Column = 18 
+  "mg_unpack_svaf" (called from "mg_svaf") was not inlined because the call site will not flatten.  "mpi_wtime_" is missing.
+
+ftn-3118 ftn: IPA MG_SVAF, File = MG_SVAF.F, Line = 128, Column = 18 
+  "mg_irecv" (called from "mg_svaf") was not inlined because the call site will not flatten.  "mpi_wtime_" is missing.
+
+ftn-3118 ftn: IPA MG_SVAF, File = MG_SVAF.F, Line = 129, Column = 18 
+  "mg_pack" (called from "mg_svaf") was not inlined because the call site will not flatten.  "mpi_wtime_" is missing.
+
+ftn-3118 ftn: IPA MG_SVAF, File = MG_SVAF.F, Line = 130, Column = 18 
+  "mg_send_svaf" (called from "mg_svaf") was not inlined because the call site will not flatten.  "mpi_wtime_" is missing.
+
+ftn-3118 ftn: IPA MG_SVAF, File = MG_SVAF.F, Line = 131, Column = 18 
+  "mg_unpack_svaf" (called from "mg_svaf") was not inlined because the call site will not flatten.  "mpi_wtime_" is missing.
+
+ftn-3118 ftn: IPA MG_SVAF, File = MG_SVAF.F, Line = 133, Column = 18 
+  "mg_irecv" (called from "mg_svaf") was not inlined because the call site will not flatten.  "mpi_wtime_" is missing.
+
+ftn-3118 ftn: IPA MG_SVAF, File = MG_SVAF.F, Line = 134, Column = 18 
+  "mg_pack" (called from "mg_svaf") was not inlined because the call site will not flatten.  "mpi_wtime_" is missing.
+
+ftn-3118 ftn: IPA MG_SVAF, File = MG_SVAF.F, Line = 135, Column = 18 
+  "mg_send_svaf" (called from "mg_svaf") was not inlined because the call site will not flatten.  "mpi_wtime_" is missing.
+
+ftn-3118 ftn: IPA MG_SVAF, File = MG_SVAF.F, Line = 136, Column = 18 
+  "mg_unpack_svaf" (called from "mg_svaf") was not inlined because the call site will not flatten.  "mpi_wtime_" is missing.
+
+ftn-3118 ftn: IPA MG_SVAF, File = MG_SVAF.F, Line = 138, Column = 18 
+  "mg_irecv" (called from "mg_svaf") was not inlined because the call site will not flatten.  "mpi_wtime_" is missing.
+
+ftn-3118 ftn: IPA MG_SVAF, File = MG_SVAF.F, Line = 139, Column = 18 
+  "mg_pack" (called from "mg_svaf") was not inlined because the call site will not flatten.  "mpi_wtime_" is missing.
+
+ftn-3118 ftn: IPA MG_SVAF, File = MG_SVAF.F, Line = 140, Column = 18 
+  "mg_send_svaf" (called from "mg_svaf") was not inlined because the call site will not flatten.  "mpi_wtime_" is missing.
+
+ftn-3118 ftn: IPA MG_SVAF, File = MG_SVAF.F, Line = 141, Column = 18 
+  "mg_unpack_svaf" (called from "mg_svaf") was not inlined because the call site will not flatten.  "mpi_wtime_" is missing.
+
+ftn-3118 ftn: IPA MG_SVAF, File = MG_SVAF.F, Line = 143, Column = 18 
+  "mg_irecv" (called from "mg_svaf") was not inlined because the call site will not flatten.  "mpi_wtime_" is missing.
+
+ftn-3118 ftn: IPA MG_SVAF, File = MG_SVAF.F, Line = 144, Column = 18 
+  "mg_pack" (called from "mg_svaf") was not inlined because the call site will not flatten.  "mpi_wtime_" is missing.
+
+ftn-3118 ftn: IPA MG_SVAF, File = MG_SVAF.F, Line = 145, Column = 18 
+  "mg_send_svaf" (called from "mg_svaf") was not inlined because the call site will not flatten.  "mpi_wtime_" is missing.
+
+ftn-3118 ftn: IPA MG_SVAF, File = MG_SVAF.F, Line = 146, Column = 18 
+  "mg_unpack_svaf" (called from "mg_svaf") was not inlined because the call site will not flatten.  "mpi_wtime_" is missing.
+
+ftn-3118 ftn: IPA MG_SVAF, File = MG_SVAF.F, Line = 149, Column = 18 
+  "mg_irecv" (called from "mg_svaf") was not inlined because the call site will not flatten.  "mpi_wtime_" is missing.
+
+ftn-3118 ftn: IPA MG_SVAF, File = MG_SVAF.F, Line = 150, Column = 18 
+  "mg_pack" (called from "mg_svaf") was not inlined because the call site will not flatten.  "mpi_wtime_" is missing.
+
+ftn-3118 ftn: IPA MG_SVAF, File = MG_SVAF.F, Line = 151, Column = 18 
+  "mg_send_svaf" (called from "mg_svaf") was not inlined because the call site will not flatten.  "mpi_wtime_" is missing.
+
+ftn-3118 ftn: IPA MG_SVAF, File = MG_SVAF.F, Line = 152, Column = 18 
+  "mg_unpack_svaf" (called from "mg_svaf") was not inlined because the call site will not flatten.  "mpi_wtime_" is missing.
+
+ftn-3118 ftn: IPA MG_SVAF, File = MG_SVAF.F, Line = 154, Column = 18 
+  "mg_irecv" (called from "mg_svaf") was not inlined because the call site will not flatten.  "mpi_wtime_" is missing.
+
+ftn-3118 ftn: IPA MG_SVAF, File = MG_SVAF.F, Line = 155, Column = 18 
+  "mg_pack" (called from "mg_svaf") was not inlined because the call site will not flatten.  "mpi_wtime_" is missing.
+
+ftn-3118 ftn: IPA MG_SVAF, File = MG_SVAF.F, Line = 156, Column = 18 
+  "mg_send_svaf" (called from "mg_svaf") was not inlined because the call site will not flatten.  "mpi_wtime_" is missing.
+
+ftn-3118 ftn: IPA MG_SVAF, File = MG_SVAF.F, Line = 157, Column = 18 
+  "mg_unpack_svaf" (called from "mg_svaf") was not inlined because the call site will not flatten.  "mpi_wtime_" is missing.
+
+ftn-3118 ftn: IPA MG_SVAF, File = MG_SVAF.F, Line = 159, Column = 18 
+  "mg_irecv" (called from "mg_svaf") was not inlined because the call site will not flatten.  "mpi_wtime_" is missing.
+
+ftn-3118 ftn: IPA MG_SVAF, File = MG_SVAF.F, Line = 160, Column = 18 
+  "mg_pack" (called from "mg_svaf") was not inlined because the call site will not flatten.  "mpi_wtime_" is missing.
+
+ftn-3118 ftn: IPA MG_SVAF, File = MG_SVAF.F, Line = 161, Column = 18 
+  "mg_send_svaf" (called from "mg_svaf") was not inlined because the call site will not flatten.  "mpi_wtime_" is missing.
+
+ftn-3118 ftn: IPA MG_SVAF, File = MG_SVAF.F, Line = 162, Column = 18 
+  "mg_unpack_svaf" (called from "mg_svaf") was not inlined because the call site will not flatten.  "mpi_wtime_" is missing.
+
+ftn-3118 ftn: IPA MG_SVAF, File = MG_SVAF.F, Line = 164, Column = 18 
+  "mg_irecv" (called from "mg_svaf") was not inlined because the call site will not flatten.  "mpi_wtime_" is missing.
+
+ftn-3118 ftn: IPA MG_SVAF, File = MG_SVAF.F, Line = 165, Column = 18 
+  "mg_pack" (called from "mg_svaf") was not inlined because the call site will not flatten.  "mpi_wtime_" is missing.
+
+ftn-3118 ftn: IPA MG_SVAF, File = MG_SVAF.F, Line = 166, Column = 18 
+  "mg_send_svaf" (called from "mg_svaf") was not inlined because the call site will not flatten.  "mpi_wtime_" is missing.
+
+ftn-3118 ftn: IPA MG_SVAF, File = MG_SVAF.F, Line = 167, Column = 18 
+  "mg_unpack_svaf" (called from "mg_svaf") was not inlined because the call site will not flatten.  "mpi_wtime_" is missing.
+
+ftn-3118 ftn: IPA MG_SVAF, File = MG_SVAF.F, Line = 169, Column = 18 
+  "mg_irecv" (called from "mg_svaf") was not inlined because the call site will not flatten.  "mpi_wtime_" is missing.
+
+ftn-3118 ftn: IPA MG_SVAF, File = MG_SVAF.F, Line = 170, Column = 18 
+  "mg_pack" (called from "mg_svaf") was not inlined because the call site will not flatten.  "mpi_wtime_" is missing.
+
+ftn-3118 ftn: IPA MG_SVAF, File = MG_SVAF.F, Line = 171, Column = 18 
+  "mg_send_svaf" (called from "mg_svaf") was not inlined because the call site will not flatten.  "mpi_wtime_" is missing.
+
+ftn-3118 ftn: IPA MG_SVAF, File = MG_SVAF.F, Line = 172, Column = 18 
+  "mg_unpack_svaf" (called from "mg_svaf") was not inlined because the call site will not flatten.  "mpi_wtime_" is missing.
+
+ftn-3118 ftn: IPA MG_SVAF, File = MG_SVAF.F, Line = 174, Column = 18 
+  "mg_irecv" (called from "mg_svaf") was not inlined because the call site will not flatten.  "mpi_wtime_" is missing.
+
+ftn-3118 ftn: IPA MG_SVAF, File = MG_SVAF.F, Line = 175, Column = 18 
+  "mg_pack" (called from "mg_svaf") was not inlined because the call site will not flatten.  "mpi_wtime_" is missing.
+
+ftn-3118 ftn: IPA MG_SVAF, File = MG_SVAF.F, Line = 176, Column = 18 
+  "mg_send_svaf" (called from "mg_svaf") was not inlined because the call site will not flatten.  "mpi_wtime_" is missing.
+
+ftn-3118 ftn: IPA MG_SVAF, File = MG_SVAF.F, Line = 177, Column = 18 
+  "mg_unpack_svaf" (called from "mg_svaf") was not inlined because the call site will not flatten.  "mpi_wtime_" is missing.
+
+ftn-3118 ftn: IPA MG_SVAF, File = MG_SVAF.F, Line = 179, Column = 18 
+  "mg_irecv" (called from "mg_svaf") was not inlined because the call site will not flatten.  "mpi_wtime_" is missing.
+
+ftn-3118 ftn: IPA MG_SVAF, File = MG_SVAF.F, Line = 180, Column = 18 
+  "mg_pack" (called from "mg_svaf") was not inlined because the call site will not flatten.  "mpi_wtime_" is missing.
+
+ftn-3118 ftn: IPA MG_SVAF, File = MG_SVAF.F, Line = 181, Column = 18 
+  "mg_send_svaf" (called from "mg_svaf") was not inlined because the call site will not flatten.  "mpi_wtime_" is missing.
+
+ftn-3118 ftn: IPA MG_SVAF, File = MG_SVAF.F, Line = 182, Column = 18 
+  "mg_unpack_svaf" (called from "mg_svaf") was not inlined because the call site will not flatten.  "mpi_wtime_" is missing.
+
+ftn-3118 ftn: IPA MG_SVAF, File = MG_SVAF.F, Line = 184, Column = 18 
+  "mg_irecv" (called from "mg_svaf") was not inlined because the call site will not flatten.  "mpi_wtime_" is missing.
+
+ftn-3118 ftn: IPA MG_SVAF, File = MG_SVAF.F, Line = 185, Column = 18 
+  "mg_pack" (called from "mg_svaf") was not inlined because the call site will not flatten.  "mpi_wtime_" is missing.
+
+ftn-3118 ftn: IPA MG_SVAF, File = MG_SVAF.F, Line = 186, Column = 18 
+  "mg_send_svaf" (called from "mg_svaf") was not inlined because the call site will not flatten.  "mpi_wtime_" is missing.
+
+ftn-3118 ftn: IPA MG_SVAF, File = MG_SVAF.F, Line = 187, Column = 18 
+  "mg_unpack_svaf" (called from "mg_svaf") was not inlined because the call site will not flatten.  "mpi_wtime_" is missing.
+
+ftn-3118 ftn: IPA MG_SVAF, File = MG_SVAF.F, Line = 189, Column = 18 
+  "mg_irecv" (called from "mg_svaf") was not inlined because the call site will not flatten.  "mpi_wtime_" is missing.
+
+ftn-3118 ftn: IPA MG_SVAF, File = MG_SVAF.F, Line = 190, Column = 18 
+  "mg_pack" (called from "mg_svaf") was not inlined because the call site will not flatten.  "mpi_wtime_" is missing.
+
+ftn-3118 ftn: IPA MG_SVAF, File = MG_SVAF.F, Line = 191, Column = 18 
+  "mg_send_svaf" (called from "mg_svaf") was not inlined because the call site will not flatten.  "mpi_wtime_" is missing.
+
+ftn-3118 ftn: IPA MG_SVAF, File = MG_SVAF.F, Line = 192, Column = 18 
+  "mg_unpack_svaf" (called from "mg_svaf") was not inlined because the call site will not flatten.  "mpi_wtime_" is missing.
+
+ftn-3118 ftn: IPA MG_SVAF, File = MG_SVAF.F, Line = 194, Column = 18 
+  "mg_irecv" (called from "mg_svaf") was not inlined because the call site will not flatten.  "mpi_wtime_" is missing.
+
+ftn-3118 ftn: IPA MG_SVAF, File = MG_SVAF.F, Line = 195, Column = 18 
+  "mg_pack" (called from "mg_svaf") was not inlined because the call site will not flatten.  "mpi_wtime_" is missing.
+
+ftn-3118 ftn: IPA MG_SVAF, File = MG_SVAF.F, Line = 196, Column = 18 
+  "mg_send_svaf" (called from "mg_svaf") was not inlined because the call site will not flatten.  "mpi_wtime_" is missing.
+
+ftn-3118 ftn: IPA MG_SVAF, File = MG_SVAF.F, Line = 197, Column = 18 
+  "mg_unpack_svaf" (called from "mg_svaf") was not inlined because the call site will not flatten.  "mpi_wtime_" is missing.
+
+ftn-3118 ftn: IPA MG_SVAF, File = MG_SVAF.F, Line = 200, Column = 18 
+  "mg_irecv" (called from "mg_svaf") was not inlined because the call site will not flatten.  "mpi_wtime_" is missing.
+
+ftn-3118 ftn: IPA MG_SVAF, File = MG_SVAF.F, Line = 201, Column = 18 
+  "mg_pack" (called from "mg_svaf") was not inlined because the call site will not flatten.  "mpi_wtime_" is missing.
+
+ftn-3118 ftn: IPA MG_SVAF, File = MG_SVAF.F, Line = 202, Column = 18 
+  "mg_send_svaf" (called from "mg_svaf") was not inlined because the call site will not flatten.  "mpi_wtime_" is missing.
+
+ftn-3118 ftn: IPA MG_SVAF, File = MG_SVAF.F, Line = 203, Column = 18 
+  "mg_unpack_svaf" (called from "mg_svaf") was not inlined because the call site will not flatten.  "mpi_wtime_" is missing.
+
+ftn-3118 ftn: IPA MG_SVAF, File = MG_SVAF.F, Line = 205, Column = 18 
+  "mg_irecv" (called from "mg_svaf") was not inlined because the call site will not flatten.  "mpi_wtime_" is missing.
+
+ftn-3118 ftn: IPA MG_SVAF, File = MG_SVAF.F, Line = 206, Column = 18 
+  "mg_pack" (called from "mg_svaf") was not inlined because the call site will not flatten.  "mpi_wtime_" is missing.
+
+ftn-3118 ftn: IPA MG_SVAF, File = MG_SVAF.F, Line = 207, Column = 18 
+  "mg_send_svaf" (called from "mg_svaf") was not inlined because the call site will not flatten.  "mpi_wtime_" is missing.
+
+ftn-3118 ftn: IPA MG_SVAF, File = MG_SVAF.F, Line = 208, Column = 18 
+  "mg_unpack_svaf" (called from "mg_svaf") was not inlined because the call site will not flatten.  "mpi_wtime_" is missing.
+
+ftn-3118 ftn: IPA MG_SVAF, File = MG_SVAF.F, Line = 210, Column = 18 
+  "mg_irecv" (called from "mg_svaf") was not inlined because the call site will not flatten.  "mpi_wtime_" is missing.
+
+ftn-3118 ftn: IPA MG_SVAF, File = MG_SVAF.F, Line = 211, Column = 18 
+  "mg_pack" (called from "mg_svaf") was not inlined because the call site will not flatten.  "mpi_wtime_" is missing.
+
+ftn-3118 ftn: IPA MG_SVAF, File = MG_SVAF.F, Line = 212, Column = 18 
+  "mg_send_svaf" (called from "mg_svaf") was not inlined because the call site will not flatten.  "mpi_wtime_" is missing.
+
+ftn-3118 ftn: IPA MG_SVAF, File = MG_SVAF.F, Line = 213, Column = 18 
+  "mg_unpack_svaf" (called from "mg_svaf") was not inlined because the call site will not flatten.  "mpi_wtime_" is missing.
+
+ftn-3118 ftn: IPA MG_SVAF, File = MG_SVAF.F, Line = 215, Column = 18 
+  "mg_irecv" (called from "mg_svaf") was not inlined because the call site will not flatten.  "mpi_wtime_" is missing.
+
+ftn-3118 ftn: IPA MG_SVAF, File = MG_SVAF.F, Line = 216, Column = 18 
+  "mg_pack" (called from "mg_svaf") was not inlined because the call site will not flatten.  "mpi_wtime_" is missing.
+
+ftn-3118 ftn: IPA MG_SVAF, File = MG_SVAF.F, Line = 217, Column = 18 
+  "mg_send_svaf" (called from "mg_svaf") was not inlined because the call site will not flatten.  "mpi_wtime_" is missing.
+
+ftn-3118 ftn: IPA MG_SVAF, File = MG_SVAF.F, Line = 218, Column = 18 
+  "mg_unpack_svaf" (called from "mg_svaf") was not inlined because the call site will not flatten.  "mpi_wtime_" is missing.
+
+ftn-3118 ftn: IPA MG_SVAF, File = MG_SVAF.F, Line = 220, Column = 18 
+  "mg_irecv" (called from "mg_svaf") was not inlined because the call site will not flatten.  "mpi_wtime_" is missing.
+
+ftn-3118 ftn: IPA MG_SVAF, File = MG_SVAF.F, Line = 221, Column = 18 
+  "mg_pack" (called from "mg_svaf") was not inlined because the call site will not flatten.  "mpi_wtime_" is missing.
+
+ftn-3118 ftn: IPA MG_SVAF, File = MG_SVAF.F, Line = 222, Column = 18 
+  "mg_send_svaf" (called from "mg_svaf") was not inlined because the call site will not flatten.  "mpi_wtime_" is missing.
+
+ftn-3118 ftn: IPA MG_SVAF, File = MG_SVAF.F, Line = 223, Column = 18 
+  "mg_unpack_svaf" (called from "mg_svaf") was not inlined because the call site will not flatten.  "mpi_wtime_" is missing.
+
+ftn-3118 ftn: IPA MG_SVAF, File = MG_SVAF.F, Line = 225, Column = 18 
+  "mg_irecv" (called from "mg_svaf") was not inlined because the call site will not flatten.  "mpi_wtime_" is missing.
+
+ftn-3118 ftn: IPA MG_SVAF, File = MG_SVAF.F, Line = 226, Column = 18 
+  "mg_pack" (called from "mg_svaf") was not inlined because the call site will not flatten.  "mpi_wtime_" is missing.
+
+ftn-3118 ftn: IPA MG_SVAF, File = MG_SVAF.F, Line = 227, Column = 18 
+  "mg_send_svaf" (called from "mg_svaf") was not inlined because the call site will not flatten.  "mpi_wtime_" is missing.
+
+ftn-3118 ftn: IPA MG_SVAF, File = MG_SVAF.F, Line = 228, Column = 18 
+  "mg_unpack_svaf" (called from "mg_svaf") was not inlined because the call site will not flatten.  "mpi_wtime_" is missing.
+
+ftn-3118 ftn: IPA MG_SVAF, File = MG_SVAF.F, Line = 230, Column = 18 
+  "mg_irecv" (called from "mg_svaf") was not inlined because the call site will not flatten.  "mpi_wtime_" is missing.
+
+ftn-3118 ftn: IPA MG_SVAF, File = MG_SVAF.F, Line = 231, Column = 18 
+  "mg_pack" (called from "mg_svaf") was not inlined because the call site will not flatten.  "mpi_wtime_" is missing.
+
+ftn-3118 ftn: IPA MG_SVAF, File = MG_SVAF.F, Line = 232, Column = 18 
+  "mg_send_svaf" (called from "mg_svaf") was not inlined because the call site will not flatten.  "mpi_wtime_" is missing.
+
+ftn-3118 ftn: IPA MG_SVAF, File = MG_SVAF.F, Line = 233, Column = 18 
+  "mg_unpack_svaf" (called from "mg_svaf") was not inlined because the call site will not flatten.  "mpi_wtime_" is missing.
+
+ftn-3118 ftn: IPA MG_SVAF, File = MG_SVAF.F, Line = 235, Column = 18 
+  "mg_irecv" (called from "mg_svaf") was not inlined because the call site will not flatten.  "mpi_wtime_" is missing.
+
+ftn-3118 ftn: IPA MG_SVAF, File = MG_SVAF.F, Line = 236, Column = 18 
+  "mg_pack" (called from "mg_svaf") was not inlined because the call site will not flatten.  "mpi_wtime_" is missing.
+
+ftn-3118 ftn: IPA MG_SVAF, File = MG_SVAF.F, Line = 237, Column = 18 
+  "mg_send_svaf" (called from "mg_svaf") was not inlined because the call site will not flatten.  "mpi_wtime_" is missing.
+
+ftn-3118 ftn: IPA MG_SVAF, File = MG_SVAF.F, Line = 238, Column = 18 
+  "mg_unpack_svaf" (called from "mg_svaf") was not inlined because the call site will not flatten.  "mpi_wtime_" is missing.
+
+ftn-3118 ftn: IPA MG_SVAF, File = MG_SVAF.F, Line = 240, Column = 18 
+  "mg_irecv" (called from "mg_svaf") was not inlined because the call site will not flatten.  "mpi_wtime_" is missing.
+
+ftn-3118 ftn: IPA MG_SVAF, File = MG_SVAF.F, Line = 241, Column = 18 
+  "mg_pack" (called from "mg_svaf") was not inlined because the call site will not flatten.  "mpi_wtime_" is missing.
+
+ftn-3118 ftn: IPA MG_SVAF, File = MG_SVAF.F, Line = 242, Column = 18 
+  "mg_send_svaf" (called from "mg_svaf") was not inlined because the call site will not flatten.  "mpi_wtime_" is missing.
+
+ftn-3118 ftn: IPA MG_SVAF, File = MG_SVAF.F, Line = 243, Column = 18 
+  "mg_unpack_svaf" (called from "mg_svaf") was not inlined because the call site will not flatten.  "mpi_wtime_" is missing.
+
+ftn-3118 ftn: IPA MG_SVAF, File = MG_SVAF.F, Line = 245, Column = 18 
+  "mg_irecv" (called from "mg_svaf") was not inlined because the call site will not flatten.  "mpi_wtime_" is missing.
+
+ftn-3118 ftn: IPA MG_SVAF, File = MG_SVAF.F, Line = 246, Column = 18 
+  "mg_pack" (called from "mg_svaf") was not inlined because the call site will not flatten.  "mpi_wtime_" is missing.
+
+ftn-3118 ftn: IPA MG_SVAF, File = MG_SVAF.F, Line = 247, Column = 18 
+  "mg_send_svaf" (called from "mg_svaf") was not inlined because the call site will not flatten.  "mpi_wtime_" is missing.
+
+ftn-3118 ftn: IPA MG_SVAF, File = MG_SVAF.F, Line = 248, Column = 18 
+  "mg_unpack_svaf" (called from "mg_svaf") was not inlined because the call site will not flatten.  "mpi_wtime_" is missing.
+
+ftn-3118 ftn: IPA MG_SVAF, File = MG_SVAF.F, Line = 251, Column = 18 
+  "mg_irecv" (called from "mg_svaf") was not inlined because the call site will not flatten.  "mpi_wtime_" is missing.
+
+ftn-3118 ftn: IPA MG_SVAF, File = MG_SVAF.F, Line = 252, Column = 18 
+  "mg_pack" (called from "mg_svaf") was not inlined because the call site will not flatten.  "mpi_wtime_" is missing.
+
+ftn-3118 ftn: IPA MG_SVAF, File = MG_SVAF.F, Line = 253, Column = 18 
+  "mg_send_svaf" (called from "mg_svaf") was not inlined because the call site will not flatten.  "mpi_wtime_" is missing.
+
+ftn-3118 ftn: IPA MG_SVAF, File = MG_SVAF.F, Line = 254, Column = 18 
+  "mg_unpack_svaf" (called from "mg_svaf") was not inlined because the call site will not flatten.  "mpi_wtime_" is missing.
+
+ftn-3118 ftn: IPA MG_SVAF, File = MG_SVAF.F, Line = 256, Column = 18 
+  "mg_irecv" (called from "mg_svaf") was not inlined because the call site will not flatten.  "mpi_wtime_" is missing.
+
+ftn-3118 ftn: IPA MG_SVAF, File = MG_SVAF.F, Line = 257, Column = 18 
+  "mg_pack" (called from "mg_svaf") was not inlined because the call site will not flatten.  "mpi_wtime_" is missing.
+
+ftn-3118 ftn: IPA MG_SVAF, File = MG_SVAF.F, Line = 258, Column = 18 
+  "mg_send_svaf" (called from "mg_svaf") was not inlined because the call site will not flatten.  "mpi_wtime_" is missing.
+
+ftn-3118 ftn: IPA MG_SVAF, File = MG_SVAF.F, Line = 259, Column = 18 
+  "mg_unpack_svaf" (called from "mg_svaf") was not inlined because the call site will not flatten.  "mpi_wtime_" is missing.
+
+ftn-3118 ftn: IPA MG_SVAF, File = MG_SVAF.F, Line = 261, Column = 18 
+  "mg_irecv" (called from "mg_svaf") was not inlined because the call site will not flatten.  "mpi_wtime_" is missing.
+
+ftn-3118 ftn: IPA MG_SVAF, File = MG_SVAF.F, Line = 262, Column = 18 
+  "mg_pack" (called from "mg_svaf") was not inlined because the call site will not flatten.  "mpi_wtime_" is missing.
+
+ftn-3118 ftn: IPA MG_SVAF, File = MG_SVAF.F, Line = 263, Column = 18 
+  "mg_send_svaf" (called from "mg_svaf") was not inlined because the call site will not flatten.  "mpi_wtime_" is missing.
+
+ftn-3118 ftn: IPA MG_SVAF, File = MG_SVAF.F, Line = 264, Column = 18 
+  "mg_unpack_svaf" (called from "mg_svaf") was not inlined because the call site will not flatten.  "mpi_wtime_" is missing.
+
+ftn-3118 ftn: IPA MG_SVAF, File = MG_SVAF.F, Line = 266, Column = 18 
+  "mg_irecv" (called from "mg_svaf") was not inlined because the call site will not flatten.  "mpi_wtime_" is missing.
+
+ftn-3118 ftn: IPA MG_SVAF, File = MG_SVAF.F, Line = 267, Column = 18 
+  "mg_pack" (called from "mg_svaf") was not inlined because the call site will not flatten.  "mpi_wtime_" is missing.
+
+ftn-3118 ftn: IPA MG_SVAF, File = MG_SVAF.F, Line = 268, Column = 18 
+  "mg_send_svaf" (called from "mg_svaf") was not inlined because the call site will not flatten.  "mpi_wtime_" is missing.
+
+ftn-3118 ftn: IPA MG_SVAF, File = MG_SVAF.F, Line = 269, Column = 18 
+  "mg_unpack_svaf" (called from "mg_svaf") was not inlined because the call site will not flatten.  "mpi_wtime_" is missing.
+
+ftn-3118 ftn: IPA MG_SVAF, File = MG_SVAF.F, Line = 271, Column = 18 
+  "mg_irecv" (called from "mg_svaf") was not inlined because the call site will not flatten.  "mpi_wtime_" is missing.
+
+ftn-3118 ftn: IPA MG_SVAF, File = MG_SVAF.F, Line = 272, Column = 18 
+  "mg_pack" (called from "mg_svaf") was not inlined because the call site will not flatten.  "mpi_wtime_" is missing.
+
+ftn-3118 ftn: IPA MG_SVAF, File = MG_SVAF.F, Line = 273, Column = 18 
+  "mg_send_svaf" (called from "mg_svaf") was not inlined because the call site will not flatten.  "mpi_wtime_" is missing.
+
+ftn-3118 ftn: IPA MG_SVAF, File = MG_SVAF.F, Line = 274, Column = 18 
+  "mg_unpack_svaf" (called from "mg_svaf") was not inlined because the call site will not flatten.  "mpi_wtime_" is missing.
+
+ftn-3118 ftn: IPA MG_SVAF, File = MG_SVAF.F, Line = 276, Column = 18 
+  "mg_irecv" (called from "mg_svaf") was not inlined because the call site will not flatten.  "mpi_wtime_" is missing.
+
+ftn-3118 ftn: IPA MG_SVAF, File = MG_SVAF.F, Line = 277, Column = 18 
+  "mg_pack" (called from "mg_svaf") was not inlined because the call site will not flatten.  "mpi_wtime_" is missing.
+
+ftn-3118 ftn: IPA MG_SVAF, File = MG_SVAF.F, Line = 278, Column = 18 
+  "mg_send_svaf" (called from "mg_svaf") was not inlined because the call site will not flatten.  "mpi_wtime_" is missing.
+
+ftn-3118 ftn: IPA MG_SVAF, File = MG_SVAF.F, Line = 279, Column = 18 
+  "mg_unpack_svaf" (called from "mg_svaf") was not inlined because the call site will not flatten.  "mpi_wtime_" is missing.
+
+ftn-3118 ftn: IPA MG_SVAF, File = MG_SVAF.F, Line = 281, Column = 18 
+  "mg_irecv" (called from "mg_svaf") was not inlined because the call site will not flatten.  "mpi_wtime_" is missing.
+
+ftn-3118 ftn: IPA MG_SVAF, File = MG_SVAF.F, Line = 282, Column = 18 
+  "mg_pack" (called from "mg_svaf") was not inlined because the call site will not flatten.  "mpi_wtime_" is missing.
+
+ftn-3118 ftn: IPA MG_SVAF, File = MG_SVAF.F, Line = 283, Column = 18 
+  "mg_send_svaf" (called from "mg_svaf") was not inlined because the call site will not flatten.  "mpi_wtime_" is missing.
+
+ftn-3118 ftn: IPA MG_SVAF, File = MG_SVAF.F, Line = 284, Column = 18 
+  "mg_unpack_svaf" (called from "mg_svaf") was not inlined because the call site will not flatten.  "mpi_wtime_" is missing.
+
+ftn-3118 ftn: IPA MG_SVAF, File = MG_SVAF.F, Line = 286, Column = 18 
+  "mg_irecv" (called from "mg_svaf") was not inlined because the call site will not flatten.  "mpi_wtime_" is missing.
+
+ftn-3118 ftn: IPA MG_SVAF, File = MG_SVAF.F, Line = 287, Column = 18 
+  "mg_pack" (called from "mg_svaf") was not inlined because the call site will not flatten.  "mpi_wtime_" is missing.
+
+ftn-3118 ftn: IPA MG_SVAF, File = MG_SVAF.F, Line = 288, Column = 18 
+  "mg_send_svaf" (called from "mg_svaf") was not inlined because the call site will not flatten.  "mpi_wtime_" is missing.
+
+ftn-3118 ftn: IPA MG_SVAF, File = MG_SVAF.F, Line = 289, Column = 18 
+  "mg_unpack_svaf" (called from "mg_svaf") was not inlined because the call site will not flatten.  "mpi_wtime_" is missing.
+
+ftn-3118 ftn: IPA MG_SVAF, File = MG_SVAF.F, Line = 291, Column = 18 
+  "mg_irecv" (called from "mg_svaf") was not inlined because the call site will not flatten.  "mpi_wtime_" is missing.
+
+ftn-3118 ftn: IPA MG_SVAF, File = MG_SVAF.F, Line = 292, Column = 18 
+  "mg_pack" (called from "mg_svaf") was not inlined because the call site will not flatten.  "mpi_wtime_" is missing.
+
+ftn-3118 ftn: IPA MG_SVAF, File = MG_SVAF.F, Line = 293, Column = 18 
+  "mg_send_svaf" (called from "mg_svaf") was not inlined because the call site will not flatten.  "mpi_wtime_" is missing.
+
+ftn-3118 ftn: IPA MG_SVAF, File = MG_SVAF.F, Line = 294, Column = 18 
+  "mg_unpack_svaf" (called from "mg_svaf") was not inlined because the call site will not flatten.  "mpi_wtime_" is missing.
+
+ftn-3118 ftn: IPA MG_SVAF, File = MG_SVAF.F, Line = 296, Column = 18 
+  "mg_irecv" (called from "mg_svaf") was not inlined because the call site will not flatten.  "mpi_wtime_" is missing.
+
+ftn-3118 ftn: IPA MG_SVAF, File = MG_SVAF.F, Line = 297, Column = 18 
+  "mg_pack" (called from "mg_svaf") was not inlined because the call site will not flatten.  "mpi_wtime_" is missing.
+
+ftn-3118 ftn: IPA MG_SVAF, File = MG_SVAF.F, Line = 298, Column = 18 
+  "mg_send_svaf" (called from "mg_svaf") was not inlined because the call site will not flatten.  "mpi_wtime_" is missing.
+
+ftn-3118 ftn: IPA MG_SVAF, File = MG_SVAF.F, Line = 299, Column = 18 
+  "mg_unpack_svaf" (called from "mg_svaf") was not inlined because the call site will not flatten.  "mpi_wtime_" is missing.
+
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+               C r o s s   R e f e r e n c e   for   MG_SVAF_MOD
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Name                                      Storage/Owner                   
+----                                      -------------                   
+
+COUNT_SEND_BACK                           Module MG_CONSTANTS_MOD         
+  Integer(kind=4), Use assoc
+  Declared  
+  Defined         92
+  Referenced
+  Referenced in contained procedure
+
+COUNT_SEND_EAST                           Module MG_CONSTANTS_MOD         
+  Integer(kind=4), Use assoc
+  Declared  
+  Defined         90
+  Referenced
+  Referenced in contained procedure
+
+COUNT_SEND_FRONT                          Module MG_CONSTANTS_MOD         
+  Integer(kind=4), Use assoc
+  Declared  
+  Defined         93
+  Referenced
+  Referenced in contained procedure
+
+COUNT_SEND_NORTH                          Module MG_CONSTANTS_MOD         
+  Integer(kind=4), Use assoc
+  Declared  
+  Defined         88
+  Referenced
+  Referenced in contained procedure
+
+COUNT_SEND_SOUTH                          Module MG_CONSTANTS_MOD         
+  Integer(kind=4), Use assoc
+  Declared  
+  Defined         89
+  Referenced
+  Referenced in contained procedure
+
+COUNT_SEND_WEST                           Module MG_CONSTANTS_MOD         
+  Integer(kind=4), Use assoc
+  Declared  
+  Defined         91
+  Referenced
+  Referenced in contained procedure
+
+GRID1                                     Module MG_CONSTANTS_MOD         
+  Real(kind=8), Use assoc, Dimension(:,:,:), Allocatable
+  Declared  
+  Defined   
+  Referenced      99     100     101
+  Referenced in contained procedure
+
+GRID10                                    Module MG_CONSTANTS_MOD         
+  Real(kind=8), Use assoc, Dimension(:,:,:), Allocatable
+  Declared  
+  Defined   
+  Referenced     144     145     146
+  Referenced in contained procedure
+
+GRID11                                    Module MG_CONSTANTS_MOD         
+  Real(kind=8), Use assoc, Dimension(:,:,:), Allocatable
+  Declared  
+  Defined   
+  Referenced     150     151     152
+  Referenced in contained procedure
+
+GRID12                                    Module MG_CONSTANTS_MOD         
+  Real(kind=8), Use assoc, Dimension(:,:,:), Allocatable
+  Declared  
+  Defined   
+  Referenced     155     156     157
+  Referenced in contained procedure
+
+GRID13                                    Module MG_CONSTANTS_MOD         
+  Real(kind=8), Use assoc, Dimension(:,:,:), Allocatable
+  Declared  
+  Defined   
+  Referenced     160     161     162
+  Referenced in contained procedure
+
+GRID14                                    Module MG_CONSTANTS_MOD         
+  Real(kind=8), Use assoc, Dimension(:,:,:), Allocatable
+  Declared  
+  Defined   
+  Referenced     165     166     167
+  Referenced in contained procedure
+
+GRID15                                    Module MG_CONSTANTS_MOD         
+  Real(kind=8), Use assoc, Dimension(:,:,:), Allocatable
+  Declared  
+  Defined   
+  Referenced     170     171     172
+  Referenced in contained procedure
+
+GRID16                                    Module MG_CONSTANTS_MOD         
+  Real(kind=8), Use assoc, Dimension(:,:,:), Allocatable
+  Declared  
+  Defined   
+  Referenced     175     176     177
+  Referenced in contained procedure
+
+GRID17                                    Module MG_CONSTANTS_MOD         
+  Real(kind=8), Use assoc, Dimension(:,:,:), Allocatable
+  Declared  
+  Defined   
+  Referenced     180     181     182
+  Referenced in contained procedure
+
+GRID18                                    Module MG_CONSTANTS_MOD         
+  Real(kind=8), Use assoc, Dimension(:,:,:), Allocatable
+  Declared  
+  Defined   
+  Referenced     185     186     187
+  Referenced in contained procedure
+
+GRID19                                    Module MG_CONSTANTS_MOD         
+  Real(kind=8), Use assoc, Dimension(:,:,:), Allocatable
+  Declared  
+  Defined   
+  Referenced     190     191     192
+  Referenced in contained procedure
+
+GRID2                                     Module MG_CONSTANTS_MOD         
+  Real(kind=8), Use assoc, Dimension(:,:,:), Allocatable
+  Declared  
+  Defined   
+  Referenced     104     105     106
+  Referenced in contained procedure
+
+GRID20                                    Module MG_CONSTANTS_MOD         
+  Real(kind=8), Use assoc, Dimension(:,:,:), Allocatable
+  Declared  
+  Defined   
+  Referenced     195     196     197
+  Referenced in contained procedure
+
+GRID21                                    Module MG_CONSTANTS_MOD         
+  Real(kind=8), Use assoc, Dimension(:,:,:), Allocatable
+  Declared  
+  Defined   
+  Referenced     201     202     203
+  Referenced in contained procedure
+
+GRID22                                    Module MG_CONSTANTS_MOD         
+  Real(kind=8), Use assoc, Dimension(:,:,:), Allocatable
+  Declared  
+  Defined   
+  Referenced     206     207     208
+  Referenced in contained procedure
+
+GRID23                                    Module MG_CONSTANTS_MOD         
+  Real(kind=8), Use assoc, Dimension(:,:,:), Allocatable
+  Declared  
+  Defined   
+  Referenced     211     212     213
+  Referenced in contained procedure
+
+GRID24                                    Module MG_CONSTANTS_MOD         
+  Real(kind=8), Use assoc, Dimension(:,:,:), Allocatable
+  Declared  
+  Defined   
+  Referenced     216     217     218
+  Referenced in contained procedure
+
+GRID25                                    Module MG_CONSTANTS_MOD         
+  Real(kind=8), Use assoc, Dimension(:,:,:), Allocatable
+  Declared  
+  Defined   
+  Referenced     221     222     223
+  Referenced in contained procedure
+
+GRID26                                    Module MG_CONSTANTS_MOD         
+  Real(kind=8), Use assoc, Dimension(:,:,:), Allocatable
+  Declared  
+  Defined   
+  Referenced     226     227     228
+  Referenced in contained procedure
+
+GRID27                                    Module MG_CONSTANTS_MOD         
+  Real(kind=8), Use assoc, Dimension(:,:,:), Allocatable
+  Declared  
+  Defined   
+  Referenced     231     232     233
+  Referenced in contained procedure
+
+GRID28                                    Module MG_CONSTANTS_MOD         
+  Real(kind=8), Use assoc, Dimension(:,:,:), Allocatable
+  Declared  
+  Defined   
+  Referenced     236     237     238
+  Referenced in contained procedure
+
+GRID29                                    Module MG_CONSTANTS_MOD         
+  Real(kind=8), Use assoc, Dimension(:,:,:), Allocatable
+  Declared  
+  Defined   
+  Referenced     241     242     243
+  Referenced in contained procedure
+
+GRID3                                     Module MG_CONSTANTS_MOD         
+  Real(kind=8), Use assoc, Dimension(:,:,:), Allocatable
+  Declared  
+  Defined   
+  Referenced     109     110     111
+  Referenced in contained procedure
+
+GRID30                                    Module MG_CONSTANTS_MOD         
+  Real(kind=8), Use assoc, Dimension(:,:,:), Allocatable
+  Declared  
+  Defined   
+  Referenced     246     247     248
+  Referenced in contained procedure
+
+GRID31                                    Module MG_CONSTANTS_MOD         
+  Real(kind=8), Use assoc, Dimension(:,:,:), Allocatable
+  Declared  
+  Defined   
+  Referenced     252     253     254
+  Referenced in contained procedure
+
+GRID32                                    Module MG_CONSTANTS_MOD         
+  Real(kind=8), Use assoc, Dimension(:,:,:), Allocatable
+  Declared  
+  Defined   
+  Referenced     257     258     259
+  Referenced in contained procedure
+
+GRID33                                    Module MG_CONSTANTS_MOD         
+  Real(kind=8), Use assoc, Dimension(:,:,:), Allocatable
+  Declared  
+  Defined   
+  Referenced     262     263     264
+  Referenced in contained procedure
+
+GRID34                                    Module MG_CONSTANTS_MOD         
+  Real(kind=8), Use assoc, Dimension(:,:,:), Allocatable
+  Declared  
+  Defined   
+  Referenced     267     268     269
+  Referenced in contained procedure
+
+GRID35                                    Module MG_CONSTANTS_MOD         
+  Real(kind=8), Use assoc, Dimension(:,:,:), Allocatable
+  Declared  
+  Defined   
+  Referenced     272     273     274
+  Referenced in contained procedure
+
+GRID36                                    Module MG_CONSTANTS_MOD         
+  Real(kind=8), Use assoc, Dimension(:,:,:), Allocatable
+  Declared  
+  Defined   
+  Referenced     277     278     279
+  Referenced in contained procedure
+
+GRID37                                    Module MG_CONSTANTS_MOD         
+  Real(kind=8), Use assoc, Dimension(:,:,:), Allocatable
+  Declared  
+  Defined   
+  Referenced     282     283     284
+  Referenced in contained procedure
+
+GRID38                                    Module MG_CONSTANTS_MOD         
+  Real(kind=8), Use assoc, Dimension(:,:,:), Allocatable
+  Declared  
+  Defined   
+  Referenced     287     288     289
+  Referenced in contained procedure
+
+GRID39                                    Module MG_CONSTANTS_MOD         
+  Real(kind=8), Use assoc, Dimension(:,:,:), Allocatable
+  Declared  
+  Defined   
+  Referenced     292     293     294
+  Referenced in contained procedure
+
+GRID4                                     Module MG_CONSTANTS_MOD         
+  Real(kind=8), Use assoc, Dimension(:,:,:), Allocatable
+  Declared  
+  Defined   
+  Referenced     114     115     116
+  Referenced in contained procedure
+
+GRID40                                    Module MG_CONSTANTS_MOD         
+  Real(kind=8), Use assoc, Dimension(:,:,:), Allocatable
+  Declared  
+  Defined   
+  Referenced     297     298     299
+  Referenced in contained procedure
+
+GRID5                                     Module MG_CONSTANTS_MOD         
+  Real(kind=8), Use assoc, Dimension(:,:,:), Allocatable
+  Declared  
+  Defined   
+  Referenced     119     120     121
+  Referenced in contained procedure
+
+GRID6                                     Module MG_CONSTANTS_MOD         
+  Real(kind=8), Use assoc, Dimension(:,:,:), Allocatable
+  Declared  
+  Defined   
+  Referenced     124     125     126
+  Referenced in contained procedure
+
+GRID7                                     Module MG_CONSTANTS_MOD         
+  Real(kind=8), Use assoc, Dimension(:,:,:), Allocatable
+  Declared  
+  Defined   
+  Referenced     129     130     131
+  Referenced in contained procedure
+
+GRID8                                     Module MG_CONSTANTS_MOD         
+  Real(kind=8), Use assoc, Dimension(:,:,:), Allocatable
+  Declared  
+  Defined   
+  Referenced     134     135     136
+  Referenced in contained procedure
+
+GRID9                                     Module MG_CONSTANTS_MOD         
+  Real(kind=8), Use assoc, Dimension(:,:,:), Allocatable
+  Declared  
+  Defined   
+  Referenced     139     140     141
+  Referenced in contained procedure
+
+I                                         Stack                           
+  Variable, Integer
+  Declared        72
+  Defined   
+  Referenced
+
+ICOUNT                                    Stack                           
+  Variable, Integer
+  Declared        69
+  Defined   
+  Referenced
+
+IERR                                      MG_SVAF                         
+  Dummy Argument, Integer, Intent(out)
+  Declared        48      62
+  Defined         86
+  Referenced      98      99     100     101     103     104     105     106     108     109     110     111     113     114     115
+           116     118     119     120     121     123     124     125     126     128     129     130     131     133     134
+           135     136     138     139     140     141     143     144     145     146     149     150     151     152     154
+           155     156     157     159     160     161     162     164     165     166     167     169     170     171     172
+           174     175     176     177     179     180     181     182     184     185     186     187     189     190     191
+           192     194     195     196     197     200     201     202     203     205     206     207     208     210     211
+           212     213     215     216     217     218     220     221     222     223     225     226     227     228     230
+           231     232     233     235     236     237     238     240     241     242     243     245     246     247     248
+           251     252     253     254     256     257     258     259     261     262     263     264     266     267     268
+           269     271     272     273     274     276     277     278     279     281     282     283     284     286     287
+           288     289     291     292     293     294     296     297     298     299
+
+ISTAT                                     Stack                           
+  Variable, Integer
+  Declared        70
+  Defined   
+  Referenced
+
+IVAR                                      MG_SVAF                         
+  Dummy Argument, Integer, Intent(in)
+  Declared        48      59
+  Defined   
+  Referenced      95     302
+
+IWHICH                                    Stack                           
+  Variable, Integer
+  Declared        71
+  Defined   
+  Referenced
+
+J                                         Stack                           
+  Variable, Integer
+  Declared        72
+  Defined   
+  Referenced
+
+K                                         Stack                           
+  Variable, Integer
+  Declared        72
+  Defined   
+  Referenced
+
+L                                         Stack                           
+  Variable, Integer
+  Declared        72
+  Defined   
+  Referenced
+
+M                                         Stack                           
+  Variable, Integer
+  Declared        72
+  Defined   
+  Referenced
+
+MG_CONSTANTS_MOD                                                          
+  Module, Used indirectly (from module MG_UTILS_MOD)
+  Declared  
+  Defined   
+  Referenced
+
+MG_CONSTANTS_MOD                                                          
+  Module, Used indirectly (from module MG_SEND_SVAF_MOD)
+  Declared  
+  Defined   
+  Referenced
+
+MG_CONSTANTS_MOD                                                          
+  Module
+  Declared  
+  Defined   
+  Referenced      35
+
+MG_CONSTANTS_MOD                                                          
+  Module, Used indirectly (from module MG_UNPACK_SVAF_MOD)
+  Declared  
+  Defined   
+  Referenced
+
+MG_CONSTANTS_MOD                                                          
+  Module, Used indirectly (from module MG_PACK_MOD)
+  Declared  
+  Defined   
+  Referenced
+
+MG_CONSTANTS_MOD                                                          
+  Module, Used indirectly (from module MG_IRECV_MOD)
+  Declared  
+  Defined   
+  Referenced
+
+MG_ENV_MOD                                                                
+  Module, Used indirectly (from module MG_SEND_SVAF_MOD)
+  Declared  
+  Defined   
+  Referenced
+
+MG_ENV_MOD                                                                
+  Module, Used indirectly (from module MG_IRECV_MOD)
+  Declared  
+  Defined   
+  Referenced
+
+MG_ENV_MOD                                                                
+  Module, Used indirectly (from module MG_PACK_MOD)
+  Declared  
+  Defined   
+  Referenced
+
+MG_ENV_MOD                                                                
+  Module, Used indirectly (from module MG_UNPACK_SVAF_MOD)
+  Declared  
+  Defined   
+  Referenced
+
+MG_GET_FACE_MOD                                                           
+  Module, Used indirectly (from module MG_UNPACK_SVAF_MOD)
+  Declared  
+  Defined   
+  Referenced
+
+MG_IRECV                                  Module MG_IRECV_MOD             
+  Subroutine, Module procedure
+  Declared  
+  Defined   
+  Referenced      98      98     103     103     108     108     113     113     118     118     123     123     128     128     133
+           133     138     138     143     143     149     149     154     154     159     159     164     164     169     169
+           174     174     179     179     184     184     189     189     194     194     200     200     205     205     210
+           210     215     215     220     220     225     225     230     230     235     235     240     240     245     245
+           251     251     256     256     261     261     266     266     271     271     276     276     281     281     286
+           286     291     291     296     296
+
+MG_IRECV                                  Module MG_IRECV_MOD             
+  Subroutine, Module procedure
+  Declared  
+  Defined   
+  Referenced      98      98     103     103     108     108     113     113     118     118     123     123     128     128     133
+           133     138     138     143     143     149     149     154     154     159     159     164     164     169     169
+           174     174     179     179     184     184     189     189     194     194     200     200     205     205     210
+           210     215     215     220     220     225     225     230     230     235     235     240     240     245     245
+           251     251     256     256     261     261     266     266     271     271     276     276     281     281     286
+           286     291     291     296     296
+
+MG_IRECV_MOD                                                              
+  Module
+  Declared  
+  Defined   
+  Referenced      37
+
+MG_OPTIONS_MOD                                                            
+  Module, Used indirectly (from module MG_UNPACK_SVAF_MOD)
+  Declared  
+  Defined   
+  Referenced
+
+MG_OPTIONS_MOD                                                            
+  Module, Used indirectly (from module MG_IRECV_MOD)
+  Declared  
+  Defined   
+  Referenced
+
+MG_OPTIONS_MOD                                                            
+  Module, Used indirectly (from module MG_SEND_SVAF_MOD)
+  Declared  
+  Defined   
+  Referenced
+
+MG_OPTIONS_MOD                                                            
+  Module, Used indirectly (from module MG_UTILS_MOD)
+  Declared  
+  Defined   
+  Referenced
+
+MG_OPTIONS_MOD                                                            
+  Module, Used indirectly (from module MG_PACK_MOD)
+  Declared  
+  Defined   
+  Referenced
+
+MG_PACK                                   Module MG_PACK_MOD              
+  Subroutine, Module procedure
+  Declared  
+  Defined   
+  Referenced      99      99     104     104     109     109     114     114     119     119     124     124     129     129     134
+           134     139     139     144     144     150     150     155     155     160     160     165     165     170     170
+           175     175     180     180     185     185     190     190     195     195     201     201     206     206     211
+           211     216     216     221     221     226     226     231     231     236     236     241     241     246     246
+           252     252     257     257     262     262     267     267     272     272     277     277     282     282     287
+           287     292     292     297     297
+
+MG_PACK                                   Module MG_PACK_MOD              
+  Subroutine, Module procedure
+  Declared  
+  Defined   
+  Referenced      99      99     104     104     109     109     114     114     119     119     124     124     129     129     134
+           134     139     139     144     144     150     150     155     155     160     160     165     165     170     170
+           175     175     180     180     185     185     190     190     195     195     201     201     206     206     211
+           211     216     216     221     221     226     226     231     231     236     236     241     241     246     246
+           252     252     257     257     262     262     267     267     272     272     277     277     282     282     287
+           287     292     292     297     297
+
+MG_PACK_MOD                                                               
+  Module
+  Declared  
+  Defined   
+  Referenced      38
+
+MG_PROFILING_MOD                                                          
+  Module, Used indirectly (from module MG_SEND_SVAF_MOD)
+  Declared  
+  Defined   
+  Referenced
+
+MG_PROFILING_MOD                                                          
+  Module, Used indirectly (from module MG_UNPACK_SVAF_MOD)
+  Declared  
+  Defined   
+  Referenced
+
+MG_PROFILING_MOD                                                          
+  Module, Used indirectly (from module MG_IRECV_MOD)
+  Declared  
+  Defined   
+  Referenced
+
+MG_PROFILING_MOD                                                          
+  Module, Used indirectly (from module MG_PACK_MOD)
+  Declared  
+  Defined   
+  Referenced
+
+MG_SEND_SVAF                              Module MG_SEND_SVAF_MOD         
+  Subroutine, Module procedure
+  Declared  
+  Defined   
+  Referenced     100     100     105     105     110     110     115     115     120     120     125     125     130     130     135
+           135     140     140     145     145     151     151     156     156     161     161     166     166     171     171
+           176     176     181     181     186     186     191     191     196     196     202     202     207     207     212
+           212     217     217     222     222     227     227     232     232     237     237     242     242     247     247
+           253     253     258     258     263     263     268     268     273     273     278     278     283     283     288
+           288     293     293     298     298
+
+MG_SEND_SVAF                              Module MG_SEND_SVAF_MOD         
+  Subroutine, Module procedure
+  Declared  
+  Defined   
+  Referenced     100     100     105     105     110     110     115     115     120     120     125     125     130     130     135
+           135     140     140     145     145     151     151     156     156     161     161     166     166     171     171
+           176     176     181     181     186     186     191     191     196     196     202     202     207     207     212
+           212     217     217     222     222     227     227     232     232     237     237     242     242     247     247
+           253     253     258     258     263     263     268     268     273     273     278     278     283     283     288
+           288     293     293     298     298
+
+MG_SEND_SVAF_MOD                                                          
+  Module
+  Declared  
+  Defined   
+  Referenced      39
+
+MG_SVAF                                                                   
+  Subroutine, Module procedure
+  Declared        48
+  Defined   
+  Referenced
+
+MG_SVAF_MOD                                                               
+  Module
+  Declared        28
+  Defined   
+  Referenced
+
+MG_UNPACK_SVAF                            Module MG_UNPACK_SVAF_MOD       
+  Subroutine, Module procedure
+  Declared  
+  Defined   
+  Referenced     101     101     106     106     111     111     116     116     121     121     126     126     131     131     136
+           136     141     141     146     146     152     152     157     157     162     162     167     167     172     172
+           177     177     182     182     187     187     192     192     197     197     203     203     208     208     213
+           213     218     218     223     223     228     228     233     233     238     238     243     243     248     248
+           254     254     259     259     264     264     269     269     274     274     279     279     284     284     289
+           289     294     294     299     299
+
+MG_UNPACK_SVAF                            Module MG_UNPACK_SVAF_MOD       
+  Subroutine, Module procedure
+  Declared  
+  Defined   
+  Referenced     101     101     106     106     111     111     116     116     121     121     126     126     131     131     136
+           136     141     141     146     146     152     152     157     157     162     162     167     167     172     172
+           177     177     182     182     187     187     192     192     197     197     203     203     208     208     213
+           213     218     218     223     223     228     228     233     233     238     238     243     243     248     248
+           254     254     259     259     264     264     269     269     274     274     279     279     284     284     289
+           289     294     294     299     299
+
+MG_UNPACK_SVAF_MOD                                                        
+  Module
+  Declared  
+  Defined   
+  Referenced      40
+
+MG_UTILS_MOD                                                              
+  Module, Used indirectly (from module MG_SEND_SVAF_MOD)
+  Declared  
+  Defined   
+  Referenced
+
+MG_UTILS_MOD                                                              
+  Module, Used indirectly (from module MG_PACK_MOD)
+  Declared  
+  Defined   
+  Referenced
+
+MG_UTILS_MOD                                                              
+  Module, Used indirectly (from module MG_UNPACK_SVAF_MOD)
+  Declared  
+  Defined   
+  Referenced
+
+MG_UTILS_MOD                                                              
+  Module, Used indirectly (from module MG_IRECV_MOD)
+  Declared  
+  Defined   
+  Referenced
+
+MG_UTILS_MOD                                                              
+  Module
+  Declared  
+  Defined   
+  Referenced      36
+
+MPIFCMB5                                  Module MG_CONSTANTS_MOD         
+  Common block 
+  Declared  
+  Defined   
+  Referenced
+
+MPIFCMB9                                  Module MG_CONSTANTS_MOD         
+  Common block 
+  Declared  
+  Defined   
+  Referenced
+
+MPIPRIV1                                  Module MG_CONSTANTS_MOD         
+  Common block 
+  Declared  
+  Defined   
+  Referenced
+
+MPIPRIV2                                  Module MG_CONSTANTS_MOD         
+  Common block 
+  Declared  
+  Defined   
+  Referenced
+
+MPIPRIVC                                  Module MG_CONSTANTS_MOD         
+  Common block 
+  Declared  
+  Defined   
+  Referenced
+
+MSG_REQ                                   Stack                           
+  Variable, Integer, Dimension(12)
+  Declared        80
+  Defined   
+  Referenced
+
+MSG_REQ_OFFSET                            Stack                           
+  Variable, Integer
+  Declared        75
+  Defined   
+  Referenced
+
+N                                         Stack                           
+  Variable, Integer
+  Declared        72
+  Defined   
+  Referenced
+
+NUM_RECVS                                 Stack                           
+  Variable, Integer
+  Declared        73
+  Defined   
+  Referenced
+
+NUM_RECVS_OUTSTANDING                     Stack                           
+  Variable, Integer
+  Declared        74
+  Defined   
+  Referenced
+
+OFFSET                                    Stack                           
+  Variable, Integer
+  Declared        76
+  Defined   
+  Referenced
+
+OFFSET_LAST                               Stack                           
+  Variable, Integer
+  Declared        77
+  Defined   
+  Referenced
+
+RECV_BUFFER_SIZE                          Stack                           
+  Variable, Integer
+  Declared        78
+  Defined   
+  Referenced
+
+SEND_BUFFER_SIZE                          Stack                           
+  Variable, Integer
+  Declared        79
+  Defined   
+  Referenced
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+                     C o m m o n   B l o c k   R e p o r t
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Blk  Program Unit                     Messages
+---  ------------                     --------
+/MPIFCMB5/                            Length: 4 bytes
+
+     MG_SVAF_MOD                      Block is used from MG_CONSTANTS_MOD
+
+Blk  Program Unit                     Messages
+---  ------------                     --------
+/MPIFCMB9/                            Length: 4 bytes
+
+     MG_SVAF_MOD                      Block is used from MG_CONSTANTS_MOD
+
+Blk  Program Unit                     Messages
+---  ------------                     --------
+/MPIPRIV1/                            Length: 28 bytes
+
+     MG_SVAF_MOD                      Block is used from MG_CONSTANTS_MOD
+
+Blk  Program Unit                     Messages
+---  ------------                     --------
+/MPIPRIV2/                            Length: 24 bytes
+
+     MG_SVAF_MOD                      Block is used from MG_CONSTANTS_MOD
+
+Blk  Program Unit                     Messages
+---  ------------                     --------
+/MPIPRIVC/                            Length: 2 bytes
+
+     MG_SVAF_MOD                      Block is used from MG_CONSTANTS_MOD
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+                         E x t e r n a l   R e p o r t
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Name  Messages
+----  --------
+ENV in MG_ENV_MOD
+      Defined as:  No definitions.
+
+                   No calls.  It is not called and does not use any procedure.
+
+      Interface:   None
+
+Name  Messages
+----  --------
+GET_FACE in MG_GET_FACE_MOD
+      Defined as:  No definitions.
+
+                   No calls.  It is not called and does not use any procedure.
+
+      Interface:   None
+
+Name  Messages
+----  --------
+MG_ASSERT in MG_UTILS_MOD
+      Defined as:  No definitions.
+
+                   No calls.  It is not called and does not use any procedure.
+
+      Interface:   None
+
+Name  Messages
+----  --------
+MG_COMPUTE_STDDEV in MG_UTILS_MOD
+      Defined as:  No definitions.
+
+                   No calls.  It is not called and does not use any procedure.
+
+      Interface:   None
+
+Name  Messages
+----  --------
+MG_CONSTANTS_MOD
+      Defined as:  No definitions.
+
+      Used By:     MG_SVAF_MOD
+                   MG_SVAF_MOD  (indirectly)
+                   MG_SVAF_MOD  (indirectly)
+                   MG_SVAF_MOD  (indirectly)
+                   MG_SVAF_MOD  (indirectly)
+                   MG_SVAF_MOD  (indirectly)
+
+Name  Messages
+----  --------
+MG_ENV_MOD
+      Defined as:  No definitions.
+
+      Used By:     MG_SVAF_MOD  (indirectly)
+                   MG_SVAF_MOD  (indirectly)
+                   MG_SVAF_MOD  (indirectly)
+                   MG_SVAF_MOD  (indirectly)
+
+Name  Messages
+----  --------
+MG_GET_FACE in MG_GET_FACE_MOD
+      Defined as:  No definitions.
+
+                   No calls.  It is not called and does not use any procedure.
+
+      Interface:   None
+
+Name  Messages
+----  --------
+MG_GET_FACE_MOD
+      Defined as:  No definitions.
+
+      Used By:     MG_SVAF_MOD  (indirectly)
+
+Name  Messages
+----  --------
+MG_GRID_DEALLOC in MG_UTILS_MOD
+      Defined as:  No definitions.
+
+                   No calls.  It is not called and does not use any procedure.
+
+      Interface:   None
+
+Name  Messages
+----  --------
+MG_GRID_INIT in MG_UTILS_MOD
+      Defined as:  No definitions.
+
+                   No calls.  It is not called and does not use any procedure.
+
+      Interface:   None
+
+Name  Messages
+----  --------
+MG_INIT in MG_UTILS_MOD
+      Defined as:  No definitions.
+
+                   No calls.  It is not called and does not use any procedure.
+
+      Interface:   None
+
+Name  Messages
+----  --------
+MG_INIT_GRID in MG_UTILS_MOD
+      Defined as:  No definitions.
+
+                   No calls.  It is not called and does not use any procedure.
+
+      Interface:   None
+
+Name  Messages
+----  --------
+MG_INSERT_SPIKE in MG_UTILS_MOD
+      Defined as:  No definitions.
+
+                   No calls.  It is not called and does not use any procedure.
+
+      Interface:   None
+
+Name  Messages
+----  --------
+MG_IRECV in MG_IRECV_MOD
+      Defined as:  No definitions.
+
+      Interface:   None
+
+      Called By:   MG_SVAF in MG_SVAF_MOD (Line 98, file MG_SVAF.F)
+                   MG_SVAF in MG_SVAF_MOD (Line 103, file MG_SVAF.F)
+                   MG_SVAF in MG_SVAF_MOD (Line 108, file MG_SVAF.F)
+                   MG_SVAF in MG_SVAF_MOD (Line 113, file MG_SVAF.F)
+                   MG_SVAF in MG_SVAF_MOD (Line 118, file MG_SVAF.F)
+                   MG_SVAF in MG_SVAF_MOD (Line 123, file MG_SVAF.F)
+                   MG_SVAF in MG_SVAF_MOD (Line 128, file MG_SVAF.F)
+                   MG_SVAF in MG_SVAF_MOD (Line 133, file MG_SVAF.F)
+                   MG_SVAF in MG_SVAF_MOD (Line 138, file MG_SVAF.F)
+                   MG_SVAF in MG_SVAF_MOD (Line 143, file MG_SVAF.F)
+                   MG_SVAF in MG_SVAF_MOD (Line 149, file MG_SVAF.F)
+                   MG_SVAF in MG_SVAF_MOD (Line 154, file MG_SVAF.F)
+                   MG_SVAF in MG_SVAF_MOD (Line 159, file MG_SVAF.F)
+                   MG_SVAF in MG_SVAF_MOD (Line 164, file MG_SVAF.F)
+                   MG_SVAF in MG_SVAF_MOD (Line 169, file MG_SVAF.F)
+                   MG_SVAF in MG_SVAF_MOD (Line 174, file MG_SVAF.F)
+                   MG_SVAF in MG_SVAF_MOD (Line 179, file MG_SVAF.F)
+                   MG_SVAF in MG_SVAF_MOD (Line 184, file MG_SVAF.F)
+                   MG_SVAF in MG_SVAF_MOD (Line 189, file MG_SVAF.F)
+                   MG_SVAF in MG_SVAF_MOD (Line 194, file MG_SVAF.F)
+                   MG_SVAF in MG_SVAF_MOD (Line 200, file MG_SVAF.F)
+                   MG_SVAF in MG_SVAF_MOD (Line 205, file MG_SVAF.F)
+                   MG_SVAF in MG_SVAF_MOD (Line 210, file MG_SVAF.F)
+                   MG_SVAF in MG_SVAF_MOD (Line 215, file MG_SVAF.F)
+                   MG_SVAF in MG_SVAF_MOD (Line 220, file MG_SVAF.F)
+                   MG_SVAF in MG_SVAF_MOD (Line 225, file MG_SVAF.F)
+                   MG_SVAF in MG_SVAF_MOD (Line 230, file MG_SVAF.F)
+                   MG_SVAF in MG_SVAF_MOD (Line 235, file MG_SVAF.F)
+                   MG_SVAF in MG_SVAF_MOD (Line 240, file MG_SVAF.F)
+                   MG_SVAF in MG_SVAF_MOD (Line 245, file MG_SVAF.F)
+                   MG_SVAF in MG_SVAF_MOD (Line 251, file MG_SVAF.F)
+                   MG_SVAF in MG_SVAF_MOD (Line 256, file MG_SVAF.F)
+                   MG_SVAF in MG_SVAF_MOD (Line 261, file MG_SVAF.F)
+                   MG_SVAF in MG_SVAF_MOD (Line 266, file MG_SVAF.F)
+                   MG_SVAF in MG_SVAF_MOD (Line 271, file MG_SVAF.F)
+                   MG_SVAF in MG_SVAF_MOD (Line 276, file MG_SVAF.F)
+                   MG_SVAF in MG_SVAF_MOD (Line 281, file MG_SVAF.F)
+                   MG_SVAF in MG_SVAF_MOD (Line 286, file MG_SVAF.F)
+                   MG_SVAF in MG_SVAF_MOD (Line 291, file MG_SVAF.F)
+                   MG_SVAF in MG_SVAF_MOD (Line 296, file MG_SVAF.F)
+
+Name  Messages
+----  --------
+MG_IRECV_MOD
+      Defined as:  No definitions.
+
+      Used By:     MG_SVAF_MOD
+
+Name  Messages
+----  --------
+MG_OPTIONS_MOD
+      Defined as:  No definitions.
+
+      Used By:     MG_SVAF_MOD  (indirectly)
+                   MG_SVAF_MOD  (indirectly)
+                   MG_SVAF_MOD  (indirectly)
+                   MG_SVAF_MOD  (indirectly)
+                   MG_SVAF_MOD  (indirectly)
+
+Name  Messages
+----  --------
+MG_PACK in MG_PACK_MOD
+      Defined as:  No definitions.
+
+      Interface:   None
+
+      Called By:   MG_SVAF in MG_SVAF_MOD (Line 99, file MG_SVAF.F)
+                   MG_SVAF in MG_SVAF_MOD (Line 104, file MG_SVAF.F)
+                   MG_SVAF in MG_SVAF_MOD (Line 109, file MG_SVAF.F)
+                   MG_SVAF in MG_SVAF_MOD (Line 114, file MG_SVAF.F)
+                   MG_SVAF in MG_SVAF_MOD (Line 119, file MG_SVAF.F)
+                   MG_SVAF in MG_SVAF_MOD (Line 124, file MG_SVAF.F)
+                   MG_SVAF in MG_SVAF_MOD (Line 129, file MG_SVAF.F)
+                   MG_SVAF in MG_SVAF_MOD (Line 134, file MG_SVAF.F)
+                   MG_SVAF in MG_SVAF_MOD (Line 139, file MG_SVAF.F)
+                   MG_SVAF in MG_SVAF_MOD (Line 144, file MG_SVAF.F)
+                   MG_SVAF in MG_SVAF_MOD (Line 150, file MG_SVAF.F)
+                   MG_SVAF in MG_SVAF_MOD (Line 155, file MG_SVAF.F)
+                   MG_SVAF in MG_SVAF_MOD (Line 160, file MG_SVAF.F)
+                   MG_SVAF in MG_SVAF_MOD (Line 165, file MG_SVAF.F)
+                   MG_SVAF in MG_SVAF_MOD (Line 170, file MG_SVAF.F)
+                   MG_SVAF in MG_SVAF_MOD (Line 175, file MG_SVAF.F)
+                   MG_SVAF in MG_SVAF_MOD (Line 180, file MG_SVAF.F)
+                   MG_SVAF in MG_SVAF_MOD (Line 185, file MG_SVAF.F)
+                   MG_SVAF in MG_SVAF_MOD (Line 190, file MG_SVAF.F)
+                   MG_SVAF in MG_SVAF_MOD (Line 195, file MG_SVAF.F)
+                   MG_SVAF in MG_SVAF_MOD (Line 201, file MG_SVAF.F)
+                   MG_SVAF in MG_SVAF_MOD (Line 206, file MG_SVAF.F)
+                   MG_SVAF in MG_SVAF_MOD (Line 211, file MG_SVAF.F)
+                   MG_SVAF in MG_SVAF_MOD (Line 216, file MG_SVAF.F)
+                   MG_SVAF in MG_SVAF_MOD (Line 221, file MG_SVAF.F)
+                   MG_SVAF in MG_SVAF_MOD (Line 226, file MG_SVAF.F)
+                   MG_SVAF in MG_SVAF_MOD (Line 231, file MG_SVAF.F)
+                   MG_SVAF in MG_SVAF_MOD (Line 236, file MG_SVAF.F)
+                   MG_SVAF in MG_SVAF_MOD (Line 241, file MG_SVAF.F)
+                   MG_SVAF in MG_SVAF_MOD (Line 246, file MG_SVAF.F)
+                   MG_SVAF in MG_SVAF_MOD (Line 252, file MG_SVAF.F)
+                   MG_SVAF in MG_SVAF_MOD (Line 257, file MG_SVAF.F)
+                   MG_SVAF in MG_SVAF_MOD (Line 262, file MG_SVAF.F)
+                   MG_SVAF in MG_SVAF_MOD (Line 267, file MG_SVAF.F)
+                   MG_SVAF in MG_SVAF_MOD (Line 272, file MG_SVAF.F)
+                   MG_SVAF in MG_SVAF_MOD (Line 277, file MG_SVAF.F)
+                   MG_SVAF in MG_SVAF_MOD (Line 282, file MG_SVAF.F)
+                   MG_SVAF in MG_SVAF_MOD (Line 287, file MG_SVAF.F)
+                   MG_SVAF in MG_SVAF_MOD (Line 292, file MG_SVAF.F)
+                   MG_SVAF in MG_SVAF_MOD (Line 297, file MG_SVAF.F)
+
+Name  Messages
+----  --------
+MG_PACK_MOD
+      Defined as:  No definitions.
+
+      Used By:     MG_SVAF_MOD
+
+Name  Messages
+----  --------
+MG_PERF_INIT in MG_PROFILING_MOD
+      Defined as:  No definitions.
+
+                   No calls.  It is not called and does not use any procedure.
+
+      Interface:   None
+
+Name  Messages
+----  --------
+MG_PERF_REPORT in MG_PROFILING_MOD
+      Defined as:  No definitions.
+
+                   No calls.  It is not called and does not use any procedure.
+
+      Interface:   None
+
+Name  Messages
+----  --------
+MG_PRINT_HEADER in MG_UTILS_MOD
+      Defined as:  No definitions.
+
+                   No calls.  It is not called and does not use any procedure.
+
+      Interface:   None
+
+Name  Messages
+----  --------
+MG_PROFILING_MOD
+      Defined as:  No definitions.
+
+      Used By:     MG_SVAF_MOD  (indirectly)
+                   MG_SVAF_MOD  (indirectly)
+                   MG_SVAF_MOD  (indirectly)
+                   MG_SVAF_MOD  (indirectly)
+
+Name  Messages
+----  --------
+MG_SEND_SVAF in MG_SEND_SVAF_MOD
+      Defined as:  No definitions.
+
+      Interface:   None
+
+      Called By:   MG_SVAF in MG_SVAF_MOD (Line 100, file MG_SVAF.F)
+                   MG_SVAF in MG_SVAF_MOD (Line 105, file MG_SVAF.F)
+                   MG_SVAF in MG_SVAF_MOD (Line 110, file MG_SVAF.F)
+                   MG_SVAF in MG_SVAF_MOD (Line 115, file MG_SVAF.F)
+                   MG_SVAF in MG_SVAF_MOD (Line 120, file MG_SVAF.F)
+                   MG_SVAF in MG_SVAF_MOD (Line 125, file MG_SVAF.F)
+                   MG_SVAF in MG_SVAF_MOD (Line 130, file MG_SVAF.F)
+                   MG_SVAF in MG_SVAF_MOD (Line 135, file MG_SVAF.F)
+                   MG_SVAF in MG_SVAF_MOD (Line 140, file MG_SVAF.F)
+                   MG_SVAF in MG_SVAF_MOD (Line 145, file MG_SVAF.F)
+                   MG_SVAF in MG_SVAF_MOD (Line 151, file MG_SVAF.F)
+                   MG_SVAF in MG_SVAF_MOD (Line 156, file MG_SVAF.F)
+                   MG_SVAF in MG_SVAF_MOD (Line 161, file MG_SVAF.F)
+                   MG_SVAF in MG_SVAF_MOD (Line 166, file MG_SVAF.F)
+                   MG_SVAF in MG_SVAF_MOD (Line 171, file MG_SVAF.F)
+                   MG_SVAF in MG_SVAF_MOD (Line 176, file MG_SVAF.F)
+                   MG_SVAF in MG_SVAF_MOD (Line 181, file MG_SVAF.F)
+                   MG_SVAF in MG_SVAF_MOD (Line 186, file MG_SVAF.F)
+                   MG_SVAF in MG_SVAF_MOD (Line 191, file MG_SVAF.F)
+                   MG_SVAF in MG_SVAF_MOD (Line 196, file MG_SVAF.F)
+                   MG_SVAF in MG_SVAF_MOD (Line 202, file MG_SVAF.F)
+                   MG_SVAF in MG_SVAF_MOD (Line 207, file MG_SVAF.F)
+                   MG_SVAF in MG_SVAF_MOD (Line 212, file MG_SVAF.F)
+                   MG_SVAF in MG_SVAF_MOD (Line 217, file MG_SVAF.F)
+                   MG_SVAF in MG_SVAF_MOD (Line 222, file MG_SVAF.F)
+                   MG_SVAF in MG_SVAF_MOD (Line 227, file MG_SVAF.F)
+                   MG_SVAF in MG_SVAF_MOD (Line 232, file MG_SVAF.F)
+                   MG_SVAF in MG_SVAF_MOD (Line 237, file MG_SVAF.F)
+                   MG_SVAF in MG_SVAF_MOD (Line 242, file MG_SVAF.F)
+                   MG_SVAF in MG_SVAF_MOD (Line 247, file MG_SVAF.F)
+                   MG_SVAF in MG_SVAF_MOD (Line 253, file MG_SVAF.F)
+                   MG_SVAF in MG_SVAF_MOD (Line 258, file MG_SVAF.F)
+                   MG_SVAF in MG_SVAF_MOD (Line 263, file MG_SVAF.F)
+                   MG_SVAF in MG_SVAF_MOD (Line 268, file MG_SVAF.F)
+                   MG_SVAF in MG_SVAF_MOD (Line 273, file MG_SVAF.F)
+                   MG_SVAF in MG_SVAF_MOD (Line 278, file MG_SVAF.F)
+                   MG_SVAF in MG_SVAF_MOD (Line 283, file MG_SVAF.F)
+                   MG_SVAF in MG_SVAF_MOD (Line 288, file MG_SVAF.F)
+                   MG_SVAF in MG_SVAF_MOD (Line 293, file MG_SVAF.F)
+                   MG_SVAF in MG_SVAF_MOD (Line 298, file MG_SVAF.F)
+
+Name  Messages
+----  --------
+MG_SEND_SVAF_MOD
+      Defined as:  No definitions.
+
+      Used By:     MG_SVAF_MOD
+
+Name  Messages
+----  --------
+MG_SVAF in MG_SVAF_MOD
+      Defined as:  Subroutine (line 48, file MG_SVAF.F)
+
+      Interface:   None
+
+      Calls:       MG_IRECV in MG_IRECV_MOD (Line 98, file MG_SVAF.F)
+                   MG_IRECV in MG_IRECV_MOD (Line 103, file MG_SVAF.F)
+                   MG_IRECV in MG_IRECV_MOD (Line 108, file MG_SVAF.F)
+                   MG_IRECV in MG_IRECV_MOD (Line 113, file MG_SVAF.F)
+                   MG_IRECV in MG_IRECV_MOD (Line 118, file MG_SVAF.F)
+                   MG_IRECV in MG_IRECV_MOD (Line 123, file MG_SVAF.F)
+                   MG_IRECV in MG_IRECV_MOD (Line 128, file MG_SVAF.F)
+                   MG_IRECV in MG_IRECV_MOD (Line 133, file MG_SVAF.F)
+                   MG_IRECV in MG_IRECV_MOD (Line 138, file MG_SVAF.F)
+                   MG_IRECV in MG_IRECV_MOD (Line 143, file MG_SVAF.F)
+                   MG_IRECV in MG_IRECV_MOD (Line 149, file MG_SVAF.F)
+                   MG_IRECV in MG_IRECV_MOD (Line 154, file MG_SVAF.F)
+                   MG_IRECV in MG_IRECV_MOD (Line 159, file MG_SVAF.F)
+                   MG_IRECV in MG_IRECV_MOD (Line 164, file MG_SVAF.F)
+                   MG_IRECV in MG_IRECV_MOD (Line 169, file MG_SVAF.F)
+                   MG_IRECV in MG_IRECV_MOD (Line 174, file MG_SVAF.F)
+                   MG_IRECV in MG_IRECV_MOD (Line 179, file MG_SVAF.F)
+                   MG_IRECV in MG_IRECV_MOD (Line 184, file MG_SVAF.F)
+                   MG_IRECV in MG_IRECV_MOD (Line 189, file MG_SVAF.F)
+                   MG_IRECV in MG_IRECV_MOD (Line 194, file MG_SVAF.F)
+                   MG_IRECV in MG_IRECV_MOD (Line 200, file MG_SVAF.F)
+                   MG_IRECV in MG_IRECV_MOD (Line 205, file MG_SVAF.F)
+                   MG_IRECV in MG_IRECV_MOD (Line 210, file MG_SVAF.F)
+                   MG_IRECV in MG_IRECV_MOD (Line 215, file MG_SVAF.F)
+                   MG_IRECV in MG_IRECV_MOD (Line 220, file MG_SVAF.F)
+                   MG_IRECV in MG_IRECV_MOD (Line 225, file MG_SVAF.F)
+                   MG_IRECV in MG_IRECV_MOD (Line 230, file MG_SVAF.F)
+                   MG_IRECV in MG_IRECV_MOD (Line 235, file MG_SVAF.F)
+                   MG_IRECV in MG_IRECV_MOD (Line 240, file MG_SVAF.F)
+                   MG_IRECV in MG_IRECV_MOD (Line 245, file MG_SVAF.F)
+                   MG_IRECV in MG_IRECV_MOD (Line 251, file MG_SVAF.F)
+                   MG_IRECV in MG_IRECV_MOD (Line 256, file MG_SVAF.F)
+                   MG_IRECV in MG_IRECV_MOD (Line 261, file MG_SVAF.F)
+                   MG_IRECV in MG_IRECV_MOD (Line 266, file MG_SVAF.F)
+                   MG_IRECV in MG_IRECV_MOD (Line 271, file MG_SVAF.F)
+                   MG_IRECV in MG_IRECV_MOD (Line 276, file MG_SVAF.F)
+                   MG_IRECV in MG_IRECV_MOD (Line 281, file MG_SVAF.F)
+                   MG_IRECV in MG_IRECV_MOD (Line 286, file MG_SVAF.F)
+                   MG_IRECV in MG_IRECV_MOD (Line 291, file MG_SVAF.F)
+                   MG_IRECV in MG_IRECV_MOD (Line 296, file MG_SVAF.F)
+                   MG_PACK in MG_PACK_MOD (Line 99, file MG_SVAF.F)
+                   MG_PACK in MG_PACK_MOD (Line 104, file MG_SVAF.F)
+                   MG_PACK in MG_PACK_MOD (Line 109, file MG_SVAF.F)
+                   MG_PACK in MG_PACK_MOD (Line 114, file MG_SVAF.F)
+                   MG_PACK in MG_PACK_MOD (Line 119, file MG_SVAF.F)
+                   MG_PACK in MG_PACK_MOD (Line 124, file MG_SVAF.F)
+                   MG_PACK in MG_PACK_MOD (Line 129, file MG_SVAF.F)
+                   MG_PACK in MG_PACK_MOD (Line 134, file MG_SVAF.F)
+                   MG_PACK in MG_PACK_MOD (Line 139, file MG_SVAF.F)
+                   MG_PACK in MG_PACK_MOD (Line 144, file MG_SVAF.F)
+                   MG_PACK in MG_PACK_MOD (Line 150, file MG_SVAF.F)
+                   MG_PACK in MG_PACK_MOD (Line 155, file MG_SVAF.F)
+                   MG_PACK in MG_PACK_MOD (Line 160, file MG_SVAF.F)
+                   MG_PACK in MG_PACK_MOD (Line 165, file MG_SVAF.F)
+                   MG_PACK in MG_PACK_MOD (Line 170, file MG_SVAF.F)
+                   MG_PACK in MG_PACK_MOD (Line 175, file MG_SVAF.F)
+                   MG_PACK in MG_PACK_MOD (Line 180, file MG_SVAF.F)
+                   MG_PACK in MG_PACK_MOD (Line 185, file MG_SVAF.F)
+                   MG_PACK in MG_PACK_MOD (Line 190, file MG_SVAF.F)
+                   MG_PACK in MG_PACK_MOD (Line 195, file MG_SVAF.F)
+                   MG_PACK in MG_PACK_MOD (Line 201, file MG_SVAF.F)
+                   MG_PACK in MG_PACK_MOD (Line 206, file MG_SVAF.F)
+                   MG_PACK in MG_PACK_MOD (Line 211, file MG_SVAF.F)
+                   MG_PACK in MG_PACK_MOD (Line 216, file MG_SVAF.F)
+                   MG_PACK in MG_PACK_MOD (Line 221, file MG_SVAF.F)
+                   MG_PACK in MG_PACK_MOD (Line 226, file MG_SVAF.F)
+                   MG_PACK in MG_PACK_MOD (Line 231, file MG_SVAF.F)
+                   MG_PACK in MG_PACK_MOD (Line 236, file MG_SVAF.F)
+                   MG_PACK in MG_PACK_MOD (Line 241, file MG_SVAF.F)
+                   MG_PACK in MG_PACK_MOD (Line 246, file MG_SVAF.F)
+                   MG_PACK in MG_PACK_MOD (Line 252, file MG_SVAF.F)
+                   MG_PACK in MG_PACK_MOD (Line 257, file MG_SVAF.F)
+                   MG_PACK in MG_PACK_MOD (Line 262, file MG_SVAF.F)
+                   MG_PACK in MG_PACK_MOD (Line 267, file MG_SVAF.F)
+                   MG_PACK in MG_PACK_MOD (Line 272, file MG_SVAF.F)
+                   MG_PACK in MG_PACK_MOD (Line 277, file MG_SVAF.F)
+                   MG_PACK in MG_PACK_MOD (Line 282, file MG_SVAF.F)
+                   MG_PACK in MG_PACK_MOD (Line 287, file MG_SVAF.F)
+                   MG_PACK in MG_PACK_MOD (Line 292, file MG_SVAF.F)
+                   MG_PACK in MG_PACK_MOD (Line 297, file MG_SVAF.F)
+                   MG_SEND_SVAF in MG_SEND_SVAF_MOD (Line 100, file MG_SVAF.F)
+                   MG_SEND_SVAF in MG_SEND_SVAF_MOD (Line 105, file MG_SVAF.F)
+                   MG_SEND_SVAF in MG_SEND_SVAF_MOD (Line 110, file MG_SVAF.F)
+                   MG_SEND_SVAF in MG_SEND_SVAF_MOD (Line 115, file MG_SVAF.F)
+                   MG_SEND_SVAF in MG_SEND_SVAF_MOD (Line 120, file MG_SVAF.F)
+                   MG_SEND_SVAF in MG_SEND_SVAF_MOD (Line 125, file MG_SVAF.F)
+                   MG_SEND_SVAF in MG_SEND_SVAF_MOD (Line 130, file MG_SVAF.F)
+                   MG_SEND_SVAF in MG_SEND_SVAF_MOD (Line 135, file MG_SVAF.F)
+                   MG_SEND_SVAF in MG_SEND_SVAF_MOD (Line 140, file MG_SVAF.F)
+                   MG_SEND_SVAF in MG_SEND_SVAF_MOD (Line 145, file MG_SVAF.F)
+                   MG_SEND_SVAF in MG_SEND_SVAF_MOD (Line 151, file MG_SVAF.F)
+                   MG_SEND_SVAF in MG_SEND_SVAF_MOD (Line 156, file MG_SVAF.F)
+                   MG_SEND_SVAF in MG_SEND_SVAF_MOD (Line 161, file MG_SVAF.F)
+                   MG_SEND_SVAF in MG_SEND_SVAF_MOD (Line 166, file MG_SVAF.F)
+                   MG_SEND_SVAF in MG_SEND_SVAF_MOD (Line 171, file MG_SVAF.F)
+                   MG_SEND_SVAF in MG_SEND_SVAF_MOD (Line 176, file MG_SVAF.F)
+                   MG_SEND_SVAF in MG_SEND_SVAF_MOD (Line 181, file MG_SVAF.F)
+                   MG_SEND_SVAF in MG_SEND_SVAF_MOD (Line 186, file MG_SVAF.F)
+                   MG_SEND_SVAF in MG_SEND_SVAF_MOD (Line 191, file MG_SVAF.F)
+                   MG_SEND_SVAF in MG_SEND_SVAF_MOD (Line 196, file MG_SVAF.F)
+                   MG_SEND_SVAF in MG_SEND_SVAF_MOD (Line 202, file MG_SVAF.F)
+                   MG_SEND_SVAF in MG_SEND_SVAF_MOD (Line 207, file MG_SVAF.F)
+                   MG_SEND_SVAF in MG_SEND_SVAF_MOD (Line 212, file MG_SVAF.F)
+                   MG_SEND_SVAF in MG_SEND_SVAF_MOD (Line 217, file MG_SVAF.F)
+                   MG_SEND_SVAF in MG_SEND_SVAF_MOD (Line 222, file MG_SVAF.F)
+                   MG_SEND_SVAF in MG_SEND_SVAF_MOD (Line 227, file MG_SVAF.F)
+                   MG_SEND_SVAF in MG_SEND_SVAF_MOD (Line 232, file MG_SVAF.F)
+                   MG_SEND_SVAF in MG_SEND_SVAF_MOD (Line 237, file MG_SVAF.F)
+                   MG_SEND_SVAF in MG_SEND_SVAF_MOD (Line 242, file MG_SVAF.F)
+                   MG_SEND_SVAF in MG_SEND_SVAF_MOD (Line 247, file MG_SVAF.F)
+                   MG_SEND_SVAF in MG_SEND_SVAF_MOD (Line 253, file MG_SVAF.F)
+                   MG_SEND_SVAF in MG_SEND_SVAF_MOD (Line 258, file MG_SVAF.F)
+                   MG_SEND_SVAF in MG_SEND_SVAF_MOD (Line 263, file MG_SVAF.F)
+                   MG_SEND_SVAF in MG_SEND_SVAF_MOD (Line 268, file MG_SVAF.F)
+                   MG_SEND_SVAF in MG_SEND_SVAF_MOD (Line 273, file MG_SVAF.F)
+                   MG_SEND_SVAF in MG_SEND_SVAF_MOD (Line 278, file MG_SVAF.F)
+                   MG_SEND_SVAF in MG_SEND_SVAF_MOD (Line 283, file MG_SVAF.F)
+                   MG_SEND_SVAF in MG_SEND_SVAF_MOD (Line 288, file MG_SVAF.F)
+                   MG_SEND_SVAF in MG_SEND_SVAF_MOD (Line 293, file MG_SVAF.F)
+                   MG_SEND_SVAF in MG_SEND_SVAF_MOD (Line 298, file MG_SVAF.F)
+                   MG_UNPACK_SVAF in MG_UNPACK_SVAF_MOD (Line 101, file MG_SVAF.F)
+                   MG_UNPACK_SVAF in MG_UNPACK_SVAF_MOD (Line 106, file MG_SVAF.F)
+                   MG_UNPACK_SVAF in MG_UNPACK_SVAF_MOD (Line 111, file MG_SVAF.F)
+                   MG_UNPACK_SVAF in MG_UNPACK_SVAF_MOD (Line 116, file MG_SVAF.F)
+                   MG_UNPACK_SVAF in MG_UNPACK_SVAF_MOD (Line 121, file MG_SVAF.F)
+                   MG_UNPACK_SVAF in MG_UNPACK_SVAF_MOD (Line 126, file MG_SVAF.F)
+                   MG_UNPACK_SVAF in MG_UNPACK_SVAF_MOD (Line 131, file MG_SVAF.F)
+                   MG_UNPACK_SVAF in MG_UNPACK_SVAF_MOD (Line 136, file MG_SVAF.F)
+                   MG_UNPACK_SVAF in MG_UNPACK_SVAF_MOD (Line 141, file MG_SVAF.F)
+                   MG_UNPACK_SVAF in MG_UNPACK_SVAF_MOD (Line 146, file MG_SVAF.F)
+                   MG_UNPACK_SVAF in MG_UNPACK_SVAF_MOD (Line 152, file MG_SVAF.F)
+                   MG_UNPACK_SVAF in MG_UNPACK_SVAF_MOD (Line 157, file MG_SVAF.F)
+                   MG_UNPACK_SVAF in MG_UNPACK_SVAF_MOD (Line 162, file MG_SVAF.F)
+                   MG_UNPACK_SVAF in MG_UNPACK_SVAF_MOD (Line 167, file MG_SVAF.F)
+                   MG_UNPACK_SVAF in MG_UNPACK_SVAF_MOD (Line 172, file MG_SVAF.F)
+                   MG_UNPACK_SVAF in MG_UNPACK_SVAF_MOD (Line 177, file MG_SVAF.F)
+                   MG_UNPACK_SVAF in MG_UNPACK_SVAF_MOD (Line 182, file MG_SVAF.F)
+                   MG_UNPACK_SVAF in MG_UNPACK_SVAF_MOD (Line 187, file MG_SVAF.F)
+                   MG_UNPACK_SVAF in MG_UNPACK_SVAF_MOD (Line 192, file MG_SVAF.F)
+                   MG_UNPACK_SVAF in MG_UNPACK_SVAF_MOD (Line 197, file MG_SVAF.F)
+                   MG_UNPACK_SVAF in MG_UNPACK_SVAF_MOD (Line 203, file MG_SVAF.F)
+                   MG_UNPACK_SVAF in MG_UNPACK_SVAF_MOD (Line 208, file MG_SVAF.F)
+                   MG_UNPACK_SVAF in MG_UNPACK_SVAF_MOD (Line 213, file MG_SVAF.F)
+                   MG_UNPACK_SVAF in MG_UNPACK_SVAF_MOD (Line 218, file MG_SVAF.F)
+                   MG_UNPACK_SVAF in MG_UNPACK_SVAF_MOD (Line 223, file MG_SVAF.F)
+                   MG_UNPACK_SVAF in MG_UNPACK_SVAF_MOD (Line 228, file MG_SVAF.F)
+                   MG_UNPACK_SVAF in MG_UNPACK_SVAF_MOD (Line 233, file MG_SVAF.F)
+                   MG_UNPACK_SVAF in MG_UNPACK_SVAF_MOD (Line 238, file MG_SVAF.F)
+                   MG_UNPACK_SVAF in MG_UNPACK_SVAF_MOD (Line 243, file MG_SVAF.F)
+                   MG_UNPACK_SVAF in MG_UNPACK_SVAF_MOD (Line 248, file MG_SVAF.F)
+                   MG_UNPACK_SVAF in MG_UNPACK_SVAF_MOD (Line 254, file MG_SVAF.F)
+                   MG_UNPACK_SVAF in MG_UNPACK_SVAF_MOD (Line 259, file MG_SVAF.F)
+                   MG_UNPACK_SVAF in MG_UNPACK_SVAF_MOD (Line 264, file MG_SVAF.F)
+                   MG_UNPACK_SVAF in MG_UNPACK_SVAF_MOD (Line 269, file MG_SVAF.F)
+                   MG_UNPACK_SVAF in MG_UNPACK_SVAF_MOD (Line 274, file MG_SVAF.F)
+                   MG_UNPACK_SVAF in MG_UNPACK_SVAF_MOD (Line 279, file MG_SVAF.F)
+                   MG_UNPACK_SVAF in MG_UNPACK_SVAF_MOD (Line 284, file MG_SVAF.F)
+                   MG_UNPACK_SVAF in MG_UNPACK_SVAF_MOD (Line 289, file MG_SVAF.F)
+                   MG_UNPACK_SVAF in MG_UNPACK_SVAF_MOD (Line 294, file MG_SVAF.F)
+                   MG_UNPACK_SVAF in MG_UNPACK_SVAF_MOD (Line 299, file MG_SVAF.F)
+
+Name  Messages
+----  --------
+MG_SVAF_MOD
+      Defined as:  Module (line 28, file MG_SVAF.F)
+
+        Uses:      MG_CONSTANTS_MOD
+                   MG_UTILS_MOD
+                   MG_OPTIONS_MOD  (indirectly)
+                   MG_CONSTANTS_MOD  (indirectly)
+                   MG_IRECV_MOD
+                   MG_ENV_MOD  (indirectly)
+                   MG_OPTIONS_MOD  (indirectly)
+                   MG_PROFILING_MOD  (indirectly)
+                   MG_UTILS_MOD  (indirectly)
+                   MG_CONSTANTS_MOD  (indirectly)
+                   MG_PACK_MOD
+                   MG_ENV_MOD  (indirectly)
+                   MG_OPTIONS_MOD  (indirectly)
+                   MG_PROFILING_MOD  (indirectly)
+                   MG_UTILS_MOD  (indirectly)
+                   MG_CONSTANTS_MOD  (indirectly)
+                   MG_SEND_SVAF_MOD
+                   MG_ENV_MOD  (indirectly)
+                   MG_OPTIONS_MOD  (indirectly)
+                   MG_PROFILING_MOD  (indirectly)
+                   MG_UTILS_MOD  (indirectly)
+                   MG_CONSTANTS_MOD  (indirectly)
+                   MG_UNPACK_SVAF_MOD
+                   MG_ENV_MOD  (indirectly)
+                   MG_OPTIONS_MOD  (indirectly)
+                   MG_PROFILING_MOD  (indirectly)
+                   MG_GET_FACE_MOD  (indirectly)
+                   MG_UTILS_MOD  (indirectly)
+                   MG_CONSTANTS_MOD  (indirectly)
+
+Name  Messages
+----  --------
+MG_TIMER in MG_UTILS_MOD
+      Defined as:  No definitions.
+
+                   No calls.  It is not called and does not use any procedure.
+
+      Interface:   None
+
+Name  Messages
+----  --------
+MG_UNPACK_SVAF in MG_UNPACK_SVAF_MOD
+      Defined as:  No definitions.
+
+      Interface:   None
+
+      Called By:   MG_SVAF in MG_SVAF_MOD (Line 101, file MG_SVAF.F)
+                   MG_SVAF in MG_SVAF_MOD (Line 106, file MG_SVAF.F)
+                   MG_SVAF in MG_SVAF_MOD (Line 111, file MG_SVAF.F)
+                   MG_SVAF in MG_SVAF_MOD (Line 116, file MG_SVAF.F)
+                   MG_SVAF in MG_SVAF_MOD (Line 121, file MG_SVAF.F)
+                   MG_SVAF in MG_SVAF_MOD (Line 126, file MG_SVAF.F)
+                   MG_SVAF in MG_SVAF_MOD (Line 131, file MG_SVAF.F)
+                   MG_SVAF in MG_SVAF_MOD (Line 136, file MG_SVAF.F)
+                   MG_SVAF in MG_SVAF_MOD (Line 141, file MG_SVAF.F)
+                   MG_SVAF in MG_SVAF_MOD (Line 146, file MG_SVAF.F)
+                   MG_SVAF in MG_SVAF_MOD (Line 152, file MG_SVAF.F)
+                   MG_SVAF in MG_SVAF_MOD (Line 157, file MG_SVAF.F)
+                   MG_SVAF in MG_SVAF_MOD (Line 162, file MG_SVAF.F)
+                   MG_SVAF in MG_SVAF_MOD (Line 167, file MG_SVAF.F)
+                   MG_SVAF in MG_SVAF_MOD (Line 172, file MG_SVAF.F)
+                   MG_SVAF in MG_SVAF_MOD (Line 177, file MG_SVAF.F)
+                   MG_SVAF in MG_SVAF_MOD (Line 182, file MG_SVAF.F)
+                   MG_SVAF in MG_SVAF_MOD (Line 187, file MG_SVAF.F)
+                   MG_SVAF in MG_SVAF_MOD (Line 192, file MG_SVAF.F)
+                   MG_SVAF in MG_SVAF_MOD (Line 197, file MG_SVAF.F)
+                   MG_SVAF in MG_SVAF_MOD (Line 203, file MG_SVAF.F)
+                   MG_SVAF in MG_SVAF_MOD (Line 208, file MG_SVAF.F)
+                   MG_SVAF in MG_SVAF_MOD (Line 213, file MG_SVAF.F)
+                   MG_SVAF in MG_SVAF_MOD (Line 218, file MG_SVAF.F)
+                   MG_SVAF in MG_SVAF_MOD (Line 223, file MG_SVAF.F)
+                   MG_SVAF in MG_SVAF_MOD (Line 228, file MG_SVAF.F)
+                   MG_SVAF in MG_SVAF_MOD (Line 233, file MG_SVAF.F)
+                   MG_SVAF in MG_SVAF_MOD (Line 238, file MG_SVAF.F)
+                   MG_SVAF in MG_SVAF_MOD (Line 243, file MG_SVAF.F)
+                   MG_SVAF in MG_SVAF_MOD (Line 248, file MG_SVAF.F)
+                   MG_SVAF in MG_SVAF_MOD (Line 254, file MG_SVAF.F)
+                   MG_SVAF in MG_SVAF_MOD (Line 259, file MG_SVAF.F)
+                   MG_SVAF in MG_SVAF_MOD (Line 264, file MG_SVAF.F)
+                   MG_SVAF in MG_SVAF_MOD (Line 269, file MG_SVAF.F)
+                   MG_SVAF in MG_SVAF_MOD (Line 274, file MG_SVAF.F)
+                   MG_SVAF in MG_SVAF_MOD (Line 279, file MG_SVAF.F)
+                   MG_SVAF in MG_SVAF_MOD (Line 284, file MG_SVAF.F)
+                   MG_SVAF in MG_SVAF_MOD (Line 289, file MG_SVAF.F)
+                   MG_SVAF in MG_SVAF_MOD (Line 294, file MG_SVAF.F)
+                   MG_SVAF in MG_SVAF_MOD (Line 299, file MG_SVAF.F)
+
+Name  Messages
+----  --------
+MG_UNPACK_SVAF_MOD
+      Defined as:  No definitions.
+
+      Used By:     MG_SVAF_MOD
+
+Name  Messages
+----  --------
+MG_UTILS_MOD
+      Defined as:  No definitions.
+
+      Used By:     MG_SVAF_MOD
+                   MG_SVAF_MOD  (indirectly)
+                   MG_SVAF_MOD  (indirectly)
+                   MG_SVAF_MOD  (indirectly)
+                   MG_SVAF_MOD  (indirectly)
+
+Name  Messages
+----  --------
+MPI_COMM_DUP_FN
+      Defined as:  No definitions.
+
+                   No calls.  It is not called and does not use any procedure.
+
+Name  Messages
+----  --------
+MPI_COMM_NULL_COPY_FN
+      Defined as:  No definitions.
+
+                   No calls.  It is not called and does not use any procedure.
+
+Name  Messages
+----  --------
+MPI_COMM_NULL_DELETE_FN
+      Defined as:  No definitions.
+
+                   No calls.  It is not called and does not use any procedure.
+
+Name  Messages
+----  --------
+MPI_CONVERSION_FN_NULL
+      Defined as:  No definitions.
+
+                   No calls.  It is not called and does not use any procedure.
+
+Name  Messages
+----  --------
+MPI_DUP_FN
+      Defined as:  No definitions.
+
+                   No calls.  It is not called and does not use any procedure.
+
+Name  Messages
+----  --------
+MPI_NULL_COPY_FN
+      Defined as:  No definitions.
+
+                   No calls.  It is not called and does not use any procedure.
+
+Name  Messages
+----  --------
+MPI_NULL_DELETE_FN
+      Defined as:  No definitions.
+
+                   No calls.  It is not called and does not use any procedure.
+
+Name  Messages
+----  --------
+MPI_TYPE_DUP_FN
+      Defined as:  No definitions.
+
+                   No calls.  It is not called and does not use any procedure.
+
+Name  Messages
+----  --------
+MPI_TYPE_NULL_COPY_FN
+      Defined as:  No definitions.
+
+                   No calls.  It is not called and does not use any procedure.
+
+Name  Messages
+----  --------
+MPI_TYPE_NULL_DELETE_FN
+      Defined as:  No definitions.
+
+                   No calls.  It is not called and does not use any procedure.
+
+Name  Messages
+----  --------
+MPI_WIN_DUP_FN
+      Defined as:  No definitions.
+
+                   No calls.  It is not called and does not use any procedure.
+
+Name  Messages
+----  --------
+MPI_WIN_NULL_COPY_FN
+      Defined as:  No definitions.
+
+                   No calls.  It is not called and does not use any procedure.
+
+Name  Messages
+----  --------
+MPI_WIN_NULL_DELETE_FN
+      Defined as:  No definitions.
+
+                   No calls.  It is not called and does not use any procedure.
+
+Name  Messages
+----  --------
+MPI_WTICK
+      Defined as:  No definitions.
+
+                   No calls.  It is not called and does not use any procedure.
+
+      Interface:   None
+
+Name  Messages
+----  --------
+MPI_WTIME
+      Defined as:  No definitions.
+
+                   No calls.  It is not called and does not use any procedure.
+
+      Interface:   None
+
+Name  Messages
+----  --------
+PMPI_WTICK
+      Defined as:  No definitions.
+
+                   No calls.  It is not called and does not use any procedure.
+
+      Interface:   None
+
+Name  Messages
+----  --------
+PMPI_WTIME
+      Defined as:  No definitions.
+
+                   No calls.  It is not called and does not use any procedure.
+
+      Interface:   None
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%

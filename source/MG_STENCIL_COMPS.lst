@@ -1,0 +1,1411 @@
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+                          S u m m a r y   R e p o r t
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Compilation
+-----------
+File     : /lus/scratch/p02128/work/MiniGhost/source/MG_STENCIL_COMPS.F
+Compiled : 10/31/18  05:23:42
+Compiler : Version 8.7.6
+Ftnlx    : Version 8503 (libcif 85008)
+Target   : x86-64
+Command  : ftn_driver.exe -hcpu=broadwell -hstatic -D__CRAYXC
+           -D__CRAY_BROADWELL -D__CRAYXT_COMPUTE_LINUX_TARGET -hnetwork=aries
+           -D_MG_MPI -D_MG_INT4 -D_MG_REAL8 -ffree -hlist=a
+           -c MG_STENCIL_COMPS.F
+           -I/opt/cray/pe/cce/8.7.6/cce/x86_64/include/craylibs -I/usr/include
+           -I/usr/include -I/opt/cray/pe/mpt/7.7.3/gni/mpich-cray/8.6/include
+           -I/opt/cray/pe/libsci/18.07.1/CRAY/8.6/x86_64/include
+           -I/opt/cray/rca/2.2.18-6.0.7.0_33.3__g2aa4f39.ari/include
+           -I/opt/cray/pe/pmi/5.0.14/include
+           -I/opt/cray/xpmem/2.2.15-6.0.7.0_35.11__g7549d06.ari/include
+           -I/opt/cray/dmapp/7.1.1-6.0.7.0_34.3__g5a674e0.ari/include
+           -I/opt/cray/gni-headers/5.0.12.0-6.0.7.0_24.1__g3b1768f.ari/include
+           -I/opt/cray/ugni/6.0.14.0-6.0.7.0_23.1__gea11d3d.ari/include
+           -I/opt/cray/udreg/2.3.2-6.0.7.0_33.18__g5196236.ari/include
+           -I/opt/cray/alps/6.6.43-6.0.7.0_26.4__ga796da3.ari/include
+           -I/opt/cray/wlm_detect/1.3.3-6.0.7.0_47.2__g7109084.ari/include
+           -I/opt/cray/krca/2.2.4-6.0.7.0_32.3__g8505b97.ari/include
+           -I/opt/cray-hss-devel/8.0.0/include
+Program
+  Units  : MG_STENCIL_COMPS_MOD
+
+ftnlx report
+------------
+Source   : /lus/scratch/p02128/work/MiniGhost/source/MG_STENCIL_COMPS.F
+Date     : 10/31/2018  05:23:43
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+                          O p t i o n s   R e p o r t
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Options :  -O cache2,scalar2,thread2,vector2,mpi0,modinline,ipa3,noaggress
+           -O autoprefetch,noautothread,fusion2,nomsgs,nonegmsgs,nooverindex
+           -O pattern,shortcircuit2,unroll2,nozeroinc
+           -h noadd_paren,align_arrays,nobounds,caf,noconcurrent,nocontiguous
+           -h nocontiguous_assumed_shape,fma,nofp_trap,nofunc_trace,noomp_analyz
+           e
+           -h noomp_trace,nopat_trace
+           -h safe_addr,thread_do_concurrent,fp2=approx,flex_mp=default         
+           -h alias=default:standard_restrict         
+           -h static (or -static)
+           -h omp,noacc
+           -h cpu=x86-64,broadwell
+           -h network=aries
+           -K trap=none
+           -s default32
+           -eh
+           -d abcdefgijmopqsvwzACEFIPQRST0
+           -e nBDZ 
+           -f free
+           -m3
+           -S /lus/scratch/tmp/pe_5283/MG_STENCIL_COMPS_1.s
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+                          S o u r c e   L i s t i n g
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+
+     %%%    L o o p m a r k   L e g e n d    %%%
+
+     Primary Loop Type        Modifiers
+     ------- ---- ----        ---------
+     A - Pattern matched      a - atomic memory operation
+                              b - blocked
+     C - Collapsed            c - conditional and/or computed
+     D - Deleted               
+     E - Cloned                
+     F - Flat - No calls      f - fused
+     G - Accelerated          g - partitioned
+     I - Inlined              i - interchanged
+     M - Multithreaded        m - partitioned
+                              n - non-blocking remote transfer
+                              p - partial
+     R - Rerolling            r - unrolled
+                              s - shortloop
+     V - Vectorized           w - unwound
+
+     + - More messages listed at end of listing
+     ------------------------------------------
+
+
+    1.                     ! ************************************************************************
+    2.                     !
+    3.                     !               miniGhost: stencil computations with boundary exchange.
+    4.                     !                 Copyright (2012) Sandia Corporation
+    5.                     !
+    6.                     ! Under terms of Contract DE-AC04-94AL85000, there is a non-exclusive
+    7.                     ! license for use of this work by or on behalf of the U.S. Government.
+    8.                     !
+    9.                     ! This library is free software; you can redistribute it and/or modify
+   10.                     ! it under the terms of the GNU Lesser General Public License as
+   11.                     ! published by the Free Software Foundation; either version 2.1 of the
+   12.                     ! License, or (at your option) any later version.
+   13.                     !
+   14.                     ! This library is distributed in the hope that it will be useful, but
+   15.                     ! WITHOUT ANY WARRANTY; without even the implied warranty of
+   16.                     ! MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+   17.                     ! Lesser General Public License for more details.
+   18.                     !
+   19.                     ! You should have received a copy of the GNU Lesser General Public
+   20.                     ! License along with this library; if not, write to the Free Software
+   21.                     ! Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307
+   22.                     ! USA
+   23.                     ! Questions? Contact Richard F. Barrett (rfbarre@sandia.gov) or
+   24.                     !                    Michael A. Heroux (maherou@sandia.gov)
+   25.                     !
+   26.                     ! ************************************************************************
+   27.                     
+   28.                     MODULE MG_STENCIL_COMPS_MOD
+   29.                     
+   30.                        USE MG_UTILS_MOD
+   31.                        USE MG_FLUX_ACCUMULATE_MOD
+   32.                        USE MG_PROFILING_MOD
+   33.                     
+   34.                        IMPLICIT NONE
+   35.                     
+   36.                        ! Stencil computations for a single variable.
+   37.                        ! WORK = F(GRID), then GRID = WORK. WORK array globally accessible.
+   38.                        !
+   39.                        ! MG_STENCIL_2D5PT
+   40.                        ! MG_STENCIL_2D9PT
+   41.                        ! MG_STENCIL_3D7PT
+   42.                        ! MG_STENCIL_3D27PT
+   43.                     
+   44.                        ! Note: Using 0-based indexing on arrays.
+   45.                     
+   46.                     CONTAINS
+   47.                        
+   48.                        SUBROUTINE MG_STENCIL_2D5PT ( IVAR, GRID, IERR )
+   49.                        
+   50.                           ! ---------------------
+   51.                           ! Argument Declarations
+   52.                           ! ---------------------
+   53.                     
+   54.                           INTEGER, INTENT(IN) :: &
+   55.                              IVAR
+   56.                     
+   57.                           INTEGER, INTENT(OUT) :: &
+   58.                              IERR           ! Return status
+   59.                     
+   60.                           REAL(KIND=MG_REAL), DIMENSION(0:NX+1, 0:NY+1, 0:NZ+1), INTENT(INOUT) :: &
+   61.                              GRID
+   62.                     
+   63.                           ! ------------------
+   64.                           ! Local Declarations
+   65.                           ! ------------------
+   66.                     
+   67.                           INTEGER ::         &
+   68.                              I, J, K,        &  ! Counters
+   69.                              NUM_GRID_PTS
+   70.                     
+   71.                           ! ---------------------
+   72.                           ! Executable Statements
+   73.                           ! ---------------------
+   74.                        
+   75.                           IERR = 0
+   76.                     
+   77.                           ! Accumulate flux out of physical domain.
+   78.                     
+   79.  +                        CALL MG_FLUX_ACCUMULATE ( IVAR, GRID, IERR )
+   80.                     
+   81.  + M-<              !$OMP PARALLEL DO
+   82.    M                
+   83.  + M  m-----------<       DO K = 1, NZ
+   84.  + M  m br2-------<          DO J = 1, NY
+   85.    M  m br2 Vbr2--<             DO I = 1, NX
+   86.    M  m br2 Vbr2                   WORK(I,J,K) =               ( GRID(I-1,J,K) +                      &
+   87.    M  m br2 Vbr2                                 GRID(I,J-1,K) + GRID(I  ,J,K) + GRID(I,J+1,K) +      &
+   88.    M  m br2 Vbr2                                                 GRID(I+1,J,K)                      ) &
+   89.    M  m br2 Vbr2                               / 5.0
+   90.    M  m br2 Vbr2-->             END DO
+   91.    M  m br2------->          END DO
+   92.    M  m----------->       END DO
+   93.    M                
+   94.    M                !$OMP END PARALLEL DO
+   95.    M                
+   96.  + M                !$OMP PARALLEL DO
+   97.    M                
+   98.  + M  m-----------<       DO K = 1, NZ
+   99.  + M  m 2---------<          DO J = 1, NY
+  100.    M  m 2 A-------<             DO I = 1, NX
+  101.    M  m 2 A                        GRID(I,J,K) = WORK(I,J,K)
+  102.    M  m 2 A------->             END DO
+  103.    M  m 2--------->          END DO
+  104.    M  m----------->       END DO
+  105.    M                
+  106.    M >              !$OMP END PARALLEL DO
+  107.                     
+  108.                           NUM_GRID_PTS = NX*NY*NZ
+  109.                           MG_PERF%NUM_ADDS    = MG_PERF%NUM_ADDS  + 4*(NUM_GRID_PTS)
+  110.                           MG_PERF%NUM_DIVIDES = MG_PERF%NUM_DIVIDES + NUM_GRID_PTS 
+  111.                           MG_PERF%NUM_COPY    = MG_PERF%NUM_COPY + NUM_GRID_PTS
+  112.                     
+  113.                        END SUBROUTINE MG_STENCIL_2D5PT
+  114.                        
+  115.                        SUBROUTINE MG_STENCIL_2D9PT ( IVAR, GRID, IERR )
+  116.                        
+  117.                           ! ---------------------
+  118.                           ! Argument Declarations
+  119.                           ! ---------------------
+  120.                     
+  121.                           INTEGER, INTENT(IN) :: &
+  122.                              IVAR
+  123.                     
+  124.                           INTEGER, INTENT(OUT) :: &
+  125.                              IERR           ! Return status
+  126.                     
+  127.                           REAL(KIND=MG_REAL), DIMENSION(0:NX+1, 0:NY+1, 0:NZ+1), INTENT(INOUT) :: &
+  128.                              GRID
+  129.                     
+  130.                           ! ------------------
+  131.                           ! Local Declarations
+  132.                           ! ------------------
+  133.                     
+  134.                           INTEGER :: &
+  135.                              I, J, K,        &  ! Counters
+  136.                              NUM_GRID_PTS
+  137.                     
+  138.                           ! ---------------------
+  139.                           ! Executable Statements
+  140.                           ! ---------------------
+  141.                        
+  142.                           IERR = 0
+  143.                     
+  144.  + M-<              !$OMP PARALLEL DO
+  145.    M                
+  146.  + M  m-----------<       DO K = 1, NZ 
+  147.  + M  m b---------<          DO J = 1, NY
+  148.    M  m b Vbr2----<             DO I = 1, NX
+  149.    M  m b Vbr2                     WORK(I,J,K) = ( GRID(I-1,J-1,K) + GRID(I-1,J,K) + GRID(I-1,J+1,K) +  &
+  150.    M  m b Vbr2                                     GRID(I  ,J-1,K) + GRID(I  ,J,K) + GRID(I  ,J+1,K) +  &
+  151.    M  m b Vbr2                                     GRID(I+1,J-1,K) + GRID(I+1,J,K) + GRID(I+1,J+1,K) )  &
+  152.    M  m b Vbr2                                 / 9.0
+  153.    M  m b Vbr2---->             END DO
+  154.    M  m b--------->          END DO
+  155.    M  m----------->       END DO
+  156.    M                
+  157.    M                !$OMP END PARALLEL DO
+  158.    M                
+  159.  + M                !$OMP PARALLEL DO
+  160.    M                
+  161.  + M  m-----------<       DO K = 1, NZ
+  162.  + M  m 2---------<          DO J = 1, NY
+  163.    M  m 2 A-------<             DO I = 1, NX
+  164.    M  m 2 A                        GRID(I,J,K) = WORK(I,J,K)
+  165.    M  m 2 A------->             END DO
+  166.    M  m 2--------->          END DO
+  167.    M  m----------->       END DO
+  168.    M                
+  169.    M >              !$OMP END PARALLEL DO
+  170.                     
+  171.                           ! Accumulate flux out of physical domain.
+  172.                     
+  173.  +                        CALL MG_FLUX_ACCUMULATE ( IVAR, GRID, IERR )
+  174.                     
+  175.                           NUM_GRID_PTS = NX*NY*NZ
+  176.                           MG_PERF%NUM_ADDS    = MG_PERF%NUM_ADDS  + 8*(NUM_GRID_PTS)
+  177.                           MG_PERF%NUM_DIVIDES = MG_PERF%NUM_DIVIDES + NUM_GRID_PTS
+  178.                           MG_PERF%NUM_COPY    = MG_PERF%NUM_COPY + NUM_GRID_PTS
+  179.                     
+  180.                        END SUBROUTINE MG_STENCIL_2D9PT
+  181.                        
+  182.                        SUBROUTINE MG_STENCIL_3D7PT ( IVAR, GRID, IERR )
+  183.                        
+  184.                           ! ---------------------
+  185.                           ! Argument Declarations
+  186.                           ! ---------------------
+  187.                     
+  188.                           INTEGER, INTENT(IN) :: &
+  189.                              IVAR
+  190.                     
+  191.                           INTEGER, INTENT(OUT) :: &
+  192.                              IERR           ! Return status
+  193.                     
+  194.                           REAL(KIND=MG_REAL), DIMENSION(0:NX+1, 0:NY+1, 0:NZ+1), INTENT(INOUT) :: &
+  195.                              GRID
+  196.                           ! ------------------
+  197.                           ! Local Declarations
+  198.                           ! ------------------
+  199.                     
+  200.                           INTEGER :: &
+  201.                              I, J, K,        &  ! Counters
+  202.                              NUM_GRID_PTS
+  203.                     
+  204.                           REAL(KIND=MG_REAL) :: &
+  205.                              SLICE_MINE               ! Temporary
+  206.                     
+  207.                           ! ---------------------
+  208.                           ! Executable Statements
+  209.                           ! ---------------------
+  210.                        
+  211.                           IERR = 0
+  212.                     
+  213.  + M-<              !$OMP PARALLEL DO PRIVATE(SLICE_MINE)
+  214.    M                
+  215.  + M  m-----------<       DO K = 1, NZ 
+  216.  + M  m 2---------<          DO J = 1, NY
+  217.    M  m 2 Vr2-----<             DO I = 1, NX
+  218.    M  m 2 Vr2                      SLICE_MINE =                  GRID(I-1,J,K) +                 &
+  219.    M  m 2 Vr2                                    GRID(I,J-1,K) + GRID(I  ,J,K) + GRID(I,J+1,K)   &
+  220.    M  m 2 Vr2                                                  + GRID(I+1,J,K)
+  221.    M  m 2 Vr2       
+  222.    M  m 2 Vr2                      WORK(I,J,K) = ( GRID(I,J,K-1)  + SLICE_MINE + GRID(I,J,K+1) ) / 7.0
+  223.    M  m 2 Vr2       
+  224.    M  m 2 Vr2----->             END DO
+  225.    M  m 2--------->          END DO
+  226.    M  m----------->       END DO
+  227.    M                
+  228.    M                !$OMP END PARALLEL DO
+  229.    M                
+  230.  + M                !$OMP PARALLEL DO
+  231.    M                
+  232.  + M  m-----------<       DO K = 1, NZ
+  233.  + M  m 2---------<          DO J = 1, NY
+  234.    M  m 2 A-------<             DO I = 1, NX
+  235.    M  m 2 A                        GRID(I,J,K) = WORK(I,J,K)
+  236.    M  m 2 A------->             END DO
+  237.    M  m 2--------->          END DO
+  238.    M  m----------->       END DO
+  239.    M                
+  240.    M >              !$OMP END PARALLEL DO
+  241.                     
+  242.                           ! Accumulate flux out of physical domain.
+  243.                     
+  244.  +                        CALL MG_FLUX_ACCUMULATE ( IVAR, GRID, IERR )
+  245.                     
+  246.                           NUM_GRID_PTS = NX*NY*NZ
+  247.                           MG_PERF%NUM_ADDS    = MG_PERF%NUM_ADDS  + 6*(NUM_GRID_PTS) 
+  248.                           MG_PERF%NUM_DIVIDES = MG_PERF%NUM_DIVIDES + NUM_GRID_PTS 
+  249.                           MG_PERF%NUM_COPY    = MG_PERF%NUM_COPY + NUM_GRID_PTS
+  250.                     
+  251.                        END SUBROUTINE MG_STENCIL_3D7PT
+  252.                     
+  253.                        SUBROUTINE MG_STENCIL_3D27PT ( IVAR, GRID, IERR )
+  254.                        
+  255.                           ! ---------------------
+  256.                           ! Argument Declarations
+  257.                           ! ---------------------
+  258.                     
+  259.                           INTEGER, INTENT(IN) :: &
+  260.                              IVAR
+  261.                     
+  262.                           INTEGER, INTENT(OUT) :: &
+  263.                              IERR           ! Return status
+  264.                     
+  265.                           REAL(KIND=MG_REAL), DIMENSION(0:NX+1, 0:NY+1, 0:NZ+1), INTENT(INOUT) :: &
+  266.                              GRID
+  267.                           ! ------------------
+  268.                           ! Local Declarations
+  269.                           ! ------------------
+  270.                     
+  271.                           INTEGER :: &
+  272.                              I, J, K,        &  ! Counters
+  273.                              NUM_GRID_PTS
+  274.                     
+  275.                           REAL(KIND=MG_REAL) :: &
+  276.                              SLICE_BACK,          &   ! Temporary
+  277.                              SLICE_MINE,          &   ! Temporary
+  278.                              SLICE_FRONT              ! Temporary
+  279.                     
+  280.                           ! ---------------------
+  281.                           ! Executable Statements
+  282.                           ! ---------------------
+  283.                        
+  284.                           IERR = 0
+  285.                     
+  286.  + M-<              !$OMP PARALLEL DO PRIVATE(SLICE_BACK, SLICE_MINE, SLICE_FRONT)
+  287.    M                
+  288.  + M  m-----------<       DO K = 1, NZ 
+  289.  + M  m 2---------<          DO J = 1, NY
+  290.    M  m 2 V-------<             DO I = 1, NX
+  291.    M  m 2 V         
+  292.    M  m 2 V                        SLICE_BACK =  GRID(I-1,J-1,K-1) + GRID(I-1,J,K-1) + GRID(I-1,J+1,K-1) + &
+  293.    M  m 2 V                                      GRID(I  ,J-1,K-1) + GRID(I  ,J,K-1) + GRID(I  ,J+1,K-1) + &
+  294.    M  m 2 V                                      GRID(I+1,J-1,K-1) + GRID(I+1,J,K-1) + GRID(I+1,J+1,K-1) 
+  295.    M  m 2 V         
+  296.    M  m 2 V                        SLICE_MINE =  GRID(I-1,J-1,K)   + GRID(I-1,J,K)   + GRID(I-1,J+1,K) + &
+  297.    M  m 2 V                                      GRID(I  ,J-1,K)   + GRID(I  ,J,K)   + GRID(I  ,J+1,K) + &
+  298.    M  m 2 V                                      GRID(I+1,J-1,K)   + GRID(I+1,J,K)   + GRID(I+1,J+1,K)
+  299.    M  m 2 V         
+  300.    M  m 2 V                        SLICE_FRONT = GRID(I-1,J-1,K+1) + GRID(I-1,J,K+1) + GRID(I-1,J+1,K+1) + &
+  301.    M  m 2 V                                      GRID(I  ,J-1,K+1) + GRID(I  ,J,K+1) + GRID(I  ,J+1,K+1) + &
+  302.    M  m 2 V                                      GRID(I+1,J-1,K+1) + GRID(I+1,J,K+1) + GRID(I+1,J+1,K+1)
+  303.    M  m 2 V         
+  304.    M  m 2 V                        WORK(I,J,K) = ( SLICE_BACK + SLICE_MINE + SLICE_FRONT ) / 27.0
+  305.    M  m 2 V         
+  306.    M  m 2 V------->             END DO
+  307.    M  m 2--------->          END DO
+  308.    M  m----------->       END DO
+  309.    M                
+  310.    M                !$OMP END PARALLEL DO
+  311.    M                
+  312.  + M                !$OMP PARALLEL DO
+  313.    M                
+  314.  + M  m-----------<       DO K = 1, NZ
+  315.  + M  m 2---------<          DO J = 1, NY
+  316.    M  m 2 A-------<             DO I = 1, NX
+  317.    M  m 2 A                        GRID(I,J,K) = WORK(I,J,K)
+  318.    M  m 2 A------->             END DO
+  319.    M  m 2--------->          END DO
+  320.    M  m----------->       END DO
+  321.    M                
+  322.    M >              !$OMP END PARALLEL DO
+  323.                     
+  324.                           ! Accumulate flux out of physical domain.
+  325.                     
+  326.  +                        CALL MG_FLUX_ACCUMULATE ( IVAR, GRID, IERR )
+  327.                     
+  328.                           NUM_GRID_PTS = NX*NY*NZ
+  329.                           MG_PERF%NUM_ADDS    = MG_PERF%NUM_ADDS  + 26*(NUM_GRID_PTS)  
+  330.                           MG_PERF%NUM_DIVIDES = MG_PERF%NUM_DIVIDES + NUM_GRID_PTS
+  331.                           MG_PERF%NUM_COPY    = MG_PERF%NUM_COPY + NUM_GRID_PTS
+  332.                     
+  333.                        END SUBROUTINE MG_STENCIL_3D27PT
+  334.                        
+  335.                     END MODULE MG_STENCIL_COMPS_MOD
+
+ftn-3171 ftn: IPA MG_STENCIL_2D5PT, File = MG_STENCIL_COMPS.F, Line = 79, Column = 12 
+  "mg_flux_accumulate" (called from "mg_stencil_2d5pt") was not inlined because it is not in the body of a loop.
+
+ftn-6831 ftn: THREAD MG_STENCIL_2D5PT, File = MG_STENCIL_COMPS.F, Line = 81 
+  An expanded multi-threaded region was created starting near line 81 and ending near line 106.
+
+ftn-6824 ftn: THREAD MG_STENCIL_2D5PT, File = MG_STENCIL_COMPS.F, Line = 81 
+  A region starting at line 81 and ending at line 94 was multi-threaded and merged with an expanded multi-thread region.
+
+ftn-6294 ftn: VECTOR MG_STENCIL_2D5PT, File = MG_STENCIL_COMPS.F, Line = 83 
+  A loop starting at line 83 was not vectorized because a better candidate was found at line 85.
+
+ftn-6817 ftn: THREAD MG_STENCIL_2D5PT, File = MG_STENCIL_COMPS.F, Line = 83 
+  A loop starting at line 83 was partitioned.
+
+ftn-6294 ftn: VECTOR MG_STENCIL_2D5PT, File = MG_STENCIL_COMPS.F, Line = 84 
+  A loop starting at line 84 was not vectorized because a better candidate was found at line 85.
+
+ftn-6075 ftn: SCALAR MG_STENCIL_2D5PT, File = MG_STENCIL_COMPS.F, Line = 84 
+  A loop starting at line 84 participated in blocking, but was not itself blocked.
+
+ftn-6005 ftn: SCALAR MG_STENCIL_2D5PT, File = MG_STENCIL_COMPS.F, Line = 84 
+  A loop starting at line 84 was unrolled 2 times.
+
+ftn-6049 ftn: SCALAR MG_STENCIL_2D5PT, File = MG_STENCIL_COMPS.F, Line = 85 
+  A loop starting at line 85 was blocked with block size 512.
+
+ftn-6005 ftn: SCALAR MG_STENCIL_2D5PT, File = MG_STENCIL_COMPS.F, Line = 85 
+  A loop starting at line 85 was unrolled 2 times.
+
+ftn-6204 ftn: VECTOR MG_STENCIL_2D5PT, File = MG_STENCIL_COMPS.F, Line = 85 
+  A loop starting at line 85 was vectorized.
+
+ftn-6824 ftn: THREAD MG_STENCIL_2D5PT, File = MG_STENCIL_COMPS.F, Line = 96 
+  A region starting at line 96 and ending at line 106 was multi-threaded and merged with an expanded multi-thread region.
+
+ftn-6294 ftn: VECTOR MG_STENCIL_2D5PT, File = MG_STENCIL_COMPS.F, Line = 98 
+  A loop starting at line 98 was not vectorized because a better candidate was found at line 100.
+
+ftn-6817 ftn: THREAD MG_STENCIL_2D5PT, File = MG_STENCIL_COMPS.F, Line = 98 
+  A loop starting at line 98 was partitioned.
+
+ftn-6294 ftn: VECTOR MG_STENCIL_2D5PT, File = MG_STENCIL_COMPS.F, Line = 99 
+  A loop starting at line 99 was not vectorized because a better candidate was found at line 100.
+
+ftn-6202 ftn: VECTOR MG_STENCIL_2D5PT, File = MG_STENCIL_COMPS.F, Line = 100 
+  A loop starting at line 100 was replaced by a library call.
+
+ftn-6831 ftn: THREAD MG_STENCIL_2D9PT, File = MG_STENCIL_COMPS.F, Line = 144 
+  An expanded multi-threaded region was created starting near line 144 and ending near line 169.
+
+ftn-6824 ftn: THREAD MG_STENCIL_2D9PT, File = MG_STENCIL_COMPS.F, Line = 144 
+  A region starting at line 144 and ending at line 157 was multi-threaded and merged with an expanded multi-thread region.
+
+ftn-6294 ftn: VECTOR MG_STENCIL_2D9PT, File = MG_STENCIL_COMPS.F, Line = 146 
+  A loop starting at line 146 was not vectorized because a better candidate was found at line 148.
+
+ftn-6817 ftn: THREAD MG_STENCIL_2D9PT, File = MG_STENCIL_COMPS.F, Line = 146 
+  A loop starting at line 146 was partitioned.
+
+ftn-6294 ftn: VECTOR MG_STENCIL_2D9PT, File = MG_STENCIL_COMPS.F, Line = 147 
+  A loop starting at line 147 was not vectorized because a better candidate was found at line 148.
+
+ftn-6075 ftn: SCALAR MG_STENCIL_2D9PT, File = MG_STENCIL_COMPS.F, Line = 147 
+  A loop starting at line 147 participated in blocking, but was not itself blocked.
+
+ftn-6049 ftn: SCALAR MG_STENCIL_2D9PT, File = MG_STENCIL_COMPS.F, Line = 148 
+  A loop starting at line 148 was blocked with block size 512.
+
+ftn-6005 ftn: SCALAR MG_STENCIL_2D9PT, File = MG_STENCIL_COMPS.F, Line = 148 
+  A loop starting at line 148 was unrolled 2 times.
+
+ftn-6204 ftn: VECTOR MG_STENCIL_2D9PT, File = MG_STENCIL_COMPS.F, Line = 148 
+  A loop starting at line 148 was vectorized.
+
+ftn-6824 ftn: THREAD MG_STENCIL_2D9PT, File = MG_STENCIL_COMPS.F, Line = 159 
+  A region starting at line 159 and ending at line 169 was multi-threaded and merged with an expanded multi-thread region.
+
+ftn-6294 ftn: VECTOR MG_STENCIL_2D9PT, File = MG_STENCIL_COMPS.F, Line = 161 
+  A loop starting at line 161 was not vectorized because a better candidate was found at line 163.
+
+ftn-6817 ftn: THREAD MG_STENCIL_2D9PT, File = MG_STENCIL_COMPS.F, Line = 161 
+  A loop starting at line 161 was partitioned.
+
+ftn-6294 ftn: VECTOR MG_STENCIL_2D9PT, File = MG_STENCIL_COMPS.F, Line = 162 
+  A loop starting at line 162 was not vectorized because a better candidate was found at line 163.
+
+ftn-6202 ftn: VECTOR MG_STENCIL_2D9PT, File = MG_STENCIL_COMPS.F, Line = 163 
+  A loop starting at line 163 was replaced by a library call.
+
+ftn-3171 ftn: IPA MG_STENCIL_2D9PT, File = MG_STENCIL_COMPS.F, Line = 173, Column = 12 
+  "mg_flux_accumulate" (called from "mg_stencil_2d9pt") was not inlined because it is not in the body of a loop.
+
+ftn-6831 ftn: THREAD MG_STENCIL_3D7PT, File = MG_STENCIL_COMPS.F, Line = 213 
+  An expanded multi-threaded region was created starting near line 213 and ending near line 240.
+
+ftn-6824 ftn: THREAD MG_STENCIL_3D7PT, File = MG_STENCIL_COMPS.F, Line = 213 
+  A region starting at line 213 and ending at line 228 was multi-threaded and merged with an expanded multi-thread region.
+
+ftn-6294 ftn: VECTOR MG_STENCIL_3D7PT, File = MG_STENCIL_COMPS.F, Line = 215 
+  A loop starting at line 215 was not vectorized because a better candidate was found at line 217.
+
+ftn-6817 ftn: THREAD MG_STENCIL_3D7PT, File = MG_STENCIL_COMPS.F, Line = 215 
+  A loop starting at line 215 was partitioned.
+
+ftn-6294 ftn: VECTOR MG_STENCIL_3D7PT, File = MG_STENCIL_COMPS.F, Line = 216 
+  A loop starting at line 216 was not vectorized because a better candidate was found at line 217.
+
+ftn-6005 ftn: SCALAR MG_STENCIL_3D7PT, File = MG_STENCIL_COMPS.F, Line = 217 
+  A loop starting at line 217 was unrolled 2 times.
+
+ftn-6204 ftn: VECTOR MG_STENCIL_3D7PT, File = MG_STENCIL_COMPS.F, Line = 217 
+  A loop starting at line 217 was vectorized.
+
+ftn-6824 ftn: THREAD MG_STENCIL_3D7PT, File = MG_STENCIL_COMPS.F, Line = 230 
+  A region starting at line 230 and ending at line 240 was multi-threaded and merged with an expanded multi-thread region.
+
+ftn-6294 ftn: VECTOR MG_STENCIL_3D7PT, File = MG_STENCIL_COMPS.F, Line = 232 
+  A loop starting at line 232 was not vectorized because a better candidate was found at line 234.
+
+ftn-6817 ftn: THREAD MG_STENCIL_3D7PT, File = MG_STENCIL_COMPS.F, Line = 232 
+  A loop starting at line 232 was partitioned.
+
+ftn-6294 ftn: VECTOR MG_STENCIL_3D7PT, File = MG_STENCIL_COMPS.F, Line = 233 
+  A loop starting at line 233 was not vectorized because a better candidate was found at line 234.
+
+ftn-6202 ftn: VECTOR MG_STENCIL_3D7PT, File = MG_STENCIL_COMPS.F, Line = 234 
+  A loop starting at line 234 was replaced by a library call.
+
+ftn-3171 ftn: IPA MG_STENCIL_3D7PT, File = MG_STENCIL_COMPS.F, Line = 244, Column = 12 
+  "mg_flux_accumulate" (called from "mg_stencil_3d7pt") was not inlined because it is not in the body of a loop.
+
+ftn-6831 ftn: THREAD MG_STENCIL_3D27PT, File = MG_STENCIL_COMPS.F, Line = 286 
+  An expanded multi-threaded region was created starting near line 286 and ending near line 322.
+
+ftn-6824 ftn: THREAD MG_STENCIL_3D27PT, File = MG_STENCIL_COMPS.F, Line = 286 
+  A region starting at line 286 and ending at line 310 was multi-threaded and merged with an expanded multi-thread region.
+
+ftn-6294 ftn: VECTOR MG_STENCIL_3D27PT, File = MG_STENCIL_COMPS.F, Line = 288 
+  A loop starting at line 288 was not vectorized because a better candidate was found at line 290.
+
+ftn-6817 ftn: THREAD MG_STENCIL_3D27PT, File = MG_STENCIL_COMPS.F, Line = 288 
+  A loop starting at line 288 was partitioned.
+
+ftn-6294 ftn: VECTOR MG_STENCIL_3D27PT, File = MG_STENCIL_COMPS.F, Line = 289 
+  A loop starting at line 289 was not vectorized because a better candidate was found at line 290.
+
+ftn-6204 ftn: VECTOR MG_STENCIL_3D27PT, File = MG_STENCIL_COMPS.F, Line = 290 
+  A loop starting at line 290 was vectorized.
+
+ftn-6824 ftn: THREAD MG_STENCIL_3D27PT, File = MG_STENCIL_COMPS.F, Line = 312 
+  A region starting at line 312 and ending at line 322 was multi-threaded and merged with an expanded multi-thread region.
+
+ftn-6294 ftn: VECTOR MG_STENCIL_3D27PT, File = MG_STENCIL_COMPS.F, Line = 314 
+  A loop starting at line 314 was not vectorized because a better candidate was found at line 316.
+
+ftn-6817 ftn: THREAD MG_STENCIL_3D27PT, File = MG_STENCIL_COMPS.F, Line = 314 
+  A loop starting at line 314 was partitioned.
+
+ftn-6294 ftn: VECTOR MG_STENCIL_3D27PT, File = MG_STENCIL_COMPS.F, Line = 315 
+  A loop starting at line 315 was not vectorized because a better candidate was found at line 316.
+
+ftn-6202 ftn: VECTOR MG_STENCIL_3D27PT, File = MG_STENCIL_COMPS.F, Line = 316 
+  A loop starting at line 316 was replaced by a library call.
+
+ftn-3171 ftn: IPA MG_STENCIL_3D27PT, File = MG_STENCIL_COMPS.F, Line = 326, Column = 12 
+  "mg_flux_accumulate" (called from "mg_stencil_3d27pt") was not inlined because it is not in the body of a loop.
+
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+           C r o s s   R e f e r e n c e   for   MG_STENCIL_COMPS_MOD
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Name                                      Storage/Owner                   
+----                                      -------------                   
+
+GRID                                      MG_STENCIL_2D5PT                
+  Dummy Argument, Real(kind=8), Dimension(0:<exp>,0:<exp>,0:<exp>),
+                                                        Intent(inout)
+  Declared        48      61
+  Defined        101
+  Referenced      79      86      87      88
+
+GRID                                      MG_STENCIL_2D9PT                
+  Dummy Argument, Real(kind=8), Dimension(0:<exp>,0:<exp>,0:<exp>),
+                                                        Intent(inout)
+  Declared       115     128
+  Defined        164
+  Referenced     149     150     151     173
+
+GRID                                      MG_STENCIL_3D7PT                
+  Dummy Argument, Real(kind=8), Dimension(0:<exp>,0:<exp>,0:<exp>),
+                                                        Intent(inout)
+  Declared       182     195
+  Defined        235
+  Referenced     218     219     220     222     244
+
+GRID                                      MG_STENCIL_3D27PT               
+  Dummy Argument, Real(kind=8), Dimension(0:<exp>,0:<exp>,0:<exp>),
+                                                        Intent(inout)
+  Declared       253     266
+  Defined        317
+  Referenced     292     293     294     296     297     298     300     301     302     326
+
+I                                         Stack                           
+  Variable, Integer
+  Declared        68
+  Defined   
+  Referenced      86      87      88     101
+
+I                                         Stack                           
+  Variable, Integer
+  Declared       135
+  Defined   
+  Referenced     149     150     151     164
+
+I                                         Stack                           
+  Variable, Integer
+  Declared       201
+  Defined   
+  Referenced     218     219     220     222     235
+
+I                                         Stack                           
+  Variable, Integer
+  Declared       272
+  Defined   
+  Referenced     292     293     294     296     297     298     300     301     302     304     317
+
+IERR                                      MG_STENCIL_2D5PT                
+  Dummy Argument, Integer, Intent(out)
+  Declared        48      58
+  Defined         75
+  Referenced      79
+
+IERR                                      MG_STENCIL_2D9PT                
+  Dummy Argument, Integer, Intent(out)
+  Declared       115     125
+  Defined        142
+  Referenced     173
+
+IERR                                      MG_STENCIL_3D7PT                
+  Dummy Argument, Integer, Intent(out)
+  Declared       182     192
+  Defined        211
+  Referenced     244
+
+IERR                                      MG_STENCIL_3D27PT               
+  Dummy Argument, Integer, Intent(out)
+  Declared       253     263
+  Defined        284
+  Referenced     326
+
+IVAR                                      MG_STENCIL_2D5PT                
+  Dummy Argument, Integer, Intent(in)
+  Declared        48      55
+  Defined   
+  Referenced      79
+
+IVAR                                      MG_STENCIL_2D9PT                
+  Dummy Argument, Integer, Intent(in)
+  Declared       115     122
+  Defined   
+  Referenced     173
+
+IVAR                                      MG_STENCIL_3D7PT                
+  Dummy Argument, Integer, Intent(in)
+  Declared       182     189
+  Defined   
+  Referenced     244
+
+IVAR                                      MG_STENCIL_3D27PT               
+  Dummy Argument, Integer, Intent(in)
+  Declared       253     260
+  Defined   
+  Referenced     326
+
+J                                         Stack                           
+  Variable, Integer
+  Declared        68
+  Defined   
+  Referenced      86      87      88     101
+
+J                                         Stack                           
+  Variable, Integer
+  Declared       135
+  Defined   
+  Referenced     149     150     151     164
+
+J                                         Stack                           
+  Variable, Integer
+  Declared       201
+  Defined   
+  Referenced     218     219     220     222     235
+
+J                                         Stack                           
+  Variable, Integer
+  Declared       272
+  Defined   
+  Referenced     292     293     294     296     297     298     300     301     302     304     317
+
+K                                         Stack                           
+  Variable, Integer
+  Declared        68
+  Defined   
+  Referenced      86      87      88     101
+
+K                                         Stack                           
+  Variable, Integer
+  Declared       135
+  Defined   
+  Referenced     149     150     151     164
+
+K                                         Stack                           
+  Variable, Integer
+  Declared       201
+  Defined   
+  Referenced     218     219     220     222     235
+
+K                                         Stack                           
+  Variable, Integer
+  Declared       272
+  Defined   
+  Referenced     292     293     294     296     297     298     300     301     302     304     317
+
+MG_CONSTANTS_MOD                                                          
+  Module, Used indirectly (from module MG_UTILS_MOD)
+  Declared  
+  Defined   
+  Referenced
+
+MG_CONSTANTS_MOD                                                          
+  Module, Used indirectly (from module MG_FLUX_ACCUMULATE_MOD)
+  Declared  
+  Defined   
+  Referenced
+
+MG_CONSTANTS_MOD                                                          
+  Module, Used indirectly (from module MG_PROFILING_MOD)
+  Declared  
+  Defined   
+  Referenced
+
+MG_ENV_MOD                                                                
+  Module, Used indirectly (from module MG_PROFILING_MOD)
+  Declared  
+  Defined   
+  Referenced
+
+MG_ENV_MOD                                                                
+  Module, Used indirectly (from module MG_FLUX_ACCUMULATE_MOD)
+  Declared  
+  Defined   
+  Referenced
+
+MG_FLUX_ACCUMULATE                        Module MG_FLUX_ACCUMULATE_MOD   
+  Subroutine, Module procedure
+  Declared  
+  Defined   
+  Referenced      79      79     173     244     326
+
+MG_FLUX_ACCUMULATE                        Module MG_FLUX_ACCUMULATE_MOD   
+  Subroutine, Module procedure
+  Declared  
+  Defined   
+  Referenced      79      79     173     244     326
+
+MG_FLUX_ACCUMULATE_MOD                                                    
+  Module
+  Declared  
+  Defined   
+  Referenced      31
+
+MG_OPTIONS_MOD                                                            
+  Module, Used indirectly (from module MG_PROFILING_MOD)
+  Declared  
+  Defined   
+  Referenced
+
+MG_OPTIONS_MOD                                                            
+  Module, Used indirectly (from module MG_FLUX_ACCUMULATE_MOD)
+  Declared  
+  Defined   
+  Referenced
+
+MG_OPTIONS_MOD                                                            
+  Module, Used indirectly (from module MG_UTILS_MOD)
+  Declared  
+  Defined   
+  Referenced
+
+MG_PERF                                   Module MG_PROFILING_MOD         
+  TYPE(PERF_CHECK), Use assoc
+  Declared  
+  Defined        109     110     111     176     177     178     247     248     249     329     330     331
+  Referenced
+  Referenced in contained procedure
+
+MG_PROFILING_MOD                                                          
+  Module, Used indirectly (from module MG_FLUX_ACCUMULATE_MOD)
+  Declared  
+  Defined   
+  Referenced      32
+
+MG_PROFILING_MOD                                                          
+  Module
+  Declared  
+  Defined   
+  Referenced      32
+
+MG_REAL                                   Module MG_CONSTANTS_MOD         
+  Parameter, Integer(kind=1), Use assoc
+  Declared  
+  Defined   
+  Referenced      60     127     194     204     265     275
+  Referenced in contained procedure
+
+MG_STENCIL_2D5PT                                                          
+  Subroutine, Module procedure
+  Declared        48
+  Defined   
+  Referenced
+
+MG_STENCIL_2D9PT                                                          
+  Subroutine, Module procedure
+  Declared       115
+  Defined   
+  Referenced
+
+MG_STENCIL_3D27PT                                                         
+  Subroutine, Module procedure
+  Declared       253
+  Defined   
+  Referenced
+
+MG_STENCIL_3D7PT                                                          
+  Subroutine, Module procedure
+  Declared       182
+  Defined   
+  Referenced
+
+MG_STENCIL_COMPS_MOD                                                      
+  Module
+  Declared        28
+  Defined   
+  Referenced
+
+MG_UTILS_MOD                                                              
+  Module
+  Declared  
+  Defined   
+  Referenced      30
+
+MG_UTILS_MOD                                                              
+  Module, Used indirectly (from module MG_FLUX_ACCUMULATE_MOD)
+  Declared  
+  Defined   
+  Referenced
+
+MG_UTILS_MOD                                                              
+  Module, Used indirectly (from module MG_PROFILING_MOD)
+  Declared  
+  Defined   
+  Referenced
+
+MPIFCMB5                                  Module MG_CONSTANTS_MOD         
+  Common block 
+  Declared  
+  Defined   
+  Referenced
+
+MPIFCMB9                                  Module MG_CONSTANTS_MOD         
+  Common block 
+  Declared  
+  Defined   
+  Referenced
+
+MPIPRIV1                                  Module MG_CONSTANTS_MOD         
+  Common block 
+  Declared  
+  Defined   
+  Referenced
+
+MPIPRIV2                                  Module MG_CONSTANTS_MOD         
+  Common block 
+  Declared  
+  Defined   
+  Referenced
+
+MPIPRIVC                                  Module MG_CONSTANTS_MOD         
+  Common block 
+  Declared  
+  Defined   
+  Referenced
+
+NUM_ADDS                                  Structure offset=64             
+  Integer(kind=8), Component of PERF_CHECK
+  Declared  
+  Defined   
+  Referenced     109     176     247     329
+
+NUM_COPY                                  Structure offset=0              
+  Integer(kind=8), Component of PERF_CHECK
+  Declared  
+  Defined   
+  Referenced     111     178     249     331
+
+NUM_DIVIDES                               Structure offset=128            
+  Integer(kind=8), Component of PERF_CHECK
+  Declared  
+  Defined   
+  Referenced     110     177     248     330
+
+NUM_GRID_PTS                              Stack                           
+  Variable, Integer
+  Declared        69
+  Defined        108
+  Referenced     109     110     111
+
+NUM_GRID_PTS                              Stack                           
+  Variable, Integer
+  Declared       136
+  Defined        175
+  Referenced     176     177     178
+
+NUM_GRID_PTS                              Stack                           
+  Variable, Integer
+  Declared       202
+  Defined        246
+  Referenced     247     248     249
+
+NUM_GRID_PTS                              Stack                           
+  Variable, Integer
+  Declared       273
+  Defined        328
+  Referenced     329     330     331
+
+NX                                        Module MG_OPTIONS_MOD           
+  Integer, Use assoc
+  Declared  
+  Defined   
+  Referenced      85     100     108     148     163     175     217     234     246     290     316     328
+  Referenced in contained procedure
+
+NY                                        Module MG_OPTIONS_MOD           
+  Integer, Use assoc
+  Declared  
+  Defined   
+  Referenced      84      99     108     147     162     175     216     233     246     289     315     328
+  Referenced in contained procedure
+
+NZ                                        Module MG_OPTIONS_MOD           
+  Integer, Use assoc
+  Declared  
+  Defined   
+  Referenced      83      98     108     146     161     175     215     232     246     288     314     328
+  Referenced in contained procedure
+
+SLICE_BACK                                Stack                           
+  Variable, Real(kind=8)
+  Declared       276
+  Defined        292
+  Referenced     304
+
+SLICE_FRONT                               Stack                           
+  Variable, Real(kind=8)
+  Declared       278
+  Defined        300
+  Referenced     304
+
+SLICE_MINE                                Stack                           
+  Variable, Real(kind=8)
+  Declared       205
+  Defined        218
+  Referenced     222
+
+SLICE_MINE                                Stack                           
+  Variable, Real(kind=8)
+  Declared       277
+  Defined        296
+  Referenced     304
+
+WORK                                      Module MG_CONSTANTS_MOD         
+  Real(kind=8), Use assoc, Dimension(:,:,:), Allocatable
+  Declared  
+  Defined         86     149     222     304
+  Referenced     101     164     235     317
+  Referenced in contained procedure
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+                     C o m m o n   B l o c k   R e p o r t
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Blk  Program Unit                     Messages
+---  ------------                     --------
+/MPIFCMB5/                            Length: 4 bytes
+
+     MG_STENCIL_COMPS_MOD             Block is used from MG_CONSTANTS_MOD
+
+Blk  Program Unit                     Messages
+---  ------------                     --------
+/MPIFCMB9/                            Length: 4 bytes
+
+     MG_STENCIL_COMPS_MOD             Block is used from MG_CONSTANTS_MOD
+
+Blk  Program Unit                     Messages
+---  ------------                     --------
+/MPIPRIV1/                            Length: 28 bytes
+
+     MG_STENCIL_COMPS_MOD             Block is used from MG_CONSTANTS_MOD
+
+Blk  Program Unit                     Messages
+---  ------------                     --------
+/MPIPRIV2/                            Length: 24 bytes
+
+     MG_STENCIL_COMPS_MOD             Block is used from MG_CONSTANTS_MOD
+
+Blk  Program Unit                     Messages
+---  ------------                     --------
+/MPIPRIVC/                            Length: 2 bytes
+
+     MG_STENCIL_COMPS_MOD             Block is used from MG_CONSTANTS_MOD
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+                         E x t e r n a l   R e p o r t
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Name  Messages
+----  --------
+ENV in MG_ENV_MOD
+      Defined as:  No definitions.
+
+                   No calls.  It is not called and does not use any procedure.
+
+      Interface:   None
+
+Name  Messages
+----  --------
+MG_ASSERT in MG_UTILS_MOD
+      Defined as:  No definitions.
+
+                   No calls.  It is not called and does not use any procedure.
+
+      Interface:   None
+
+Name  Messages
+----  --------
+MG_COMPUTE_STDDEV in MG_UTILS_MOD
+      Defined as:  No definitions.
+
+                   No calls.  It is not called and does not use any procedure.
+
+      Interface:   None
+
+Name  Messages
+----  --------
+MG_CONSTANTS_MOD
+      Defined as:  No definitions.
+
+      Used By:     MG_STENCIL_COMPS_MOD  (indirectly)
+                   MG_STENCIL_COMPS_MOD  (indirectly)
+                   MG_STENCIL_COMPS_MOD  (indirectly)
+
+Name  Messages
+----  --------
+MG_ENV_MOD
+      Defined as:  No definitions.
+
+      Used By:     MG_STENCIL_COMPS_MOD  (indirectly)
+                   MG_STENCIL_COMPS_MOD  (indirectly)
+
+Name  Messages
+----  --------
+MG_FLUX_ACCUMULATE in MG_FLUX_ACCUMULATE_MOD
+      Defined as:  No definitions.
+
+      Interface:   None
+
+      Called By:   MG_STENCIL_2D5PT in MG_STENCIL_COMPS_MOD (Line 79, file MG_STENCIL_COMPS.F)
+
+Name  Messages
+----  --------
+MG_FLUX_ACCUMULATE_MOD
+      Defined as:  No definitions.
+
+      Used By:     MG_STENCIL_COMPS_MOD
+
+Name  Messages
+----  --------
+MG_GRID_DEALLOC in MG_UTILS_MOD
+      Defined as:  No definitions.
+
+                   No calls.  It is not called and does not use any procedure.
+
+      Interface:   None
+
+Name  Messages
+----  --------
+MG_GRID_INIT in MG_UTILS_MOD
+      Defined as:  No definitions.
+
+                   No calls.  It is not called and does not use any procedure.
+
+      Interface:   None
+
+Name  Messages
+----  --------
+MG_INIT in MG_UTILS_MOD
+      Defined as:  No definitions.
+
+                   No calls.  It is not called and does not use any procedure.
+
+      Interface:   None
+
+Name  Messages
+----  --------
+MG_INIT_GRID in MG_UTILS_MOD
+      Defined as:  No definitions.
+
+                   No calls.  It is not called and does not use any procedure.
+
+      Interface:   None
+
+Name  Messages
+----  --------
+MG_INSERT_SPIKE in MG_UTILS_MOD
+      Defined as:  No definitions.
+
+                   No calls.  It is not called and does not use any procedure.
+
+      Interface:   None
+
+Name  Messages
+----  --------
+MG_OPTIONS_MOD
+      Defined as:  No definitions.
+
+      Used By:     MG_STENCIL_COMPS_MOD  (indirectly)
+                   MG_STENCIL_COMPS_MOD  (indirectly)
+                   MG_STENCIL_COMPS_MOD  (indirectly)
+
+Name  Messages
+----  --------
+MG_PERF_INIT in MG_PROFILING_MOD
+      Defined as:  No definitions.
+
+                   No calls.  It is not called and does not use any procedure.
+
+      Interface:   None
+
+Name  Messages
+----  --------
+MG_PERF_REPORT in MG_PROFILING_MOD
+      Defined as:  No definitions.
+
+                   No calls.  It is not called and does not use any procedure.
+
+      Interface:   None
+
+Name  Messages
+----  --------
+MG_PRINT_HEADER in MG_UTILS_MOD
+      Defined as:  No definitions.
+
+                   No calls.  It is not called and does not use any procedure.
+
+      Interface:   None
+
+Name  Messages
+----  --------
+MG_PROFILING_MOD
+      Defined as:  No definitions.
+
+      Used By:     MG_STENCIL_COMPS_MOD  (indirectly)
+                   MG_STENCIL_COMPS_MOD
+
+Name  Messages
+----  --------
+MG_STENCIL_2D5PT in MG_STENCIL_COMPS_MOD
+      Defined as:  Subroutine (line 48, file MG_STENCIL_COMPS.F)
+
+      Interface:   None
+
+      Calls:       MG_FLUX_ACCUMULATE in MG_FLUX_ACCUMULATE_MOD (Line 79, file MG_STENCIL_COMPS.F)
+
+Name  Messages
+----  --------
+MG_STENCIL_2D9PT in MG_STENCIL_COMPS_MOD
+      Defined as:  Subroutine (line 115, file MG_STENCIL_COMPS.F)
+
+                   No calls.  It is not called and does not use any procedure.
+
+      Interface:   None
+
+Name  Messages
+----  --------
+MG_STENCIL_3D27PT in MG_STENCIL_COMPS_MOD
+      Defined as:  Subroutine (line 253, file MG_STENCIL_COMPS.F)
+
+                   No calls.  It is not called and does not use any procedure.
+
+      Interface:   None
+
+Name  Messages
+----  --------
+MG_STENCIL_3D7PT in MG_STENCIL_COMPS_MOD
+      Defined as:  Subroutine (line 182, file MG_STENCIL_COMPS.F)
+
+                   No calls.  It is not called and does not use any procedure.
+
+      Interface:   None
+
+Name  Messages
+----  --------
+MG_STENCIL_COMPS_MOD
+      Defined as:  Module (line 28, file MG_STENCIL_COMPS.F)
+
+        Uses:      MG_UTILS_MOD
+                   MG_OPTIONS_MOD  (indirectly)
+                   MG_CONSTANTS_MOD  (indirectly)
+                   MG_FLUX_ACCUMULATE_MOD
+                   MG_ENV_MOD  (indirectly)
+                   MG_OPTIONS_MOD  (indirectly)
+                   MG_CONSTANTS_MOD  (indirectly)
+                   MG_PROFILING_MOD  (indirectly)
+                   MG_PROFILING_MOD
+                   MG_UTILS_MOD  (indirectly)
+                   MG_OPTIONS_MOD  (indirectly)
+                   MG_ENV_MOD  (indirectly)
+                   MG_UTILS_MOD  (indirectly)
+                   MG_CONSTANTS_MOD  (indirectly)
+
+Name  Messages
+----  --------
+MG_TIMER in MG_UTILS_MOD
+      Defined as:  No definitions.
+
+                   No calls.  It is not called and does not use any procedure.
+
+      Interface:   None
+
+Name  Messages
+----  --------
+MG_UTILS_MOD
+      Defined as:  No definitions.
+
+      Used By:     MG_STENCIL_COMPS_MOD
+                   MG_STENCIL_COMPS_MOD  (indirectly)
+                   MG_STENCIL_COMPS_MOD  (indirectly)
+
+Name  Messages
+----  --------
+MPI_COMM_DUP_FN
+      Defined as:  No definitions.
+
+                   No calls.  It is not called and does not use any procedure.
+
+Name  Messages
+----  --------
+MPI_COMM_NULL_COPY_FN
+      Defined as:  No definitions.
+
+                   No calls.  It is not called and does not use any procedure.
+
+Name  Messages
+----  --------
+MPI_COMM_NULL_DELETE_FN
+      Defined as:  No definitions.
+
+                   No calls.  It is not called and does not use any procedure.
+
+Name  Messages
+----  --------
+MPI_CONVERSION_FN_NULL
+      Defined as:  No definitions.
+
+                   No calls.  It is not called and does not use any procedure.
+
+Name  Messages
+----  --------
+MPI_DUP_FN
+      Defined as:  No definitions.
+
+                   No calls.  It is not called and does not use any procedure.
+
+Name  Messages
+----  --------
+MPI_NULL_COPY_FN
+      Defined as:  No definitions.
+
+                   No calls.  It is not called and does not use any procedure.
+
+Name  Messages
+----  --------
+MPI_NULL_DELETE_FN
+      Defined as:  No definitions.
+
+                   No calls.  It is not called and does not use any procedure.
+
+Name  Messages
+----  --------
+MPI_TYPE_DUP_FN
+      Defined as:  No definitions.
+
+                   No calls.  It is not called and does not use any procedure.
+
+Name  Messages
+----  --------
+MPI_TYPE_NULL_COPY_FN
+      Defined as:  No definitions.
+
+                   No calls.  It is not called and does not use any procedure.
+
+Name  Messages
+----  --------
+MPI_TYPE_NULL_DELETE_FN
+      Defined as:  No definitions.
+
+                   No calls.  It is not called and does not use any procedure.
+
+Name  Messages
+----  --------
+MPI_WIN_DUP_FN
+      Defined as:  No definitions.
+
+                   No calls.  It is not called and does not use any procedure.
+
+Name  Messages
+----  --------
+MPI_WIN_NULL_COPY_FN
+      Defined as:  No definitions.
+
+                   No calls.  It is not called and does not use any procedure.
+
+Name  Messages
+----  --------
+MPI_WIN_NULL_DELETE_FN
+      Defined as:  No definitions.
+
+                   No calls.  It is not called and does not use any procedure.
+
+Name  Messages
+----  --------
+MPI_WTICK
+      Defined as:  No definitions.
+
+                   No calls.  It is not called and does not use any procedure.
+
+      Interface:   None
+
+Name  Messages
+----  --------
+MPI_WTIME
+      Defined as:  No definitions.
+
+                   No calls.  It is not called and does not use any procedure.
+
+      Interface:   None
+
+Name  Messages
+----  --------
+PMPI_WTICK
+      Defined as:  No definitions.
+
+                   No calls.  It is not called and does not use any procedure.
+
+      Interface:   None
+
+Name  Messages
+----  --------
+PMPI_WTIME
+      Defined as:  No definitions.
+
+                   No calls.  It is not called and does not use any procedure.
+
+      Interface:   None
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%

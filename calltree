@@ -1,0 +1,180 @@
+CrayPat/X:  Version 7.0.4 Revision e00a493  09/12/18 13:16:44
+
+Number of PEs (MPI ranks):   144
+                           
+Numbers of PEs per Node:      36  PEs on each of  4  Nodes
+                           
+Numbers of Threads per PE:     1
+                           
+Number of Cores per Socket:   22
+
+Execution start time:  Wed Oct 31 04:55:08 2018
+
+System name and speed:  nid00024  2.201 GHz (nominal)
+
+Intel Broadwell  CPU  Family:  6  Model: 79  Stepping:  1
+
+DRAM: 128 GiB DDR4-2400 on 2.2 GHz nodes
+
+
+Current path to data file:
+  /home/users/p02128/work/MiniGhost/miniGhost.x+9766-24t   (RTS, 4 data files)
+
+
+Notes for table 1:
+
+  This table shows functions that have significant exclusive time,
+    averaged across ranks, as the leaves in a calltree view. Time
+    shown for a caller (non-leaf) is the sum of times below it in the
+    tree.
+  For further explanation, see the "General table notes" below,
+    or use:  pat_report -v -O calltree ...
+
+Table 1:  Function Calltree View (limited entries shown)
+
+  Time% |      Time | Calls | Calltree
+        |           |       |  PE=HIDE
+       
+ 100.0% | 30.725083 |    -- | Total
+|-----------------------------------------------------------------------------
+|  98.6% | 30.291133 |   1.0 | main
+|  98.4% | 30.225655 |   1.0 |  mini_ghost_
+|||---------------------------------------------------------------------------
+3||  96.7% | 29.720188 |   1.0 | driver_bspma$driver_bspma_mod_
+||||--------------------------------------------------------------------------
+4|||  74.3% | 22.838488 | 800.0 | mg_stencil$mg_stencil_mod_
+5|||  74.3% | 22.834829 |    -- |  mg_stencil_3d27pt$mg_stencil_comps_mod_
+6|||  73.5% | 22.585315 | 800.0 |   mg_stencil_3d27pt$mg_stencil_comps_mod_.REGION@li.288
+|||||||-----------------------------------------------------------------------
+7||||||  37.2% | 11.415465 | 800.0 | mg_stencil_3d27pt$mg_stencil_comps_mod_.LOOP@li.286
+7||||||  36.3% | 11.159994 | 800.0 | mg_stencil_3d27pt$mg_stencil_comps_mod_.LOOP@li.312
+|||||||=======================================================================
+4|||  14.7% |  4.504387 |    -- | mg_sum_grid$mg_sum_grid_mod_
+5|||        |           |       |  mg_allreduce_sum$mg_allreduce_mod_
+||||||------------------------------------------------------------------------
+6|||||  12.3% |  3.784572 | 800.0 | mg_allreduce_sum$mg_allreduce_mod_.REGION@li.83
+7|||||  12.3% |  3.780967 | 800.0 |  mg_allreduce_sum$mg_allreduce_mod_.LOOP@li.82
+6|||||   2.2% |  0.686756 | 800.0 | MPI_ALLREDUCE
+||||||========================================================================
+4|||   7.7% |  2.360079 |  20.0 | mg_bspma_diags$mg_bspma_diags_mod_
+|||||-------------------------------------------------------------------------
+5||||   5.4% |  1.659541 |  60.0 | mg_unpack_bspma$mg_unpack_bspma_mod_
+||||||------------------------------------------------------------------------
+6|||||   3.3% |  1.019038 |    -- | mg_get_face$mg_get_face_mod_
+7|||||        |           |       |  get_face$mg_get_face_mod_
+||||||||----------------------------------------------------------------------
+8|||||||   1.1% |  0.350833 | 600.0 | get_face$mg_get_face_mod_.REGION@li.110
+9|||||||   1.1% |  0.349689 | 600.0 |  get_face$mg_get_face_mod_.LOOP@li.110
+8|||||||   1.1% |  0.330136 | 600.0 | get_face$mg_get_face_mod_.REGION@li.99
+9|||||||   1.1% |  0.329035 | 600.0 |  get_face$mg_get_face_mod_.LOOP@li.99
+||||||||======================================================================
+6|||||   2.1% |  0.633912 | 302.4 | MPI_WAITANY
+||||||========================================================================
+5||||   2.2% |  0.686290 |    -- | mg_pack$mg_pack_mod_
+||||==========================================================================
+3||   1.6% |  0.503628 |   1.0 | mg_grid_init$mg_utils_mod_
+4||   1.6% |  0.503179 |    -- |  mg_init_grid$mg_utils_mod_
+5||   1.6% |  0.502622 |  40.0 |   mg_init_grid$mg_utils_mod_.REGION@li.1062
+6||   1.6% |  0.502485 |  40.0 |    mg_init_grid$mg_utils_mod_.LOOP@li.1061
+|||===========================================================================
+|   1.4% |  0.430252 | 524.0 | query_cpu_mask
+|=============================================================================
+
+
+General table notes:
+
+    The default notes for a table do not account for the effects
+    of additional command-line options, but the detailed notes
+    produced by the -v option do account for them.
+    
+    An imbalance metric in a line is based on values in main threads
+    across multiple ranks, or on values across all threads, as applicable.
+    
+    An imbalance percent in a line is relative to the maximum value
+    for that line across ranks or threads, as applicable.
+    
+
+========================  Additional details  ========================
+
+Experiment:  trace
+
+Original path to data file:
+  /lus/scratch/p02128/work/MiniGhost/miniGhost.x+9766-24t/xf-files   (RTS, 4 data files)
+
+Original program:
+  /lus/scratch/p02128/work/MiniGhost/source/miniGhost.x+orig
+
+Instrumented with:
+  pat_build -f -O lite-events -Drtenv=PAT_RT_REPORT_METHOD=team \
+    -Drtenv=PAT_RT_REPORT_CLEANUP=skip miniGhost.x+orig miniGhost.x
+
+  Option file "lite-events" contained:
+    -g mpi,io
+    -u -Dreport=y
+    -Drtenv=PAT_RT_REPORT_CMD=pat_report,-O,lite-events,-s,summoner=rtl
+
+Instrumented program:
+  /lus/scratch/p02128/work/MiniGhost/source/miniGhost.x
+
+Program invocation:
+  /lus/scratch/p02128/work/MiniGhost/source/miniGhost.x --scaling 1 --nx 672 --ny 672 --nz 672 --num_vars 40 --num_spikes 1 --debug_grid 1 --report_diffusion 21 --percent_sum 100 --num_tsteps 20 --stencil 24 --comm_method 10 --report_perf 1 --npx 4 --npy ...
+
+Exit Status:  0 for 144 PEs
+
+Memory pagesize:  4 KiB
+
+Memory hugepagesize:  Not Available
+
+Programming environment:  CRAY
+
+Runtime environment variables:
+  CRAYPAT_ALPS_COMPONENT=/opt/cray/pe/perftools/7.0.4/sbin/pat_alps
+  CRAYPAT_LD_LIBRARY_PATH=/opt/cray/pe/gcc-libs:/opt/cray/gcc-libs:/opt/cray/pe/perftools/7.0.4/lib64
+  CRAYPAT_OPTS_EXECUTABLE=sbin/pat-opts
+  CRAYPAT_ROOT=/opt/cray/pe/perftools/7.0.4
+  CRAYPE_VERSION=2.5.15
+  CRAY_BINUTILS_VERSION=/opt/cray/pe/cce/8.7.6
+  CRAY_CC_VERSION=8.7.6
+  CRAY_FTN_VERSION=8.7.6
+  CRAY_LIBSCI_VERSION=18.07.1
+  LIBSCI_VERSION=18.07.1
+  MODULE_VERSION=3.2.11.1
+  MODULE_VERSION_STACK=3.2.11.1
+  MPICH_ABORT_ON_ERROR=1
+  MPICH_DIR=/opt/cray/pe/mpt/7.7.3/gni/mpich-cray/8.6
+  OMP_NUM_THREADS=1
+  PAT_BUILD_PAPI_BASEDIR=/opt/cray/pe/papi/5.6.0.4
+  PAT_REPORT_PRUNE_NAME=_cray$mt_execute_,_cray$mt_start_,__cray_hwpc_,f_cray_hwpc_,cstart,__pat_,pat_region_,PAT_,OMP.slave_loop,slave_entry,_new_slave_entry,_thread_pool_slave_entry,THREAD_POOL_join,__libc_start_main,_start,__start,start_thread,__wrap_,UPC_ADIO_,_upc_,upc_,__caf_,__pgas_,syscall,__device_stub
+  PAT_RT_REPORT_CLEANUP=skip
+  PAT_RT_REPORT_CMD=pat_report,-O,lite-events,-s,summoner=rtl
+  PAT_RT_REPORT_METHOD=team
+  PBS_VERSION=TORQUE-6.0.2.h4
+  PERFTOOLS_VERSION=7.0.4
+  PMI_FORK_RANK=0
+  PMI_GNI_COOKIE=1924661248:1924726784
+  PMI_GNI_DEV_ID=0
+  PMI_GNI_LOC_ADDR=24:24
+  PMI_GNI_PTAG=102:103
+
+Report time environment variables:
+    CRAYPAT_ROOT=/opt/cray/pe/perftools/7.0.4
+    PAT_REPORT_PRUNE_NAME=_cray$mt_execute_,_cray$mt_start_,__cray_hwpc_,f_cray_hwpc_,cstart,__pat_,pat_region_,PAT_,OMP.slave_loop,slave_entry,_new_slave_entry,_thread_pool_slave_entry,THREAD_POOL_join,__libc_start_main,_start,__start,start_thread,__wrap_,UPC_ADIO_,_upc_,upc_,__caf_,__pgas_,syscall,__device_stub
+
+Number of MPI control variables collected:  108
+
+  (To see the list, specify: -s mpi_cvar=show)
+
+Report command line options:  -O ct
+
+Operating system:
+  Linux 4.4.103-6.38_4.0.134-cray_ari_c #1 SMP Tue Jun 12 15:46:05 UTC 2018 (5534fad)
+
+Estimated minimum instrumentation overhead per call of a traced function,
+  which was subtracted from the data shown in this report
+  (for raw data, use the option:  -s overhead=include):
+    Time  0.156  microsecs
+
+Number of traced functions that were called:  56
+
+  (To see the list, specify:  -s traced_functions=show)
+

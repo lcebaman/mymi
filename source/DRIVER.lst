@@ -1,0 +1,1581 @@
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+                          S u m m a r y   R e p o r t
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Compilation
+-----------
+File     : /lus/scratch/p02128/work/MiniGhost/source/DRIVER.F
+Compiled : 10/31/18  05:23:47
+Compiler : Version 8.7.6
+Ftnlx    : Version 8503 (libcif 85008)
+Target   : x86-64
+Command  : ftn_driver.exe -hcpu=broadwell -hstatic -D__CRAYXC
+           -D__CRAY_BROADWELL -D__CRAYXT_COMPUTE_LINUX_TARGET -hnetwork=aries
+           -D_MG_MPI -D_MG_INT4 -D_MG_REAL8 -ffree -hlist=a -c DRIVER.F
+           -I/opt/cray/pe/cce/8.7.6/cce/x86_64/include/craylibs -I/usr/include
+           -I/usr/include -I/opt/cray/pe/mpt/7.7.3/gni/mpich-cray/8.6/include
+           -I/opt/cray/pe/libsci/18.07.1/CRAY/8.6/x86_64/include
+           -I/opt/cray/rca/2.2.18-6.0.7.0_33.3__g2aa4f39.ari/include
+           -I/opt/cray/pe/pmi/5.0.14/include
+           -I/opt/cray/xpmem/2.2.15-6.0.7.0_35.11__g7549d06.ari/include
+           -I/opt/cray/dmapp/7.1.1-6.0.7.0_34.3__g5a674e0.ari/include
+           -I/opt/cray/gni-headers/5.0.12.0-6.0.7.0_24.1__g3b1768f.ari/include
+           -I/opt/cray/ugni/6.0.14.0-6.0.7.0_23.1__gea11d3d.ari/include
+           -I/opt/cray/udreg/2.3.2-6.0.7.0_33.18__g5196236.ari/include
+           -I/opt/cray/alps/6.6.43-6.0.7.0_26.4__ga796da3.ari/include
+           -I/opt/cray/wlm_detect/1.3.3-6.0.7.0_47.2__g7109084.ari/include
+           -I/opt/cray/krca/2.2.4-6.0.7.0_32.3__g8505b97.ari/include
+           -I/opt/cray-hss-devel/8.0.0/include
+Program
+  Units  : MINI_GHOST
+
+ftnlx report
+------------
+Source   : /lus/scratch/p02128/work/MiniGhost/source/DRIVER.F
+Date     : 10/31/2018  05:23:48
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+                          O p t i o n s   R e p o r t
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Options :  -O cache2,scalar2,thread2,vector2,mpi0,modinline,ipa3,noaggress
+           -O autoprefetch,noautothread,fusion2,nomsgs,nonegmsgs,nooverindex
+           -O pattern,shortcircuit2,unroll2,nozeroinc
+           -h noadd_paren,align_arrays,nobounds,caf,noconcurrent,nocontiguous
+           -h nocontiguous_assumed_shape,fma,nofp_trap,nofunc_trace,noomp_analyz
+           e
+           -h noomp_trace,nopat_trace
+           -h safe_addr,thread_do_concurrent,fp2=approx,flex_mp=default         
+           -h alias=default:standard_restrict         
+           -h static (or -static)
+           -h omp,noacc
+           -h cpu=x86-64,broadwell
+           -h network=aries
+           -K trap=none
+           -s default32
+           -eh
+           -d abcdefgijmopqsvwzACEFIPQRST0
+           -e nBDZ 
+           -f free
+           -m3
+           -S /lus/scratch/tmp/pe_5412/DRIVER_1.s
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+                          S o u r c e   L i s t i n g
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+
+     %%%    L o o p m a r k   L e g e n d    %%%
+
+     Primary Loop Type        Modifiers
+     ------- ---- ----        ---------
+     A - Pattern matched      a - atomic memory operation
+                              b - blocked
+     C - Collapsed            c - conditional and/or computed
+     D - Deleted               
+     E - Cloned                
+     F - Flat - No calls      f - fused
+     G - Accelerated          g - partitioned
+     I - Inlined              i - interchanged
+     M - Multithreaded        m - partitioned
+                              n - non-blocking remote transfer
+                              p - partial
+     R - Rerolling            r - unrolled
+                              s - shortloop
+     V - Vectorized           w - unwound
+
+     + - More messages listed at end of listing
+     ------------------------------------------
+
+
+    1.        ! ************************************************************************
+    2.        !
+    3.        !               miniGhost: stencil computations with boundary exchange.
+    4.        !                 Copyright (2012) Sandia Corporation
+    5.        !
+    6.        ! Under terms of Contract DE-AC04-94AL85000, there is a non-exclusive
+    7.        ! license for use of this work by or on behalf of the U.S. Government.
+    8.        !
+    9.        ! This library is free software; you can redistribute it and/or modify
+   10.        ! it under the terms of the GNU Lesser General Public License as
+   11.        ! published by the Free Software Foundation; either version 2.1 of the
+   12.        ! License, or (at your option) any later version.
+   13.        !
+   14.        ! This library is distributed in the hope that it will be useful, but
+   15.        ! WITHOUT ANY WARRANTY; without even the implied warranty of
+   16.        ! MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+   17.        ! Lesser General Public License for more details.
+   18.        !
+   19.        ! You should have received a copy of the GNU Lesser General Public
+   20.        ! License along with this library; if not, write to the Free Software
+   21.        ! Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307
+   22.        ! USA
+   23.        ! Questions? Contact Richard F. Barrett (rfbarre@sandia.gov) or
+   24.        !                    Michael A. Heroux (maherou@sandia.gov)
+   25.        !
+   26.        ! ************************************************************************
+   27.        
+   28.           SUBROUTINE MINI_GHOST ( SCALING_IN,          &
+   29.                                   NX_IN,               &
+   30.                                   NY_IN,               &
+   31.                                   NZ_IN,               &
+   32.                                   NUM_VARS_IN,         &
+   33.                                   PERCENT_SUM_IN,      &
+   34.                                   NUM_SPIKES_IN,       &
+   35.                                   NUM_TSTEPS_IN,       &
+   36.                                   STENCIL_IN,          &
+   37.                                   COMM_METHOD_IN,      &
+   38.                                   ERROR_TOL_IN,        &
+   39.                                   REPORT_DIFFUSION_IN, &
+   40.                                   NPX_IN,              &
+   41.                                   NPY_IN,              &
+   42.                                   NPZ_IN,              &
+   43.                                   REPORT_PERF_IN,        &
+   44.                                   CP_INTERVAL_IN,      &
+   45.                                   CP_FILE_IN,          &
+   46.                                   DEBUG_GRID_IN        &
+   47.                                   )
+   48.        
+   49.           USE MG_CONSTANTS_MOD
+   50.           USE MG_OPTIONS_MOD
+   51.           USE MG_UTILS_MOD
+   52.           USE MG_BUFINIT_MOD
+   53.           USE DRIVER_BSPMA_MOD
+   54.           USE DRIVER_SVAF_MOD
+   55.           USE MG_STENCIL_MOD
+   56.           USE MG_PROFILING_MOD
+   57.           USE MG_CHECKPOINT_MOD
+   58.        
+   59.           IMPLICIT NONE
+   60.        
+   61.              INTEGER(KIND=MG_INT), INTENT(IN) :: &
+   62.                 SCALING_IN,         &
+   63.                 NX_IN,              &
+   64.                 NY_IN,              &
+   65.                 NZ_IN,              &
+   66.                 NUM_VARS_IN,        &
+   67.                 PERCENT_SUM_IN,     &
+   68.                 NUM_SPIKES_IN,      &
+   69.                 NUM_TSTEPS_IN,      &
+   70.                 STENCIL_IN,         &
+   71.                 COMM_METHOD_IN,     &
+   72.                 ERROR_TOL_IN,       &
+   73.                 REPORT_DIFFUSION_IN, &
+   74.                 NPX_IN,             &
+   75.                 NPY_IN,             &
+   76.                 NPZ_IN,             &
+   77.                 REPORT_PERF_IN,       &
+   78.                 CP_INTERVAL_IN,     &
+   79.                 DEBUG_GRID_IN
+   80.        
+   81.              CHARACTER*(1024), INTENT(IN) :: &
+   82.                 CP_FILE_IN
+   83.        
+   84.              ! ------------------
+   85.              ! Local Declarations
+   86.              ! ------------------
+   87.        
+   88.              INTEGER :: &
+   89.                 IERR,                    &  ! Return status
+   90.                 I,                       &  ! Counter
+   91.                 IVAR                        ! Counter (over variables)
+   92.        
+   93.              REAL(KIND=MG_REAL8) ::      &
+   94.                 TIME_START,              &
+   95.                 TIME_START_2,            &
+   96.                 TIME_START_ALL
+   97.        
+   98.              ! ---------------------
+   99.              ! Executable Statements
+  100.              ! ---------------------
+  101.        
+  102.              IERR = 0
+  103.        
+  104.              ! Set C input parameters to Fortran-stored parameters
+  105.              SCALING          = SCALING_IN
+  106.              NX               = NX_IN
+  107.              NY               = NY_IN
+  108.              NZ               = NZ_IN
+  109.              NUM_VARS         = NUM_VARS_IN
+  110.              PERCENT_SUM      = PERCENT_SUM_IN
+  111.              NUM_SPIKES       = NUM_SPIKES_IN
+  112.              NUM_TSTEPS       = NUM_TSTEPS_IN
+  113.              STENCIL          = STENCIL_IN
+  114.              COMM_METHOD      = COMM_METHOD_IN
+  115.              ERROR_TOL        = 1.0 / (10.0**ERROR_TOL_IN)
+  116.        
+  117.              IF ( REPORT_DIFFUSION_IN == 0 ) THEN
+  118.                 REPORT_DIFFUSION = NUM_TSTEPS
+  119.              ELSE
+  120.                 REPORT_DIFFUSION = REPORT_DIFFUSION_IN
+  121.              END IF
+  122.        
+  123.              NPX = NPX_IN
+  124.              NPY = NPY_IN
+  125.              NPZ = NPZ_IN
+  126.        
+  127.              REPORT_PERF = REPORT_PERF_IN
+  128.        
+  129.        #if defined _MG_CHECKPT
+  130.    D         CP_INTERVAL = CP_INTERVAL_IN
+  131.    D         CP_FILE     = CP_FILE_IN
+  132.        #endif
+  133.        
+  134.               DEBUG_GRID = DEBUG_GRID_IN
+  135.        
+  136.              ! Set up computing environment (e.g. MPI if selected).
+  137.              ! Set 3d processor grid, position in processor grid.
+  138.              ! Set neighbors, message tag initialization, spikes (for testing).
+  139.  +           CALL MG_INIT ( IERR )
+  140.        
+  141.              ! Initialize performance capture
+  142.  +           CALL MG_PERF_INIT ( IERR )
+  143.        
+  144.              ! Allocate local domain, including space for all variables, including ghosts:
+  145.  +           CALL MG_GRID_INIT ( IERR )
+  146.        
+  147.  +           CALL MG_BUFINIT ( IERR )
+  148.  +           CALL MG_ASSERT ( IERR, 'MINIGHOST: MG_BUFINIT', IERR )
+  149.        
+  150.  +           CALL MG_PRINT_HEADER ( COMM_METHOD, STENCIL, IERR )
+  151.        
+  152.              ! ---------------------------------
+  153.              ! Call COMM_METHOD specific DRIVER.
+  154.              ! ---------------------------------
+  155.        
+  156.              SELECT CASE ( COMM_METHOD )
+  157.        
+  158.                 CASE ( COMM_METHOD_BSPMA )
+  159.        
+  160.  +                 CALL DRIVER_BSPMA ( IERR )
+  161.        
+  162.                 CASE ( COMM_METHOD_SVAF )
+  163.        
+  164.  +                 CALL DRIVER_SVAF ( IERR )
+  165.        
+  166.              END SELECT ! COMM_METHOD
+  167.        
+  168.              !  Report results.
+  169.        
+  170.  +           CALL MG_PERF_REPORT ( COMM_METHOD, STENCIL, IERR )
+  171.  +           CALL MG_ASSERT ( IERR, 'MINIGHOST: PERF_REPORT', COMM_METHOD )
+  172.        
+  173.              ! Done. Deallocate memory and terminate.
+  174.        
+  175.  +           CALL MG_GRID_DEALLOC ( IERR )
+  176.        
+  177.              IF ( ALLOCATED ( SEND_BUFFER_BACK ) )  &
+  178.                 DEALLOCATE ( SEND_BUFFER_BACK )
+  179.              IF ( ALLOCATED ( RECV_BUFFER_BACK ) )  &
+  180.                 DEALLOCATE ( RECV_BUFFER_BACK )
+  181.              IF ( ALLOCATED ( SEND_BUFFER_FRONT ) ) &
+  182.                 DEALLOCATE ( SEND_BUFFER_FRONT )
+  183.              IF ( ALLOCATED ( RECV_BUFFER_FRONT ) ) &
+  184.                 DEALLOCATE ( RECV_BUFFER_FRONT )
+  185.              IF ( ALLOCATED ( SEND_BUFFER_EAST ) )  &
+  186.                 DEALLOCATE ( SEND_BUFFER_EAST )
+  187.              IF ( ALLOCATED ( RECV_BUFFER_EAST ) )  &
+  188.                 DEALLOCATE ( RECV_BUFFER_EAST )
+  189.              IF ( ALLOCATED ( SEND_BUFFER_WEST ) )  &
+  190.                 DEALLOCATE ( SEND_BUFFER_WEST )
+  191.              IF ( ALLOCATED ( RECV_BUFFER_WEST ) )  &
+  192.                 DEALLOCATE ( RECV_BUFFER_WEST )
+  193.              IF ( ALLOCATED ( SEND_BUFFER_NORTH ) ) &
+  194.                 DEALLOCATE ( SEND_BUFFER_NORTH )
+  195.              IF ( ALLOCATED ( RECV_BUFFER_NORTH ) ) &
+  196.                 DEALLOCATE ( RECV_BUFFER_NORTH )
+  197.              IF ( ALLOCATED ( SEND_BUFFER_SOUTH ) ) &
+  198.                 DEALLOCATE ( SEND_BUFFER_SOUTH )
+  199.              IF ( ALLOCATED ( RECV_BUFFER_SOUTH ) ) &
+  200.                 DEALLOCATE ( RECV_BUFFER_SOUTH )
+  201.        
+  202.              IF ( ALLOCATED ( MSG_REQS ) ) &
+  203.                 DEALLOCATE ( MSG_REQS )
+  204.              IF ( ALLOCATED ( MSG_TAGS ) ) &
+  205.                 DEALLOCATE ( MSG_TAGS )
+  206.        
+  207.              RETURN
+  208.        
+  209.           END SUBROUTINE MINI_GHOST
+ftn-5002 ftn: NOTE MINI_GHOST, File = DRIVER.F, Line = 209 
+  Local variable "TIME_START_ALL" is declared but neither defined nor used.
+
+ftn-5002 ftn: NOTE MINI_GHOST, File = DRIVER.F, Line = 209 
+  Local variable "I" is declared but neither defined nor used.
+
+ftn-5002 ftn: NOTE MINI_GHOST, File = DRIVER.F, Line = 209 
+  Local variable "TIME_START_2" is declared but neither defined nor used.
+
+ftn-5002 ftn: NOTE MINI_GHOST, File = DRIVER.F, Line = 209 
+  Local variable "TIME_START" is declared but neither defined nor used.
+
+ftn-5002 ftn: NOTE MINI_GHOST, File = DRIVER.F, Line = 209 
+  Local variable "IVAR" is declared but neither defined nor used.
+
+ftn-5004 ftn: NOTE MINI_GHOST, File = DRIVER.F, Line = 209 
+  Dummy Argument "CP_FILE_IN" is not referenced or defined.
+
+ftn-5004 ftn: NOTE MINI_GHOST, File = DRIVER.F, Line = 209 
+  Dummy Argument "CP_INTERVAL_IN" is not referenced or defined.
+
+
+ftn-3118 ftn: IPA MINI_GHOST, File = DRIVER.F, Line = 139, Column = 12 
+  "mg_init" (called from "mini_ghost") was not inlined because the call site will not flatten.  "mpi_abort_" is missing.
+
+ftn-3171 ftn: IPA MINI_GHOST, File = DRIVER.F, Line = 142, Column = 12 
+  "mg_perf_init" (called from "mini_ghost") was not inlined because it is not in the body of a loop.
+
+ftn-3118 ftn: IPA MINI_GHOST, File = DRIVER.F, Line = 145, Column = 12 
+  "mg_grid_init" (called from "mini_ghost") was not inlined because the call site will not flatten.  "mpi_abort_" is missing.
+
+ftn-3118 ftn: IPA MINI_GHOST, File = DRIVER.F, Line = 147, Column = 12 
+  "mg_bufinit" (called from "mini_ghost") was not inlined because the call site will not flatten.  "mpi_abort_" is missing.
+
+ftn-3118 ftn: IPA MINI_GHOST, File = DRIVER.F, Line = 148, Column = 12 
+  "mg_assert" (called from "mini_ghost") was not inlined because the call site will not flatten.  "mpi_abort_" is missing.
+
+ftn-3118 ftn: IPA MINI_GHOST, File = DRIVER.F, Line = 150, Column = 12 
+  "mg_print_header" (called from "mini_ghost") was not inlined because the call site will not flatten.  "mpi_wtick_" is missing.
+
+ftn-3118 ftn: IPA MINI_GHOST, File = DRIVER.F, Line = 160, Column = 18 
+  "driver_bspma" (called from "mini_ghost") was not inlined because the call site will not flatten.  "mpi_wtime_" is missing.
+
+ftn-3118 ftn: IPA MINI_GHOST, File = DRIVER.F, Line = 164, Column = 18 
+  "driver_svaf" (called from "mini_ghost") was not inlined because the call site will not flatten.  "mpi_wtime_" is missing.
+
+ftn-3118 ftn: IPA MINI_GHOST, File = DRIVER.F, Line = 170, Column = 12 
+  "mg_perf_report" (called from "mini_ghost") was not inlined because the call site will not flatten.  "_CLOSE" is missing.
+
+ftn-3118 ftn: IPA MINI_GHOST, File = DRIVER.F, Line = 171, Column = 12 
+  "mg_assert" (called from "mini_ghost") was not inlined because the call site will not flatten.  "mpi_abort_" is missing.
+
+ftn-3171 ftn: IPA MINI_GHOST, File = DRIVER.F, Line = 175, Column = 12 
+  "mg_grid_dealloc" (called from "mini_ghost") was not inlined because it is not in the body of a loop.
+
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+                C r o s s   R e f e r e n c e   for   MINI_GHOST
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Name                                      Storage/Owner                   
+----                                      -------------                   
+
+ALLOCATED                                                                 
+  Function, Integer, Intrinsic, Pure
+  Declared  
+  Defined   
+  Referenced     177     179     181     183     185     187     189     191     193     195     197     199     202     204
+
+COMM_METHOD                               Module MG_OPTIONS_MOD           
+  Integer, Use assoc
+  Declared  
+  Defined        114
+  Referenced     150     156     170     171
+
+COMM_METHOD_BSPMA                         Module MG_OPTIONS_MOD           
+  Parameter, Integer, Use assoc
+  Declared  
+  Defined   
+  Referenced     158
+
+COMM_METHOD_IN                            MINI_GHOST                      
+  Dummy Argument, Integer(kind=4), Intent(in)
+  Declared        37      71
+  Defined   
+  Referenced     114
+
+COMM_METHOD_SVAF                          Module MG_OPTIONS_MOD           
+  Parameter, Integer, Use assoc
+  Declared  
+  Defined   
+  Referenced     162
+
+CP_FILE_IN                                MINI_GHOST                      
+  Dummy Argument, Character(1024), Intent(in)
+  Declared        45      82
+  Defined   
+  Referenced
+
+CP_INTERVAL_IN                            MINI_GHOST                      
+  Dummy Argument, Integer(kind=4), Intent(in)
+  Declared        44      78
+  Defined   
+  Referenced
+
+DEBUG_GRID                                Module MG_OPTIONS_MOD           
+  Integer, Use assoc
+  Declared  
+  Defined        134
+  Referenced
+
+DEBUG_GRID_IN                             MINI_GHOST                      
+  Dummy Argument, Integer(kind=4), Intent(in)
+  Declared        46      79
+  Defined   
+  Referenced     134
+
+DRIVER_BSPMA                              Module DRIVER_BSPMA_MOD         
+  Subroutine, Module procedure
+  Declared  
+  Defined   
+  Referenced     160
+
+DRIVER_BSPMA_MOD                                                          
+  Module
+  Declared  
+  Defined   
+  Referenced      53
+
+DRIVER_SVAF                               Module DRIVER_SVAF_MOD          
+  Subroutine, Module procedure
+  Declared  
+  Defined   
+  Referenced     164
+
+DRIVER_SVAF_MOD                                                           
+  Module
+  Declared  
+  Defined   
+  Referenced      54
+
+ERROR_TOL                                 Module MG_CONSTANTS_MOD         
+  Real(kind=8), Use assoc
+  Declared  
+  Defined        115
+  Referenced
+
+ERROR_TOL_IN                              MINI_GHOST                      
+  Dummy Argument, Integer(kind=4), Intent(in)
+  Declared        38      72
+  Defined   
+  Referenced     115
+
+I                                         Stack                           
+  Variable, Integer
+  Declared        90
+  Defined   
+  Referenced
+
+IERR                                      Stack                           
+  Variable, Integer
+  Declared        89
+  Defined        102
+  Referenced     139     142     145     147     148     150     160     164     170     171     175
+
+IVAR                                      Stack                           
+  Variable, Integer
+  Declared        91
+  Defined   
+  Referenced
+
+MG_ASSERT                                 Module MG_UTILS_MOD             
+  Subroutine, Module procedure
+  Declared  
+  Defined   
+  Referenced     148     148     171     171
+
+MG_BUFINIT                                Module MG_BUFINIT_MOD           
+  Subroutine, Module procedure
+  Declared  
+  Defined   
+  Referenced     147
+
+MG_BUFINIT_MOD                                                            
+  Module
+  Declared  
+  Defined   
+  Referenced      52
+
+MG_CHECKPOINT_MOD                                                         
+  Module
+  Declared  
+  Defined   
+  Referenced      57
+
+MG_CONSTANTS_MOD                                                          
+  Module, Used indirectly (from module MG_PROFILING_MOD)
+  Declared  
+  Defined   
+  Referenced
+
+MG_CONSTANTS_MOD                                                          
+  Module, Used indirectly (from module MG_STENCIL_MOD)
+  Declared  
+  Defined   
+  Referenced
+
+MG_CONSTANTS_MOD                                                          
+  Module, Used indirectly (from module MG_BUFINIT_MOD)
+  Declared  
+  Defined   
+  Referenced
+
+MG_CONSTANTS_MOD                                                          
+  Module, Used indirectly (from module MG_UTILS_MOD)
+  Declared  
+  Defined   
+  Referenced
+
+MG_CONSTANTS_MOD                                                          
+  Module, Used indirectly (from module MG_CHECKPOINT_MOD)
+  Declared  
+  Defined   
+  Referenced
+
+MG_CONSTANTS_MOD                                                          
+  Module, Used indirectly (from module MG_OPTIONS_MOD)
+  Declared  
+  Defined   
+  Referenced
+
+MG_CONSTANTS_MOD                                                          
+  Module
+  Declared  
+  Defined   
+  Referenced      49
+
+MG_ENV_MOD                                                                
+  Module, Used indirectly (from module MG_STENCIL_MOD)
+  Declared  
+  Defined   
+  Referenced
+
+MG_ENV_MOD                                                                
+  Module, Used indirectly (from module MG_PROFILING_MOD)
+  Declared  
+  Defined   
+  Referenced
+
+MG_FLUX_ACCUMULATE_MOD                                                    
+  Module, Used indirectly (from module MG_STENCIL_MOD)
+  Declared  
+  Defined   
+  Referenced
+
+MG_GRID_DEALLOC                           Module MG_UTILS_MOD             
+  Subroutine, Module procedure
+  Declared  
+  Defined   
+  Referenced     175
+
+MG_GRID_INIT                              Module MG_UTILS_MOD             
+  Subroutine, Module procedure
+  Declared  
+  Defined   
+  Referenced     145
+
+MG_INIT                                   Module MG_UTILS_MOD             
+  Subroutine, Module procedure
+  Declared  
+  Defined   
+  Referenced     139
+
+MG_INT                                    Module MG_CONSTANTS_MOD         
+  Parameter, Integer(kind=1), Use assoc
+  Declared  
+  Defined   
+  Referenced      61
+
+MG_OPTIONS_MOD                                                            
+  Module
+  Declared  
+  Defined   
+  Referenced      50
+
+MG_OPTIONS_MOD                                                            
+  Module, Used indirectly (from module MG_BUFINIT_MOD)
+  Declared  
+  Defined   
+  Referenced
+
+MG_OPTIONS_MOD                                                            
+  Module, Used indirectly (from module MG_PROFILING_MOD)
+  Declared  
+  Defined   
+  Referenced
+
+MG_OPTIONS_MOD                                                            
+  Module, Used indirectly (from module MG_CHECKPOINT_MOD)
+  Declared  
+  Defined   
+  Referenced
+
+MG_OPTIONS_MOD                                                            
+  Module, Used indirectly (from module MG_STENCIL_MOD)
+  Declared  
+  Defined   
+  Referenced
+
+MG_OPTIONS_MOD                                                            
+  Module, Used indirectly (from module MG_UTILS_MOD)
+  Declared  
+  Defined   
+  Referenced
+
+MG_PERF_INIT                              Module MG_PROFILING_MOD         
+  Subroutine, Module procedure
+  Declared  
+  Defined   
+  Referenced     142
+
+MG_PERF_REPORT                            Module MG_PROFILING_MOD         
+  Subroutine, Module procedure
+  Declared  
+  Defined   
+  Referenced     170
+
+MG_PRINT_HEADER                           Module MG_UTILS_MOD             
+  Subroutine, Module procedure
+  Declared  
+  Defined   
+  Referenced     150
+
+MG_PROFILING_MOD                                                          
+  Module
+  Declared  
+  Defined   
+  Referenced      56
+
+MG_PROFILING_MOD                                                          
+  Module, Used indirectly (from module MG_STENCIL_MOD)
+  Declared  
+  Defined   
+  Referenced      56
+
+MG_REAL8                                  Module MG_CONSTANTS_MOD         
+  Parameter, Integer(kind=1), Use assoc
+  Declared  
+  Defined   
+  Referenced      93
+
+MG_STENCIL_COMPS_MOD                                                      
+  Module, Used indirectly (from module MG_STENCIL_MOD)
+  Declared  
+  Defined   
+  Referenced
+
+MG_STENCIL_MOD                                                            
+  Module
+  Declared  
+  Defined   
+  Referenced      55
+
+MG_UTILS_MOD                                                              
+  Module, Used indirectly (from module MG_PROFILING_MOD)
+  Declared  
+  Defined   
+  Referenced
+
+MG_UTILS_MOD                                                              
+  Module
+  Declared  
+  Defined   
+  Referenced      51
+
+MG_UTILS_MOD                                                              
+  Module, Used indirectly (from module MG_BUFINIT_MOD)
+  Declared  
+  Defined   
+  Referenced
+
+MG_UTILS_MOD                                                              
+  Module, Used indirectly (from module MG_STENCIL_MOD)
+  Declared  
+  Defined   
+  Referenced
+
+MINI_GHOST                                                                
+  Subroutine, External
+  Declared        28
+  Defined   
+  Referenced
+
+MPIFCMB5                                  Module MG_CONSTANTS_MOD         
+  Common block 
+  Declared  
+  Defined   
+  Referenced
+
+MPIFCMB9                                  Module MG_CONSTANTS_MOD         
+  Common block 
+  Declared  
+  Defined   
+  Referenced
+
+MPIPRIV1                                  Module MG_CONSTANTS_MOD         
+  Common block 
+  Declared  
+  Defined   
+  Referenced
+
+MPIPRIV2                                  Module MG_CONSTANTS_MOD         
+  Common block 
+  Declared  
+  Defined   
+  Referenced
+
+MPIPRIVC                                  Module MG_CONSTANTS_MOD         
+  Common block 
+  Declared  
+  Defined   
+  Referenced
+
+MSG_REQS                                  Module MG_CONSTANTS_MOD         
+  Integer(kind=4), Use assoc, Dimension(:), Allocatable
+  Declared  
+  Defined   
+  Referenced     202     203
+
+MSG_TAGS                                  Module MG_CONSTANTS_MOD         
+  Integer(kind=4), Use assoc, Dimension(:), Allocatable
+  Declared  
+  Defined   
+  Referenced     204     205
+
+NPX                                       Module MG_OPTIONS_MOD           
+  Integer, Use assoc
+  Declared  
+  Defined        123
+  Referenced
+
+NPX_IN                                    MINI_GHOST                      
+  Dummy Argument, Integer(kind=4), Intent(in)
+  Declared        40      74
+  Defined   
+  Referenced     123
+
+NPY                                       Module MG_OPTIONS_MOD           
+  Integer, Use assoc
+  Declared  
+  Defined        124
+  Referenced
+
+NPY_IN                                    MINI_GHOST                      
+  Dummy Argument, Integer(kind=4), Intent(in)
+  Declared        41      75
+  Defined   
+  Referenced     124
+
+NPZ                                       Module MG_OPTIONS_MOD           
+  Integer, Use assoc
+  Declared  
+  Defined        125
+  Referenced
+
+NPZ_IN                                    MINI_GHOST                      
+  Dummy Argument, Integer(kind=4), Intent(in)
+  Declared        42      76
+  Defined   
+  Referenced     125
+
+NUM_SPIKES                                Module MG_OPTIONS_MOD           
+  Integer, Use assoc
+  Declared  
+  Defined        111
+  Referenced
+
+NUM_SPIKES_IN                             MINI_GHOST                      
+  Dummy Argument, Integer(kind=4), Intent(in)
+  Declared        34      68
+  Defined   
+  Referenced     111
+
+NUM_TSTEPS                                Module MG_OPTIONS_MOD           
+  Integer, Use assoc
+  Declared  
+  Defined        112
+  Referenced     118
+
+NUM_TSTEPS_IN                             MINI_GHOST                      
+  Dummy Argument, Integer(kind=4), Intent(in)
+  Declared        35      69
+  Defined   
+  Referenced     112
+
+NUM_VARS                                  Module MG_OPTIONS_MOD           
+  Integer, Use assoc
+  Declared  
+  Defined        109
+  Referenced
+
+NUM_VARS_IN                               MINI_GHOST                      
+  Dummy Argument, Integer(kind=4), Intent(in)
+  Declared        32      66
+  Defined   
+  Referenced     109
+
+NX                                        Module MG_OPTIONS_MOD           
+  Integer, Use assoc
+  Declared  
+  Defined        106
+  Referenced
+
+NX_IN                                     MINI_GHOST                      
+  Dummy Argument, Integer(kind=4), Intent(in)
+  Declared        29      63
+  Defined   
+  Referenced     106
+
+NY                                        Module MG_OPTIONS_MOD           
+  Integer, Use assoc
+  Declared  
+  Defined        107
+  Referenced
+
+NY_IN                                     MINI_GHOST                      
+  Dummy Argument, Integer(kind=4), Intent(in)
+  Declared        30      64
+  Defined   
+  Referenced     107
+
+NZ                                        Module MG_OPTIONS_MOD           
+  Integer, Use assoc
+  Declared  
+  Defined        108
+  Referenced
+
+NZ_IN                                     MINI_GHOST                      
+  Dummy Argument, Integer(kind=4), Intent(in)
+  Declared        31      65
+  Defined   
+  Referenced     108
+
+PERCENT_SUM                               Module MG_OPTIONS_MOD           
+  Integer, Use assoc
+  Declared  
+  Defined        110
+  Referenced
+
+PERCENT_SUM_IN                            MINI_GHOST                      
+  Dummy Argument, Integer(kind=4), Intent(in)
+  Declared        33      67
+  Defined   
+  Referenced     110
+
+RECV_BUFFER_BACK                          Module MG_CONSTANTS_MOD         
+  Real(kind=8), Use assoc, Dimension(:), Allocatable
+  Declared  
+  Defined   
+  Referenced     179     180
+
+RECV_BUFFER_EAST                          Module MG_CONSTANTS_MOD         
+  Real(kind=8), Use assoc, Dimension(:), Allocatable
+  Declared  
+  Defined   
+  Referenced     187     188
+
+RECV_BUFFER_FRONT                         Module MG_CONSTANTS_MOD         
+  Real(kind=8), Use assoc, Dimension(:), Allocatable
+  Declared  
+  Defined   
+  Referenced     183     184
+
+RECV_BUFFER_NORTH                         Module MG_CONSTANTS_MOD         
+  Real(kind=8), Use assoc, Dimension(:), Allocatable
+  Declared  
+  Defined   
+  Referenced     195     196
+
+RECV_BUFFER_SOUTH                         Module MG_CONSTANTS_MOD         
+  Real(kind=8), Use assoc, Dimension(:), Allocatable
+  Declared  
+  Defined   
+  Referenced     199     200
+
+RECV_BUFFER_WEST                          Module MG_CONSTANTS_MOD         
+  Real(kind=8), Use assoc, Dimension(:), Allocatable
+  Declared  
+  Defined   
+  Referenced     191     192
+
+REPORT_DIFFUSION                          Module MG_OPTIONS_MOD           
+  Integer, Use assoc
+  Declared  
+  Defined        118     120
+  Referenced
+
+REPORT_DIFFUSION_IN                       MINI_GHOST                      
+  Dummy Argument, Integer(kind=4), Intent(in)
+  Declared        39      73
+  Defined   
+  Referenced     117     120
+
+REPORT_PERF                               Module MG_OPTIONS_MOD           
+  Integer, Use assoc
+  Declared  
+  Defined        127
+  Referenced
+
+REPORT_PERF_IN                            MINI_GHOST                      
+  Dummy Argument, Integer(kind=4), Intent(in)
+  Declared        43      77
+  Defined   
+  Referenced     127
+
+SCALING                                   Module MG_OPTIONS_MOD           
+  Integer, Use assoc
+  Declared  
+  Defined        105
+  Referenced
+
+SCALING_IN                                MINI_GHOST                      
+  Dummy Argument, Integer(kind=4), Intent(in)
+  Declared        28      62
+  Defined   
+  Referenced     105
+
+SEND_BUFFER_BACK                          Module MG_CONSTANTS_MOD         
+  Real(kind=8), Use assoc, Dimension(:), Allocatable
+  Declared  
+  Defined   
+  Referenced     177     178
+
+SEND_BUFFER_EAST                          Module MG_CONSTANTS_MOD         
+  Real(kind=8), Use assoc, Dimension(:), Allocatable
+  Declared  
+  Defined   
+  Referenced     185     186
+
+SEND_BUFFER_FRONT                         Module MG_CONSTANTS_MOD         
+  Real(kind=8), Use assoc, Dimension(:), Allocatable
+  Declared  
+  Defined   
+  Referenced     181     182
+
+SEND_BUFFER_NORTH                         Module MG_CONSTANTS_MOD         
+  Real(kind=8), Use assoc, Dimension(:), Allocatable
+  Declared  
+  Defined   
+  Referenced     193     194
+
+SEND_BUFFER_SOUTH                         Module MG_CONSTANTS_MOD         
+  Real(kind=8), Use assoc, Dimension(:), Allocatable
+  Declared  
+  Defined   
+  Referenced     197     198
+
+SEND_BUFFER_WEST                          Module MG_CONSTANTS_MOD         
+  Real(kind=8), Use assoc, Dimension(:), Allocatable
+  Declared  
+  Defined   
+  Referenced     189     190
+
+STENCIL                                   Module MG_OPTIONS_MOD           
+  Integer, Use assoc
+  Declared  
+  Defined        113
+  Referenced     150     170
+
+STENCIL_IN                                MINI_GHOST                      
+  Dummy Argument, Integer(kind=4), Intent(in)
+  Declared        36      70
+  Defined   
+  Referenced     113
+
+TIME_START                                Stack                           
+  Variable, Real(kind=8)
+  Declared        94
+  Defined   
+  Referenced
+
+TIME_START_2                              Stack                           
+  Variable, Real(kind=8)
+  Declared        95
+  Defined   
+  Referenced
+
+TIME_START_ALL                            Stack                           
+  Variable, Real(kind=8)
+  Declared        96
+  Defined   
+  Referenced
+
+_ALLOCATED                                                                
+  Function, Integer, Intrinsic, Pure
+  Declared  
+  Defined   
+  Referenced     177     179     181     183     185     187     189     191     193     195     197     199     202     204
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+                     C o m m o n   B l o c k   R e p o r t
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Blk  Program Unit                     Messages
+---  ------------                     --------
+/MPIFCMB5/                            Length: 4 bytes
+
+     MINI_GHOST                       Block is used from MG_CONSTANTS_MOD
+
+Blk  Program Unit                     Messages
+---  ------------                     --------
+/MPIFCMB9/                            Length: 4 bytes
+
+     MINI_GHOST                       Block is used from MG_CONSTANTS_MOD
+
+Blk  Program Unit                     Messages
+---  ------------                     --------
+/MPIPRIV1/                            Length: 28 bytes
+
+     MINI_GHOST                       Block is used from MG_CONSTANTS_MOD
+
+Blk  Program Unit                     Messages
+---  ------------                     --------
+/MPIPRIV2/                            Length: 24 bytes
+
+     MINI_GHOST                       Block is used from MG_CONSTANTS_MOD
+
+Blk  Program Unit                     Messages
+---  ------------                     --------
+/MPIPRIVC/                            Length: 2 bytes
+
+     MINI_GHOST                       Block is used from MG_CONSTANTS_MOD
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+                         E x t e r n a l   R e p o r t
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Name  Messages
+----  --------
+ALLOCATED(Intrinsic)
+      Defined as:  No definitions.
+
+      Interface:   None
+
+      Called By:   MINI_GHOST (Line 177, file DRIVER.F)
+                   MINI_GHOST (Line 179, file DRIVER.F)
+                   MINI_GHOST (Line 181, file DRIVER.F)
+                   MINI_GHOST (Line 183, file DRIVER.F)
+                   MINI_GHOST (Line 185, file DRIVER.F)
+                   MINI_GHOST (Line 187, file DRIVER.F)
+                   MINI_GHOST (Line 189, file DRIVER.F)
+                   MINI_GHOST (Line 191, file DRIVER.F)
+                   MINI_GHOST (Line 193, file DRIVER.F)
+                   MINI_GHOST (Line 195, file DRIVER.F)
+                   MINI_GHOST (Line 197, file DRIVER.F)
+                   MINI_GHOST (Line 199, file DRIVER.F)
+                   MINI_GHOST (Line 202, file DRIVER.F)
+                   MINI_GHOST (Line 204, file DRIVER.F)
+
+Name  Messages
+----  --------
+DRIVER_BSPMA in DRIVER_BSPMA_MOD
+      Defined as:  No definitions.
+
+      Interface:   None
+
+      Called By:   MINI_GHOST (Line 160, file DRIVER.F)
+
+Name  Messages
+----  --------
+DRIVER_BSPMA_MOD
+      Defined as:  No definitions.
+
+      Used By:     MINI_GHOST
+
+Name  Messages
+----  --------
+DRIVER_SVAF in DRIVER_SVAF_MOD
+      Defined as:  No definitions.
+
+      Interface:   None
+
+      Called By:   MINI_GHOST (Line 164, file DRIVER.F)
+
+Name  Messages
+----  --------
+DRIVER_SVAF_MOD
+      Defined as:  No definitions.
+
+      Used By:     MINI_GHOST
+
+Name  Messages
+----  --------
+ENV in MG_ENV_MOD
+      Defined as:  No definitions.
+
+                   No calls.  It is not called and does not use any procedure.
+
+      Interface:   None
+
+Name  Messages
+----  --------
+MG_ASSERT in MG_UTILS_MOD
+      Defined as:  No definitions.
+
+      Interface:   None
+
+      Called By:   MINI_GHOST (Line 148, file DRIVER.F)
+                   MINI_GHOST (Line 171, file DRIVER.F)
+
+Name  Messages
+----  --------
+MG_BUFINIT in MG_BUFINIT_MOD
+      Defined as:  No definitions.
+
+      Interface:   None
+
+      Called By:   MINI_GHOST (Line 147, file DRIVER.F)
+
+Name  Messages
+----  --------
+MG_BUFINIT_MOD
+      Defined as:  No definitions.
+
+      Used By:     MINI_GHOST
+
+Name  Messages
+----  --------
+MG_BUF_BSPMA in MG_BUFINIT_MOD
+      Defined as:  No definitions.
+
+                   No calls.  It is not called and does not use any procedure.
+
+      Interface:   None
+
+Name  Messages
+----  --------
+MG_BUF_SVAF in MG_BUFINIT_MOD
+      Defined as:  No definitions.
+
+                   No calls.  It is not called and does not use any procedure.
+
+      Interface:   None
+
+Name  Messages
+----  --------
+MG_CHECKPOINT in MG_CHECKPOINT_MOD
+      Defined as:  No definitions.
+
+                   No calls.  It is not called and does not use any procedure.
+
+      Interface:   None
+
+Name  Messages
+----  --------
+MG_CHECKPOINT_MOD
+      Defined as:  No definitions.
+
+      Used By:     MINI_GHOST
+
+Name  Messages
+----  --------
+MG_COMPUTE_STDDEV in MG_UTILS_MOD
+      Defined as:  No definitions.
+
+                   No calls.  It is not called and does not use any procedure.
+
+      Interface:   None
+
+Name  Messages
+----  --------
+MG_CONSTANTS_MOD
+      Defined as:  No definitions.
+
+      Used By:     MINI_GHOST
+                   MINI_GHOST  (indirectly)
+                   MINI_GHOST  (indirectly)
+                   MINI_GHOST  (indirectly)
+                   MINI_GHOST  (indirectly)
+                   MINI_GHOST  (indirectly)
+                   MINI_GHOST  (indirectly)
+
+Name  Messages
+----  --------
+MG_ENV_MOD
+      Defined as:  No definitions.
+
+      Used By:     MINI_GHOST  (indirectly)
+                   MINI_GHOST  (indirectly)
+
+Name  Messages
+----  --------
+MG_FLUX_ACCUMULATE in MG_FLUX_ACCUMULATE_MOD
+      Defined as:  No definitions.
+
+                   No calls.  It is not called and does not use any procedure.
+
+      Interface:   None
+
+Name  Messages
+----  --------
+MG_FLUX_ACCUMULATE_MOD
+      Defined as:  No definitions.
+
+      Used By:     MINI_GHOST  (indirectly)
+
+Name  Messages
+----  --------
+MG_GRID_DEALLOC in MG_UTILS_MOD
+      Defined as:  No definitions.
+
+      Interface:   None
+
+      Called By:   MINI_GHOST (Line 175, file DRIVER.F)
+
+Name  Messages
+----  --------
+MG_GRID_INIT in MG_UTILS_MOD
+      Defined as:  No definitions.
+
+      Interface:   None
+
+      Called By:   MINI_GHOST (Line 145, file DRIVER.F)
+
+Name  Messages
+----  --------
+MG_INIT in MG_UTILS_MOD
+      Defined as:  No definitions.
+
+      Interface:   None
+
+      Called By:   MINI_GHOST (Line 139, file DRIVER.F)
+
+Name  Messages
+----  --------
+MG_INIT_GRID in MG_UTILS_MOD
+      Defined as:  No definitions.
+
+                   No calls.  It is not called and does not use any procedure.
+
+      Interface:   None
+
+Name  Messages
+----  --------
+MG_INSERT_SPIKE in MG_UTILS_MOD
+      Defined as:  No definitions.
+
+                   No calls.  It is not called and does not use any procedure.
+
+      Interface:   None
+
+Name  Messages
+----  --------
+MG_OPTIONS_MOD
+      Defined as:  No definitions.
+
+      Used By:     MINI_GHOST
+                   MINI_GHOST  (indirectly)
+                   MINI_GHOST  (indirectly)
+                   MINI_GHOST  (indirectly)
+                   MINI_GHOST  (indirectly)
+                   MINI_GHOST  (indirectly)
+
+Name  Messages
+----  --------
+MG_PERF_INIT in MG_PROFILING_MOD
+      Defined as:  No definitions.
+
+      Interface:   None
+
+      Called By:   MINI_GHOST (Line 142, file DRIVER.F)
+
+Name  Messages
+----  --------
+MG_PERF_REPORT in MG_PROFILING_MOD
+      Defined as:  No definitions.
+
+      Interface:   None
+
+      Called By:   MINI_GHOST (Line 170, file DRIVER.F)
+
+Name  Messages
+----  --------
+MG_PRINT_HEADER in MG_UTILS_MOD
+      Defined as:  No definitions.
+
+      Interface:   None
+
+      Called By:   MINI_GHOST (Line 150, file DRIVER.F)
+
+Name  Messages
+----  --------
+MG_PROFILING_MOD
+      Defined as:  No definitions.
+
+      Used By:     MINI_GHOST  (indirectly)
+                   MINI_GHOST
+
+Name  Messages
+----  --------
+MG_STENCIL in MG_STENCIL_MOD
+      Defined as:  No definitions.
+
+                   No calls.  It is not called and does not use any procedure.
+
+      Interface:   None
+
+Name  Messages
+----  --------
+MG_STENCIL_2D5PT in MG_STENCIL_COMPS_MOD
+      Defined as:  No definitions.
+
+                   No calls.  It is not called and does not use any procedure.
+
+      Interface:   None
+
+Name  Messages
+----  --------
+MG_STENCIL_2D9PT in MG_STENCIL_COMPS_MOD
+      Defined as:  No definitions.
+
+                   No calls.  It is not called and does not use any procedure.
+
+      Interface:   None
+
+Name  Messages
+----  --------
+MG_STENCIL_3D27PT in MG_STENCIL_COMPS_MOD
+      Defined as:  No definitions.
+
+                   No calls.  It is not called and does not use any procedure.
+
+      Interface:   None
+
+Name  Messages
+----  --------
+MG_STENCIL_3D7PT in MG_STENCIL_COMPS_MOD
+      Defined as:  No definitions.
+
+                   No calls.  It is not called and does not use any procedure.
+
+      Interface:   None
+
+Name  Messages
+----  --------
+MG_STENCIL_COMPS_MOD
+      Defined as:  No definitions.
+
+      Used By:     MINI_GHOST  (indirectly)
+
+Name  Messages
+----  --------
+MG_STENCIL_MOD
+      Defined as:  No definitions.
+
+      Used By:     MINI_GHOST
+
+Name  Messages
+----  --------
+MG_TIMER in MG_UTILS_MOD
+      Defined as:  No definitions.
+
+                   No calls.  It is not called and does not use any procedure.
+
+      Interface:   None
+
+Name  Messages
+----  --------
+MG_UTILS_MOD
+      Defined as:  No definitions.
+
+      Used By:     MINI_GHOST
+                   MINI_GHOST  (indirectly)
+                   MINI_GHOST  (indirectly)
+                   MINI_GHOST  (indirectly)
+
+Name  Messages
+----  --------
+MINI_GHOST
+      Defined as:  Subroutine (line 28, file DRIVER.F)
+
+      Interface:   None
+
+      Calls:       MG_INIT in MG_UTILS_MOD (Line 139, file DRIVER.F)
+                   MG_PERF_INIT in MG_PROFILING_MOD (Line 142, file DRIVER.F)
+                   MG_GRID_INIT in MG_UTILS_MOD (Line 145, file DRIVER.F)
+                   MG_BUFINIT in MG_BUFINIT_MOD (Line 147, file DRIVER.F)
+                   MG_ASSERT in MG_UTILS_MOD (Line 148, file DRIVER.F)
+                   MG_ASSERT in MG_UTILS_MOD (Line 171, file DRIVER.F)
+                   MG_PRINT_HEADER in MG_UTILS_MOD (Line 150, file DRIVER.F)
+                   DRIVER_BSPMA in DRIVER_BSPMA_MOD (Line 160, file DRIVER.F)
+                   DRIVER_SVAF in DRIVER_SVAF_MOD (Line 164, file DRIVER.F)
+                   MG_PERF_REPORT in MG_PROFILING_MOD (Line 170, file DRIVER.F)
+                   MG_GRID_DEALLOC in MG_UTILS_MOD (Line 175, file DRIVER.F)
+                   ALLOCATED(Intrinsic) (Line 177, file DRIVER.F)
+                   ALLOCATED(Intrinsic) (Line 179, file DRIVER.F)
+                   ALLOCATED(Intrinsic) (Line 181, file DRIVER.F)
+                   ALLOCATED(Intrinsic) (Line 183, file DRIVER.F)
+                   ALLOCATED(Intrinsic) (Line 185, file DRIVER.F)
+                   ALLOCATED(Intrinsic) (Line 187, file DRIVER.F)
+                   ALLOCATED(Intrinsic) (Line 189, file DRIVER.F)
+                   ALLOCATED(Intrinsic) (Line 191, file DRIVER.F)
+                   ALLOCATED(Intrinsic) (Line 193, file DRIVER.F)
+                   ALLOCATED(Intrinsic) (Line 195, file DRIVER.F)
+                   ALLOCATED(Intrinsic) (Line 197, file DRIVER.F)
+                   ALLOCATED(Intrinsic) (Line 199, file DRIVER.F)
+                   ALLOCATED(Intrinsic) (Line 202, file DRIVER.F)
+                   ALLOCATED(Intrinsic) (Line 204, file DRIVER.F)
+
+        Uses:      MG_CONSTANTS_MOD
+                   MG_OPTIONS_MOD
+                   MG_CONSTANTS_MOD  (indirectly)
+                   MG_UTILS_MOD
+                   MG_OPTIONS_MOD  (indirectly)
+                   MG_CONSTANTS_MOD  (indirectly)
+                   MG_BUFINIT_MOD
+                   MG_OPTIONS_MOD  (indirectly)
+                   MG_UTILS_MOD  (indirectly)
+                   MG_CONSTANTS_MOD  (indirectly)
+                   DRIVER_BSPMA_MOD
+                   DRIVER_SVAF_MOD
+                   MG_STENCIL_MOD
+                   MG_ENV_MOD  (indirectly)
+                   MG_PROFILING_MOD  (indirectly)
+                   MG_PROFILING_MOD
+                   MG_FLUX_ACCUMULATE_MOD  (indirectly)
+                   MG_OPTIONS_MOD  (indirectly)
+                   MG_CONSTANTS_MOD  (indirectly)
+                   MG_STENCIL_COMPS_MOD  (indirectly)
+                   MG_UTILS_MOD  (indirectly)
+                   MG_OPTIONS_MOD  (indirectly)
+                   MG_ENV_MOD  (indirectly)
+                   MG_UTILS_MOD  (indirectly)
+                   MG_CONSTANTS_MOD  (indirectly)
+                   MG_CHECKPOINT_MOD
+                   MG_OPTIONS_MOD  (indirectly)
+                   MG_CONSTANTS_MOD  (indirectly)
+
+Name  Messages
+----  --------
+MPI_COMM_DUP_FN
+      Defined as:  No definitions.
+
+                   No calls.  It is not called and does not use any procedure.
+
+Name  Messages
+----  --------
+MPI_COMM_NULL_COPY_FN
+      Defined as:  No definitions.
+
+                   No calls.  It is not called and does not use any procedure.
+
+Name  Messages
+----  --------
+MPI_COMM_NULL_DELETE_FN
+      Defined as:  No definitions.
+
+                   No calls.  It is not called and does not use any procedure.
+
+Name  Messages
+----  --------
+MPI_CONVERSION_FN_NULL
+      Defined as:  No definitions.
+
+                   No calls.  It is not called and does not use any procedure.
+
+Name  Messages
+----  --------
+MPI_DUP_FN
+      Defined as:  No definitions.
+
+                   No calls.  It is not called and does not use any procedure.
+
+Name  Messages
+----  --------
+MPI_NULL_COPY_FN
+      Defined as:  No definitions.
+
+                   No calls.  It is not called and does not use any procedure.
+
+Name  Messages
+----  --------
+MPI_NULL_DELETE_FN
+      Defined as:  No definitions.
+
+                   No calls.  It is not called and does not use any procedure.
+
+Name  Messages
+----  --------
+MPI_TYPE_DUP_FN
+      Defined as:  No definitions.
+
+                   No calls.  It is not called and does not use any procedure.
+
+Name  Messages
+----  --------
+MPI_TYPE_NULL_COPY_FN
+      Defined as:  No definitions.
+
+                   No calls.  It is not called and does not use any procedure.
+
+Name  Messages
+----  --------
+MPI_TYPE_NULL_DELETE_FN
+      Defined as:  No definitions.
+
+                   No calls.  It is not called and does not use any procedure.
+
+Name  Messages
+----  --------
+MPI_WIN_DUP_FN
+      Defined as:  No definitions.
+
+                   No calls.  It is not called and does not use any procedure.
+
+Name  Messages
+----  --------
+MPI_WIN_NULL_COPY_FN
+      Defined as:  No definitions.
+
+                   No calls.  It is not called and does not use any procedure.
+
+Name  Messages
+----  --------
+MPI_WIN_NULL_DELETE_FN
+      Defined as:  No definitions.
+
+                   No calls.  It is not called and does not use any procedure.
+
+Name  Messages
+----  --------
+MPI_WTICK
+      Defined as:  No definitions.
+
+                   No calls.  It is not called and does not use any procedure.
+
+      Interface:   None
+
+Name  Messages
+----  --------
+MPI_WTIME
+      Defined as:  No definitions.
+
+                   No calls.  It is not called and does not use any procedure.
+
+      Interface:   None
+
+Name  Messages
+----  --------
+PMPI_WTICK
+      Defined as:  No definitions.
+
+                   No calls.  It is not called and does not use any procedure.
+
+      Interface:   None
+
+Name  Messages
+----  --------
+PMPI_WTIME
+      Defined as:  No definitions.
+
+                   No calls.  It is not called and does not use any procedure.
+
+      Interface:   None
+
+Name  Messages
+----  --------
+_ALLOCATED(Intrinsic)
+      Defined as:  No definitions.
+
+                   No calls.  It is not called and does not use any procedure.
+
+      Interface:   None
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
