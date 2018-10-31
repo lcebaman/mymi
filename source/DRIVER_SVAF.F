@@ -84,6 +84,7 @@ CONTAINS
 
          DO TSTEP = 1, NUM_TSTEPS
             DO IVAR = 1, NUM_VARS
+               
 #if defined _MG_MPI
                TIME_START = MG_TIMER()
                IF ( STENCIL == STENCIL_2D5PT .OR. STENCIL == STENCIL_3D7PT ) THEN

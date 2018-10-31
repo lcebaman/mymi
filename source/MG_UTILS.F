@@ -332,6 +332,8 @@ CONTAINS
 
             WRITE(*,*) 'Communication strategy: one variable at a time (COMM_METHOD_SVAF)'
 
+         CASE ( COMM_METHOD_OVER )
+            WRITE(*,*) 'Communication strategy: one variable at a time overlapped (COMM_METHOD_OVER)'
          CASE DEFAULT
 
             WRITE(*,*) '** Warning ** Unknown communication strategy'

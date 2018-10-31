@@ -116,7 +116,17 @@ CONTAINS
             CALL MG_PACK ( GRID9,  IERR )
          IF ( NUM_VARS > 9 ) &
             CALL MG_PACK ( GRID10, IERR )
-   
+            
+          
+        CALL MG_SEND_BSPMA ( IERR )
+
+        COUNT_SEND_NORTH = 0
+        COUNT_SEND_SOUTH = 0
+        COUNT_SEND_EAST  = 0
+        COUNT_SEND_WEST  = 0
+        COUNT_SEND_BACK  = 0
+        COUNT_SEND_FRONT = 0
+      
          IF ( NUM_VARS > 10 ) &
             CALL MG_PACK ( GRID11, IERR )
          IF ( NUM_VARS > 11 ) &
@@ -137,7 +147,15 @@ CONTAINS
             CALL MG_PACK ( GRID19, IERR )
          IF ( NUM_VARS > 19 ) &
             CALL MG_PACK ( GRID20, IERR )
-   
+
+         CALL MG_SEND_BSPMA ( IERR )
+         COUNT_SEND_NORTH = 0
+         COUNT_SEND_SOUTH = 0
+         COUNT_SEND_EAST  = 0
+         COUNT_SEND_WEST  = 0
+         COUNT_SEND_BACK  = 0
+         COUNT_SEND_FRONT = 0
+            
          IF ( NUM_VARS > 20 ) &
             CALL MG_PACK ( GRID21, IERR )
          IF ( NUM_VARS > 21 ) &
@@ -158,7 +176,15 @@ CONTAINS
             CALL MG_PACK ( GRID29, IERR )
          IF ( NUM_VARS > 29 ) &
             CALL MG_PACK ( GRID30, IERR )
-   
+
+         CALL MG_SEND_BSPMA ( IERR )
+         COUNT_SEND_NORTH = 0
+         COUNT_SEND_SOUTH = 0
+         COUNT_SEND_EAST  = 0
+         COUNT_SEND_WEST  = 0
+         COUNT_SEND_BACK  = 0
+         COUNT_SEND_FRONT = 0
+         
          IF ( NUM_VARS > 30 ) &
             CALL MG_PACK ( GRID31, IERR )
          IF ( NUM_VARS > 31 ) &

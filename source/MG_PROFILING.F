@@ -77,6 +77,7 @@ MODULE MG_PROFILING_MOD
          ! Timing variables:
 
          REAL(KIND=MG_REAL8) :: TIME_BSPMA_PE
+         REAL(KIND=MG_REAL8) :: TIME_OVER_PE
          REAL(KIND=MG_REAL8) :: TIME_COPY_PE
          REAL(KIND=MG_REAL8) :: TIME_PACK_PE
          REAL(KIND=MG_REAL8) :: TIME_RECV_PE
@@ -1249,7 +1250,9 @@ MODULE MG_PROFILING_MOD
                CASE ( COMM_METHOD_SVAF )
       
                   WRITE(OUTPUT_LOC,*) 'Communication strategy: one variable at a time (COMM_METHOD_SVAF)'
+               CASE ( COMM_METHOD_OVER )
       
+                  WRITE(OUTPUT_LOC,*) 'Communication strategy: one variable at a time overlapped(COMM_METHOD_OVER)'
                CASE DEFAULT
       
                   WRITE(OUTPUT_LOC,*) '** Warning ** Unknown communication strategy'

@@ -10,12 +10,12 @@ MODULE MG_ENV_MOD
       INTEGER, INTENT(IN) :: OUTPUT_LOC
 
       WRITE(OUTPUT_LOC,*) 'code: miniGhost'
-      WRITE(OUTPUT_LOC,*) 'compiled_on: Wed 31 Oct 05:23:32 CDT 2018'
+      WRITE(OUTPUT_LOC,*) 'compiled_on: Wed 31 Oct 17:12:02 CDT 2018'
       WRITE(OUTPUT_LOC,*) 'directory: /lus/scratch/p02128/work/MiniGhost/source'
       WRITE(OUTPUT_LOC,*) 'FORTRAN_compiler: ftn'
       WRITE(OUTPUT_LOC,*) 'C_compiler: cc'
       WRITE(OUTPUT_LOC,*) 'linker: cc'
-      WRITE(OUTPUT_LOC,*) 'FORTRAN_flags: -D_MG_MPI -D_MG_INT4 -D_MG_REAL8  -f free -h list=a'
+      WRITE(OUTPUT_LOC,*) 'FORTRAN_flags: -D_MG_MPI -D_MG_INT4 -D_MG_REAL8  -f free -h list=a -hfp3 '
       WRITE(OUTPUT_LOC,*) 'C_flags: -D_MG_MPI -Df2c_'
       WRITE(OUTPUT_LOC,*) 'arch: '
       WRITE(OUTPUT_LOC,*) 'hostname: swan'
