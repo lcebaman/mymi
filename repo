@@ -1,0 +1,544 @@
+CrayPat/X:  Version 7.0.4 Revision e00a493  09/12/18 13:16:44
+
+Number of PEs (MPI ranks):   72
+                           
+Numbers of PEs per Node:     18  PEs on each of  4  Nodes
+                           
+Numbers of Threads per PE:    2
+                           
+Number of Cores per Socket:  22
+
+Execution start time:  Thu Nov  1 11:49:56 2018
+
+System name and speed:  nid00029  2.201 GHz (nominal)
+
+Intel Broadwell  CPU  Family:  6  Model: 79  Stepping:  1
+
+DRAM: 128 GiB DDR4-2400 on 2.2 GHz nodes
+
+
+Current path to data file:
+  /home/users/p02128/work/MiniGhost/miniGhost.x+66171-29s   (RTS, 4 data files)
+
+
+Notes for table 1:
+
+  This table shows functions that have significant exclusive sample
+    hits, averaged across ranks.
+  For further explanation, see the "General table notes" below,
+    or use:  pat_report -v -O samp_profile ...
+
+Table 1:  Profile by Function (limited entries shown)
+
+  Samp% |    Samp | Imb. |  Imb. | Group
+        |         | Samp | Samp% |  Function
+        |         |      |       |   PE=HIDE
+        |         |      |       |    Thread=HIDE
+       
+ 100.0% | 3,038.4 |   -- |    -- | Total
+|-----------------------------------------------------------------------------
+|  92.3% | 2,804.3 |   -- |    -- | USER
+||----------------------------------------------------------------------------
+||  39.7% | 1,205.5 | 35.5 |  2.9% | mg_stencil_3d27pt$mg_stencil_comps_mod_.LOOP@li.290
+||  37.1% | 1,126.0 | 18.0 |  1.6% | mg_stencil_3d27pt$mg_stencil_comps_mod_.LOOP@li.319
+||  12.3% |   375.0 | 55.0 | 13.0% | mg_allreduce_sum$mg_allreduce_mod_.LOOP@li.82
+||   1.5% |    46.1 | 27.9 | 38.2% | mg_pack_send$mg_pack_mod_
+||============================================================================
+|   4.6% |   140.9 |   -- |    -- | MPI
+||----------------------------------------------------------------------------
+||   2.2% |    65.9 | 73.1 | 53.4% | MPI_ALLREDUCE
+||   2.1% |    63.9 | 42.1 | 40.3% | MPI_WAITANY
+||============================================================================
+|   2.9% |    87.9 |   -- |    -- | ETC
+||----------------------------------------------------------------------------
+||   1.2% |    37.7 | 14.3 | 28.0% | __cray_dset_HSW
+||   1.1% |    32.2 | 23.8 | 43.2% | void spinwait<>
+|=============================================================================
+
+Notes for table 2:
+
+  This table shows functions that have the most significant exclusive
+    time, taking the maximum time across ranks and threads.
+  For further explanation, see the "General table notes" below,
+    or use:  pat_report -v -O profile_max ...
+
+Table 2:  Profile of maximum function times (limited entries shown)
+
+  Samp% |    Samp | Imb. |  Imb. | Function
+        |         | Samp | Samp% |  PE=[max,min]
+        |         |      |       |   Thread=HIDE
+|-----------------------------------------------------------------------------
+| 100.0% | 1,242.0 | 33.7 |  2.7% | mg_stencil_3d27pt$mg_stencil_comps_mod_.LOOP@li.290
+||----------------------------------------------------------------------------
+|| 100.0% | 1,242.0 |  1.5 |  0.2% | pe.12
+||  91.0% | 1,130.0 |  3.0 |  0.5% | pe.23
+||============================================================================
+|  92.1% | 1,144.0 | 16.7 |  1.5% | mg_stencil_3d27pt$mg_stencil_comps_mod_.LOOP@li.319
+||----------------------------------------------------------------------------
+||  92.1% | 1,144.0 |  7.5 |  1.3% | pe.43
+||  88.3% | 1,097.0 |  2.5 |  0.5% | pe.23
+||============================================================================
+|  34.6% |   430.0 | 53.2 | 12.5% | mg_allreduce_sum$mg_allreduce_mod_.LOOP@li.82
+||----------------------------------------------------------------------------
+||  34.6% |   430.0 |  2.5 |  1.2% | pe.23
+||  26.2% |   325.0 |  0.5 |  0.3% | pe.20
+||============================================================================
+|  20.6% |   256.0 | 51.9 | 20.6% | _thread_pool_slave_entry
+||----------------------------------------------------------------------------
+||  20.6% |   256.0 |   -- |    -- | pe.18
+||  13.1% |   163.0 |   -- |    -- | pe.44
+||============================================================================
+|  11.2% |   139.0 | 73.1 | 53.4% | MPI_ALLREDUCE
+||----------------------------------------------------------------------------
+||  11.2% |   139.0 |   -- |    -- | pe.23
+||   1.1% |    14.0 |   -- |    -- | pe.12
+||============================================================================
+|   8.5% |   106.0 | 42.1 | 40.3% | MPI_WAITANY
+||----------------------------------------------------------------------------
+||   8.5% |   106.0 |   -- |    -- | pe.20
+||   2.1% |    26.0 |   -- |    -- | pe.47
+||============================================================================
+|   6.0% |    74.0 | 27.9 | 38.2% | mg_pack_send$mg_pack_mod_
+||----------------------------------------------------------------------------
+||   6.0% |    74.0 |   -- |    -- | pe.38
+||   2.1% |    26.0 |   -- |    -- | pe.7
+||============================================================================
+|   4.7% |    58.0 |  7.5 | 13.1% | __cray_dset_HSW
+||----------------------------------------------------------------------------
+||   4.7% |    58.0 |  8.0 | 27.6% | pe.2
+||   3.4% |    42.0 |  5.5 | 26.2% | pe.48
+||============================================================================
+|   4.5% |    56.0 | 21.9 | 39.7% | void spinwait<>
+||----------------------------------------------------------------------------
+||   4.5% |    56.0 | 23.5 | 83.9% | pe.60
+||   1.5% |    19.0 |  0.5 |  5.3% | pe.46
+||============================================================================
+|   4.1% |    51.0 | 29.2 | 58.2% | mg_flux_accumulate$mg_flux_accumulate_mod_.LOOP@li.83
+||----------------------------------------------------------------------------
+||   4.1% |    51.0 |  5.0 | 19.6% | pe.47
+||   0.0% |     0.0 |  0.0 |    -- | pe.70
+||============================================================================
+|   1.9% |    24.0 | 18.4 | 77.9% | mg_flux_accumulate$mg_flux_accumulate_mod_.LOOP@li.95
+||----------------------------------------------------------------------------
+||   1.9% |    24.0 |  4.5 | 37.5% | pe.24
+||   0.0% |     0.0 |  0.0 |    -- | pe.67
+||============================================================================
+|   1.6% |    20.0 |  5.1 | 26.1% | sysmalloc
+||----------------------------------------------------------------------------
+||   1.6% |    20.0 |   -- |    -- | pe.7
+||   0.6% |     7.0 |   -- |    -- | pe.12
+||============================================================================
+|   1.4% |    18.0 | 12.4 | 69.6% | get_face$mg_get_face_mod_.LOOP@li.110
+||----------------------------------------------------------------------------
+||   1.4% |    18.0 |  1.0 | 11.1% | pe.18
+||   0.0% |     0.0 |  0.0 |    -- | pe.68
+||============================================================================
+|   1.2% |    15.0 |  7.6 | 51.4% | mpi_wtime
+||----------------------------------------------------------------------------
+||   1.2% |    15.0 |   -- |    -- | pe.28
+||   0.2% |     2.0 |   -- |    -- | pe.22
+||============================================================================
+|   1.2% |    15.0 |  9.5 | 64.1% | get_face$mg_get_face_mod_.LOOP@li.99
+||----------------------------------------------------------------------------
+||   1.2% |    15.0 |  4.5 | 60.0% | pe.61
+||   0.0% |     0.0 |  0.0 |    -- | pe.71
+||============================================================================
+|   1.0% |    13.0 |  9.0 | 70.3% | mg_flux_accumulate$mg_flux_accumulate_mod_.LOOP@li.107
+||----------------------------------------------------------------------------
+||   1.0% |    13.0 |  2.0 | 30.8% | pe.22
+||   0.0% |     0.0 |  0.0 |    -- | pe.46
+|=============================================================================
+
+===================  Observations and suggestions  ===================
+
+MPI Grid Detection:
+
+    A 3x6x4 grid pattern was detected in sent message traffic.  Because only
+    4.6% of the total execution time was spent in MPI functions, modifying
+    the rank order is unlikely to significantly improve overall performance.
+
+
+Metric-Based Rank Order:
+
+    No rank order was suggested based on the USER Samp metric because
+    that metric was already well balanced across the nodes.
+
+
+Stall Cycles:
+
+    Stall cycles are 83.3% of total cycles, which exceeds the guideline
+    of 40.0%. This can be caused by issues in the program such as
+    saturation of memory bandwidth.
+
+=========================  End Observations  =========================
+
+Notes for table 3:
+
+  This table shows functions, and line numbers within functions, that
+    have significant exclusive sample hits, averaged across ranks.
+  For further explanation, see the "General table notes" below,
+    or use:  pat_report -v -O samp_profile+src ...
+
+Table 3:  Profile by Group, Function, and Line (limited entries shown)
+
+  Samp% |    Samp | Imb. |  Imb. | Group
+        |         | Samp | Samp% |  Function
+        |         |      |       |   Source
+        |         |      |       |    Line
+        |         |      |       |     PE=HIDE
+        |         |      |       |      Thread=HIDE
+       
+ 100.0% | 3,038.4 |   -- |    -- | Total
+|-----------------------------------------------------------------------------
+|  92.3% | 2,804.3 |   -- |    -- | USER
+||----------------------------------------------------------------------------
+||  39.7% | 1,205.5 |   -- |    -- | mg_stencil_3d27pt$mg_stencil_comps_mod_.LOOP@li.290
+3|        |         |      |       |  work/MiniGhost/source/MG_STENCIL_COMPS.F
+||||--------------------------------------------------------------------------
+4|||   6.5% |   196.1 | 37.9 | 16.4% | line.295
+4|||   7.4% |   225.7 | 34.3 | 13.4% | line.299
+4|||  20.1% |   611.9 | 70.1 | 10.4% | line.303
+4|||   5.3% |   162.5 | 57.5 | 26.5% | line.309
+||||==========================================================================
+||  37.1% | 1,126.0 |   -- |    -- | mg_stencil_3d27pt$mg_stencil_comps_mod_.LOOP@li.319
+3|        |         |      |       |  work/MiniGhost/source/MG_STENCIL_COMPS.F
+||||--------------------------------------------------------------------------
+4|||   1.8% |    55.3 | 25.7 | 32.2% | line.321
+4|||  35.1% | 1,068.0 | 30.0 |  2.8% | line.322
+||||==========================================================================
+||  12.3% |   375.0 |   -- |    -- | mg_allreduce_sum$mg_allreduce_mod_.LOOP@li.82
+3|        |         |      |       |  work/MiniGhost/source/MG_ALLREDUCE.F
+||||--------------------------------------------------------------------------
+4|||   3.5% |   106.3 | 26.7 | 20.4% | line.85
+4|||   8.8% |   268.5 | 46.5 | 15.0% | line.86
+||||==========================================================================
+||   1.5% |    46.1 |   -- |    -- | mg_pack_send$mg_pack_mod_
+3|        |         |      |       |  work/MiniGhost/source/MG_PACK.F
+||============================================================================
+|   4.6% |   140.9 |   -- |    -- | MPI
+||----------------------------------------------------------------------------
+||   2.2% |    65.9 | 73.1 | 53.4% | MPI_ALLREDUCE
+||   2.1% |    63.9 | 42.1 | 40.3% | MPI_WAITANY
+||============================================================================
+|   2.9% |    87.9 |   -- |    -- | ETC
+||----------------------------------------------------------------------------
+||   1.2% |    37.7 | 14.3 | 28.0% | __cray_dset_HSW
+||   1.1% |    32.2 | 23.8 | 43.2% | void spinwait<>
+|=============================================================================
+
+Notes for table 4:
+
+  This table shows HW performance counter data for the whole program,
+    averaged across ranks or threads, as applicable.
+  For further explanation, see the "General table notes" below,
+    or use:  pat_report -v -O hwpc ...
+
+Table 4:  Program HW Performance Counter Data (limited entries shown)
+
+PE=HIDE / Thread=HIDE
+
+  
+==============================================================================
+  Total
+------------------------------------------------------------------------------
+  Thread Time                                            30.737357 secs
+  UNHALTED_REFERENCE_CYCLES                         65,594,982,283 
+  CPU_CLK_THREAD_UNHALTED:THREAD_P                  79,753,773,050 
+  INST_RETIRED:ANY_P                                29,017,753,524 
+  RESOURCE_STALLS:ANY                               66,428,444,857 
+  FP_ARITH:PACKED                                   11,845,299,245 
+  OFFCORE_RESPONSE_0:ANY_REQUEST:L3_MISS_LOCAL         702,479,790 
+  OFFCORE_RESPONSE_1:ANY_REQUEST:L3_MISS_REMOTE          1,877,291 
+  CPU CLK Boost                                               1.22 X
+  Resource stall cycles / Cycles                             83.3% 
+  FP Packed Instr / All Instr                                40.8% 
+  Memory traffic GBytes                      1.467G/sec      45.08 GB
+  Local Memory traffic GBytes                1.463G/sec      44.96 GB
+  Remote Memory traffic GBytes               0.004G/sec       0.12 GB
+  Retired Inst per Clock                                      0.36 
+==============================================================================
+
+Notes for table 5:
+
+  This table show the average time and number of bytes read from each
+    input file, taking the average over the number of ranks that read
+    from the file.  It also shows the number of read operations, and
+    average rates.
+  For further explanation, see the "General table notes" below,
+    or use:  pat_report -v -O read_stats ...
+
+Table 5:  File Input Stats by Filename (limited entries shown)
+
+ Avg Read | Avg Read |   Read Rate | Number |    Avg | Bytes/ | File Name=!x/^/(proc|sys)/
+ Time per |  MiBytes | MiBytes/sec |     of |  Reads |   Call |  PE=HIDE
+   Reader |      per |             | Reader |    per |        | 
+     Rank |   Reader |             |  Ranks | Reader |        | 
+          |     Rank |             |        |   Rank |        | 
+|-----------------------------------------------------------------------------
+| 0.000002 | 0.000008 |    3.071982 |     72 |    1.0 |   8.00 | _UnknownFile_
+|=============================================================================
+
+Notes for table 6:
+
+  This table show the average time and number of bytes written to each
+    output file, taking the average over the number of ranks that
+    wrote to the file.  It also shows the number of write operations,
+    and average rates.
+  For further explanation, see the "General table notes" below,
+    or use:  pat_report -v -O write_stats ...
+
+Table 6:  File Output Stats by Filename (limited entries shown)
+
+      Avg |      Avg |  Write Rate | Number |    Avg | Bytes/ | File Name=!x/^/(proc|sys)/
+    Write |    Write | MiBytes/sec |     of | Writes |   Call |  PE=HIDE
+ Time per |  MiBytes |             | Writer |    per |        | 
+   Writer |      per |             |  Ranks | Writer |        | 
+     Rank |   Writer |             |        |   Rank |        | 
+          |     Rank |             |        |        |        | 
+|-----------------------------------------------------------------------------
+| 0.000076 | 0.005281 |   69.483599 |      1 |  132.0 |  41.95 | stdout
+| 0.000009 | 0.005312 |  607.081822 |      1 |  181.0 |  30.77 | results.yaml
+| 0.000007 | 0.004588 |  629.631829 |      1 |  107.0 |  44.96 | results.txt
+| 0.000006 | 0.000064 |   10.236771 |     72 |    2.1 |  32.00 | _UnknownFile_
+|=============================================================================
+
+Table 7:  Lustre File Information
+
+    File Path |    Stripe | Stripe | Stripe | OST list
+              |      size | offset |  count | 
+-------------------------------------------------------
+  results.txt | 1,048,576 |      0 |      1 | 22
+ results.yaml | 1,048,576 |      0 |      1 | 3
+=======================================================
+
+Notes for table 8:
+
+  This table shows energy and power usage for the nodes with the
+    maximum, mean, and minimum usage, as well as the sum of usage over
+    all nodes.
+    Energy and power for accelerators is also shown, if applicable.
+  For further explanation, see the "General table notes" below,
+    or use:  pat_report -v -O program_energy ...
+
+Table 8:
+  Program energy and power usage (from Cray PM) (limited entries shown)
+
+   Node |      Node |   Process | Node Id
+ Energy | Power (W) |      Time |  PE=HIDE
+    (J) |           |           |   Thread=HIDE
+       
+ 39,105 | 1,271.502 | 30.754973 | Total
+-----------------------------------------------
+ 10,063 |   327.181 | 30.756700 | nid.56
+  9,875 |   321.092 | 30.754456 | nid.59
+  9,613 |   312.565 | 30.755183 | nid.29
+  9,554 |   310.663 | 30.753554 | nid.50
+===============================================
+
+Notes for table 9:
+
+  This table shows values shown for HiMem calculated from information
+    in the /proc/self/numa_maps files captured near the end of the
+    program. It is the total size of all pages, including huge pages,
+    that were actually mapped into physical memory from both private
+    and shared memory segments.
+  For further explanation, see the "General table notes" below,
+    or use:  pat_report -v -O himem ...
+
+Table 9:  Memory High Water Mark by Numa Node (limited entries shown)
+
+   Process |     HiMem |     HiMem | Numanode
+     HiMem | Numa Node | Numa Node |  PE=HIDE
+ (MiBytes) |         0 |         1 | 
+           | (MiBytes) | (MiBytes) | 
+-----------------------------------------------
+   1,447.2 |   1,443.7 |       3.5 | numanode.0
+   1,447.2 |       4.4 |   1,442.8 | numanode.1
+===============================================
+
+Notes for table 10:
+
+  This table shows memory traffic to local and remote memory for numa
+    nodes, taking for each numa node the maximum value across nodes.
+    It also shows the balance in memory traffic by showing the top 3
+    and bottom 3 node values.
+  For further explanation, see the "General table notes" below,
+    or use:  pat_report -v -O mem_bw ...
+
+Table 10:  Memory Bandwidth by Numanode (limited entries shown)
+
+  Memory |   Local |  Remote |    Thread |  Memory |  Memory | Numanode
+ Traffic |  Memory |  Memory |      Time | Traffic | Traffic |  Node Id
+  GBytes | Traffic | Traffic |           |  GBytes |       / |   PE=HIDE
+         |  GBytes |  GBytes |           |   / Sec | Nominal |    Thread=HIDE
+         |         |         |           |         |    Peak | 
+-----------------------------------------------------------------------------
+  792.96 |  791.97 |    0.99 | 30.764930 |   25.77 |   33.6% | numanode.0
+|----------------------------------------------------------------------------
+|  792.80 |  791.97 |    0.83 | 30.739262 |   25.79 |   33.6% | nid.56
+|  787.01 |  786.02 |    0.99 | 30.764930 |   25.58 |   33.3% | nid.29
+|  782.57 |  781.76 |    0.81 | 30.742295 |   25.46 |   33.1% | nid.59
+|  780.36 |  779.74 |    0.63 | 30.744006 |   25.38 |   33.1% | nid.50
+|============================================================================
+  793.48 |  791.04 |    2.44 | 30.743034 |   25.81 |   33.6% | numanode.1
+|----------------------------------------------------------------------------
+|  793.48 |  791.04 |    2.44 | 30.739813 |   25.81 |   33.6% | nid.50
+|  792.16 |  790.27 |    1.89 | 30.737118 |   25.77 |   33.6% | nid.29
+|  782.91 |  781.29 |    1.62 | 30.741270 |   25.47 |   33.2% | nid.59
+|  780.36 |  778.35 |    2.02 | 30.743034 |   25.38 |   33.1% | nid.56
+=============================================================================
+
+Notes for table 11:
+
+  This table shows total wall clock time for the ranks with the
+    maximum, mean, and minimum time, as well as the average across
+    ranks.
+    It also shows maximum memory usage from /proc/self/numa_maps for
+    those ranks, and on average.  The usage is total size of all
+    pages, including huge pages, that were actually mapped into
+    physical memory from both private and shared memory segments.
+  For further explanation, see the "General table notes" below,
+    or use:  pat_report -v -O program_time ...
+
+Table 11:
+  Wall Clock Time, Memory High Water Mark (limited entries shown)
+
+   Process |   Process | PE=[mmm]
+      Time |     HiMem |  Thread
+           | (MiBytes) | 
+          
+ 30.754973 |   1,447.2 | Total
+---------------------------------
+ 30.780912 |   1,447.3 | pe.0
+|           |           | thread.0
+ 30.755056 |   1,447.2 | pe.7
+|           |           | thread.0
+ 30.748741 |   1,447.1 | pe.21
+|           |           | thread.0
+=================================
+
+
+General table notes:
+
+    The default notes for a table do not account for the effects
+    of additional command-line options, but the detailed notes
+    produced by the -v option do account for them.
+    
+    An imbalance metric in a line is based on values in main threads
+    across multiple ranks, or on values across all threads, as applicable.
+    
+    An imbalance percent in a line is relative to the maximum value
+    for that line across ranks or threads, as applicable.
+    
+
+========================  Additional details  ========================
+
+Experiment:  samp_cs_time
+
+Sampling interval:  10000 microsecs
+
+Original path to data file:
+  /lus/scratch/p02128/work/MiniGhost/miniGhost.x+66171-29s/xf-files   (RTS, 4 data files)
+
+Original program:
+  /lus/scratch/p02128/work/MiniGhost/source/miniGhost.x+orig
+
+Instrumented with:
+  pat_build -f -O lite-samples -Drtenv=PAT_RT_REPORT_METHOD=team \
+    -Drtenv=PAT_RT_REPORT_CLEANUP=skip miniGhost.x+orig miniGhost.x
+
+  Option file "lite-samples" contained:
+    -Drtenv=PAT_RT_PERFCTR=default_samp
+    -Drtenv=PAT_RT_EXPERIMENT=samp_cs_time
+    -Drtenv=PAT_RT_SAMPLING_MODE=3
+    -Dreport=y
+    -Drtenv=PAT_RT_REPORT_CMD=pat_report,-O,lite-samples,-s,summoner=rtl
+    -g upc
+    -g caf
+    -g mpi
+    -g shmem
+    -g syscall
+    -g io
+
+Instrumented program:
+  /lus/scratch/p02128/work/MiniGhost/source/miniGhost.x
+
+Program invocation:
+  /lus/scratch/p02128/work/MiniGhost/source/miniGhost.x --npx 4 --npy 6 --npz 3 --scaling 1 --nx 672 --ny 672 --nz 672 --num_vars 40 --num_spikes 1 --debug_grid 1 --report_diffusion 21 --percent_sum 100 --num_tsteps 20 --stencil 24 --comm_method 12 ...
+
+Exit Status:  0 for 72 PEs
+
+Thread start functions and creator functions:
+    18 threads:  THREAD_POOL_join(THREAD_POOL*) <- void spinwait<int, std::not_equal_to<int>, false>(int*, int)
+    72 threads:  main
+    18 threads:  _thread_pool_slave_entry(void*) <- _cray$mt_start_two_code_parallel
+    18 threads:  mg_allreduce_sum$mg_allreduce_mod__cray$mt$p0001 <- mg_allreduce_sum$mg_allreduce_mod_
+    18 threads:  mg_stencil_3d27pt$mg_stencil_comps_mod__cray$mt$p0010 <- mg_allreduce_sum$mg_allreduce_mod__cray$mt$p0001
+
+Memory pagesize:  4 KiB
+
+Memory hugepagesize:  8 MiB
+
+Programming environment:  CRAY
+
+Runtime environment variables:
+  CRAYPAT_ALPS_COMPONENT=/opt/cray/pe/perftools/7.0.4/sbin/pat_alps
+  CRAYPAT_COMPILER_OPTIONS=1
+  CRAYPAT_LD_LIBRARY_PATH=/opt/cray/pe/gcc-libs:/opt/cray/gcc-libs:/opt/cray/pe/perftools/7.0.4/lib64
+  CRAYPAT_LITE=lite-samples
+  CRAYPAT_OPTS_EXECUTABLE=sbin/pat-opts
+  CRAYPAT_ROOT=/opt/cray/pe/perftools/7.0.4
+  CRAYPE_VERSION=2.5.15
+  CRAY_BINUTILS_VERSION=/opt/cray/pe/cce/8.7.6
+  CRAY_CC_VERSION=8.7.6
+  CRAY_FTN_VERSION=8.7.6
+  CRAY_LIBSCI_VERSION=18.07.1
+  HUGETLB_DEFAULT_PAGE_SIZE=8M
+  HUGETLB_ELFMAP=W
+  HUGETLB_FORCE_ELFMAP=yes+
+  HUGETLB_MORECORE=yes
+  HUGETLB_MORECORE_HEAPBASE=10000000000
+  LIBSCI_VERSION=18.07.1
+  MODULE_VERSION=3.2.11.1
+  MODULE_VERSION_STACK=3.2.11.1
+  MPICH_ABORT_ON_ERROR=1
+  MPICH_DIR=/opt/cray/pe/mpt/7.7.3/gni/mpich-cray/8.6
+  OMP_NUM_THREADS=2
+  PAT_BUILD_PAPI_BASEDIR=/opt/cray/pe/papi/5.6.0.4
+  PAT_REPORT_PRUNE_NAME=_cray$mt_execute_,_cray$mt_start_,__cray_hwpc_,f_cray_hwpc_,cstart,__pat_,pat_region_,PAT_,OMP.slave_loop,slave_entry,_new_slave_entry,_thread_pool_slave_entry,THREAD_POOL_join,__libc_start_main,_start,__start,start_thread,__wrap_,UPC_ADIO_,_upc_,upc_,__caf_,__pgas_,syscall,__device_stub
+  PAT_RT_EXPERIMENT=samp_cs_time
+  PAT_RT_PERFCTR=default_samp
+  PAT_RT_REPORT_CLEANUP=skip
+  PAT_RT_REPORT_CMD=pat_report,-O,lite-samples,-s,summoner=rtl
+  PAT_RT_REPORT_METHOD=team
+  PAT_RT_SAMPLING_MODE=3
+  PBS_VERSION=TORQUE-6.0.2.h4
+  PERFTOOLS_VERSION=7.0.4
+  PMI_FORK_RANK=0
+  PMI_GNI_COOKIE=3401973760:3402039296
+  PMI_GNI_DEV_ID=0
+  PMI_GNI_LOC_ADDR=29:29
+  PMI_GNI_PTAG=140:141
+
+Report time environment variables:
+    CRAYPAT_ROOT=/opt/cray/pe/perftools/7.0.4
+    PAT_REPORT_PRUNE_NAME=_cray$mt_execute_,_cray$mt_start_,__cray_hwpc_,f_cray_hwpc_,cstart,__pat_,pat_region_,PAT_,OMP.slave_loop,slave_entry,_new_slave_entry,_thread_pool_slave_entry,THREAD_POOL_join,__libc_start_main,_start,__start,start_thread,__wrap_,UPC_ADIO_,_upc_,upc_,__caf_,__pgas_,syscall,__device_stub
+
+Number of MPI control variables collected:  108
+
+  (To see the list, specify: -s mpi_cvar=show)
+
+Report command line options:  <none>
+
+Operating system:
+  Linux 4.4.103-6.38_4.0.134-cray_ari_c #1 SMP Tue Jun 12 15:46:05 UTC 2018 (5534fad)
+
+Hardware performance counter events:
+   UNHALTED_REFERENCE_CYCLES                      Unhalted reference cycles
+   CPU_CLK_THREAD_UNHALTED:THREAD_P               Count core clock cycles whenever the clock signal on the specificcore is running (not halted):Cycles when thread is not halted
+   INST_RETIRED:ANY_P                             Number of instructions retired (Precise Event):Number of instructions retired. General Counter - architectural event
+   RESOURCE_STALLS:ANY                            Cycles Allocation is stalled due to Resource Related reason:Cycles Allocation is stalled due to Resource Related reason
+   FP_ARITH:PACKED                                Floating-point instructions retired:Number of SSE/AVX computational packed floating-point instructionsretired. Applies to SSE* and AVX*, packed, double and single precision floating-point: ADD SUB MUL DIV MIN MAX RSQRT RCP SQRT DPP FM(N)ADD/SUB.  DPP and FM(N)ADD/SUB instructions count twice as they perform multiple calculations per element
+   OFFCORE_RESPONSE_0:ANY_REQUEST:L3_MISS_LOCAL   Offcore response event (must provide at least one request type andeither any_response or any combination of supplier + snoop):Request: combination of all request umasks:Supplier: counts L3 misses to local DRAM
+   OFFCORE_RESPONSE_1:ANY_REQUEST:L3_MISS_REMOTE  Offcore response event (must provide at least one request type andeither any_response or any combination of supplier + snoop):Request: combination of all request umasks:Supplier: counts L3 misses to remote node
+

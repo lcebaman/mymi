@@ -221,13 +221,13 @@
 
       IF ( NEIGHBORS(BACK) /= -1 ) THEN
          TIME_START_DIR = MG_TIMER ()
-!     $OMP PARALLEL DO
+!$OMP PARALLEL DO
          DO J = 0, NY+1
             DO I = 0, NX+1
                SEND_BUFFER_BACK(COUNT_SEND_BACK + J*(NX+2) + I + 1) = GRID ( I, J, 1 )
             END DO
          END DO
-!     $OMP END PARALLEL DO
+!$OMP END PARALLEL DO
          MG_PERF%TIME_PACK_Z_PE = MG_PERF%TIME_PACK_Z_PE + MG_TIMER () - &
          TIME_START_DIR
          COUNT_SEND_BACK = COUNT_SEND_BACK + (NX+2)*(NY+2)
@@ -257,13 +257,13 @@
 
       IF ( NEIGHBORS(FRONT) /= -1 ) THEN
          TIME_START_DIR = MG_TIMER ()
-!     $OMP PARALLEL DO
+!$OMP PARALLEL DO
          DO J = 0, NY+1
             DO I = 0, NX+1
                SEND_BUFFER_FRONT(COUNT_SEND_FRONT + J*(NX+2) + I + 1) = GRID ( I, J, NZ )
             END DO
          END DO
-!     $OMP END PARALLEL DO
+!$OMP END PARALLEL DO
          MG_PERF%TIME_PACK_Z_PE = MG_PERF%TIME_PACK_Z_PE + MG_TIMER () - &
          TIME_START_DIR
          COUNT_SEND_FRONT = COUNT_SEND_FRONT + (NX+2)*(NY+2)
@@ -289,13 +289,13 @@
 
       IF ( NEIGHBORS(WEST) /= -1 ) THEN
          TIME_START_DIR = MG_TIMER ()
-!     $OMP PARALLEL DO
+!$OMP PARALLEL DO
          DO K = 0, NZ+1
             DO J = 0, NY+1
                SEND_BUFFER_WEST(COUNT_SEND_WEST + K*(NY+2) + J + 1) = GRID ( 1, J, K )
             END DO
          END DO
-!     $OMP END PARALLEL DO
+!$OMP END PARALLEL DO
          MG_PERF%TIME_PACK_X_PE = MG_PERF%TIME_PACK_X_PE + MG_TIMER () - &
          TIME_START_DIR
          COUNT_SEND_WEST = COUNT_SEND_WEST + (NZ+2)*(NY+2)
@@ -305,13 +305,13 @@
 
       IF ( NEIGHBORS(NORTH) /= -1 ) THEN
          TIME_START_DIR = MG_TIMER ()
-!     $OMP PARALLEL DO
+!$OMP PARALLEL DO
          DO K = 0, NZ+1
             DO I = 0, NX+1
                SEND_BUFFER_NORTH(COUNT_SEND_NORTH + K*(NX+2) + I + 1) = GRID ( I, NY, K )
             END DO
          END DO
-!     $OMP END PARALLEL DO
+!$OMP END PARALLEL DO
          MG_PERF%TIME_PACK_Y_PE = MG_PERF%TIME_PACK_Y_PE + MG_TIMER () - &
          TIME_START_DIR
          COUNT_SEND_NORTH = COUNT_SEND_NORTH + (NZ+2)*(NX+2)
@@ -321,13 +321,13 @@
 
       IF ( NEIGHBORS(SOUTH) /= -1 ) THEN
          TIME_START_DIR = MG_TIMER ()
-!     $OMP PARALLEL DO
+!$OMP PARALLEL DO
          DO K = 0, NZ+1
             DO I = 0, NX+1
                SEND_BUFFER_SOUTH(COUNT_SEND_SOUTH + K*(NX+2) + I + 1) = GRID ( I, 1, K )
             END DO
          END DO
-!     $OMP END PARALLEL DO
+!$OMP END PARALLEL DO
          MG_PERF%TIME_PACK_Y_PE = MG_PERF%TIME_PACK_Y_PE + MG_TIMER () - &
          TIME_START_DIR
          COUNT_SEND_SOUTH = COUNT_SEND_SOUTH + (NZ+2)*(NX+2)
@@ -387,13 +387,13 @@
 
       IF ( NEIGHBORS(BACK) /= -1 ) THEN
          TIME_START_DIR = MG_TIMER ()
-!     $OMP PARALLEL DO
+!$OMP PARALLEL DO
          DO J = 0, NY+1
             DO I = 0, NX+1
                SEND_BUFFER_BACK(COUNT_SEND_BACK + J*(NX+2) + I + 1) = GRID ( I, J, 1 )
             END DO
          END DO
-!     $OMP END PARALLEL DO
+!$OMP END PARALLEL DO
          MG_PERF%TIME_PACK_Z_PE = MG_PERF%TIME_PACK_Z_PE + MG_TIMER () - &
          TIME_START_DIR
          COUNT_SEND_BACK = COUNT_SEND_BACK + (NX+2)*(NY+2)
@@ -423,13 +423,13 @@
 
       IF ( NEIGHBORS(FRONT) /= -1 ) THEN
          TIME_START_DIR = MG_TIMER ()
-!     $OMP PARALLEL DO
+!$OMP PARALLEL DO
          DO J = 0, NY+1
             DO I = 0, NX+1
                SEND_BUFFER_FRONT(COUNT_SEND_FRONT + J*(NX+2) + I + 1) = GRID ( I, J, NZ )
             END DO
          END DO
-!     $OMP END PARALLEL DO
+!$OMP END PARALLEL DO
          MG_PERF%TIME_PACK_Z_PE = MG_PERF%TIME_PACK_Z_PE + MG_TIMER () - &
          TIME_START_DIR
          COUNT_SEND_FRONT = COUNT_SEND_FRONT + (NX+2)*(NY+2)

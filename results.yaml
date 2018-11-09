@@ -1,10 +1,10 @@
  code: miniGhost
- compiled_on: Wed 31 Oct 05:23:32 CDT 2018
+ compiled_on: Fri  2 Nov 13:43:03 CDT 2018
  directory: /lus/scratch/p02128/work/MiniGhost/source
  FORTRAN_compiler: ftn
  C_compiler: cc
  linker: cc
- FORTRAN_flags: -D_MG_MPI -D_MG_INT4 -D_MG_REAL8  -f free -h list=a
+ FORTRAN_flags: -D_MG_MPI -D_MG_INT4 -D_MG_REAL8  -f free -h list=a -O3 -hfp3  -O ipa4 
  C_flags: -D_MG_MPI -Df2c_
  arch: 
  hostname: swan
@@ -36,146 +36,145 @@
  module_list26: craype-broadwell
  module_list27: moab/9.0.2-1469837953_f87b286-sles12
  module_list28: torque/6.0.2.h4
- Comm_strategy: full message aggregation (COMM_METHOD_BSPMA)
  Computation: 27-point difference stencil on a 3D grid (STENCIL_3D27PT)
  Global_Grid_X:      672
  Global_Grid_Y:      672
  Global_Grid_Z:      672
  Local_Grid_X:      168
  Local_Grid_Y:      112
- Local_Grid_Z:      112
+ Local_Grid_Z:      224
  Number_variables: 40
  Number_reduced: 40
  Percent_reduced: 100
  Time_steps:     20
  Task_grid_X:     4
  Task_grid_Y:     6
- Task_grid_Z:     6
+ Task_grid_Z:     3
  Scaling: strong
- processes:  144
+ processes:   72
  machine: Insert machine name here      
- Program_execution_at: 052448.108
- Program_execution_date: 20181031
- Total_time: 2.981E+01
+ Program_execution_at: 134452.820
+ Program_execution_date: 20181102
+ Total_time: 2.976E+01
  clock_resolution: 1.000E-06
  Error_tolerance: 1.000000E-08
- Comp_time_ave: 2.281E+01
- Comp_time_min: 2.222E+01
- Comp_time_max: 2.348E+01
- GFLOPS_Total:             4.398E+03
- GFLOPS_per_process:       3.054E+01
+ Comp_time_ave: 2.386E+01
+ Comp_time_min: 2.340E+01
+ Comp_time_max: 2.436E+01
+ GFLOPS_Total:             4.406E+03
+ GFLOPS_per_process:       6.119E+01
  FLOPS_Total:              1.311E+14
  FLOPS_Sums:               1.262E+14
  FLOPS_Divide:             4.855E+12
  Number_spikes:  1
- Comm_total_ave:    2.346E+00
- Comm_pack_ave:     6.757E-01
- Comm_send_ave:     9.240E-04
- Comm_wait_ave:     6.410E-01
- Comm_recv_ave:     1.666E-03
- Comm_unpack_ave:   1.026E+00
- Comm_total_max:    2.921E+00
- Comm_pack_max:     8.310E-01
- Comm_send_max:     1.452E-03
- Comm_wait_max:     9.521E-01
- Comm_recv_max:     1.891E-02
- Comm_unpack_max:   1.423E+00
- Comm_total_min:    1.620E+00
- Comm_pack_min:     5.137E-01
- Comm_send_min:     4.928E-04
- Comm_wait_min:     4.035E-01
- Comm_recv_min:     2.828E-04
- Comm_unpack_min:   5.925E-01
- Send_messages:  13920
- Send_total_words:  9687628800
- Send_total_bytes:  77501030400
- Send_min_words:  519840
- Send_min_bytes:  4158720
- Send_max_words:  775200
- Send_max_bytes:  6201600
- Send_min_proc:  60
- Send_min_words_proc:  41404800
- Send_min_bytes_proc:  331238400
- Send_max_proc:  120
- Send_max_words_proc:  82809600
- Send_max_bytes_proc:  662476800
- Recv_messages:  13920
- Recv_total_words:  9687628800
- Recv_total_bytes:  77501030400
- Recv_min_words:  519840
- Recv_min_bytes:  4158720
- Recv_max_words:  775200
- Recv_max_bytes:  6201600
- Recv_min_proc:  60
- Recv_min_words_proc:  41404800
- Recv_min_bytes_proc:  331238400
- Recv_max_proc:  120
- Recv_max_words_proc:  82809600
- Recv_max_bytes_proc:  662476800
- Comm_x_total_ave:  1.173E+00
- Comm_x_pack_ave:   3.342E-01
- Comm_x_send_ave:   1.206E-04
- Comm_x_wait_ave:   1.398E-01
- Comm_x_recv_ave:   8.489E-05
- Comm_x_unpack_ave: 6.989E-01
- Comm_x_total_max:  1.575E+00
- Comm_x_pack_max:   4.806E-01
- Comm_x_send_max:   2.313E-04
- Comm_x_wait_max:   2.554E-01
- Comm_x_recv_max:   1.929E-04
- Comm_x_unpack_max: 1.068E+00
- Comm_x_total_min:  8.262E-01
- Comm_x_pack_min:   2.467E-01
- Comm_x_send_min:   6.294E-05
- Comm_x_wait_min:   8.028E-02
- Comm_x_recv_min:   4.458E-05
- Comm_x_unpack_min: 3.723E-01
- Comm_y_total_ave:  5.967E-01
- Comm_y_pack_ave:   1.867E-01
- Comm_y_send_ave:   2.488E-04
- Comm_y_wait_ave:   2.072E-01
- Comm_y_recv_ave:   8.041E-05
- Comm_y_unpack_ave: 2.024E-01
- Comm_y_total_max:  6.898E-01
- Comm_y_pack_max:   2.325E-01
- Comm_y_send_max:   8.016E-04
- Comm_y_wait_max:   2.920E-01
- Comm_y_recv_max:   1.266E-04
- Comm_y_unpack_max: 2.529E-01
- Comm_y_total_min:  4.361E-01
- Comm_y_pack_min:   1.233E-01
- Comm_y_send_min:   1.454E-04
- Comm_y_wait_min:   1.710E-01
- Comm_y_recv_min:   4.268E-05
- Comm_y_unpack_min: 1.228E-01
- Comm_z_total_ave:  5.711E-01
- Comm_z_pack_ave:   1.508E-01
- Comm_z_send_ave:   4.403E-04
- Comm_z_wait_ave:   2.940E-01
- Comm_z_recv_ave:   1.381E-03
- Comm_z_unpack_ave: 1.245E-01
- Comm_z_total_max:  8.738E-01
- Comm_z_pack_max:   2.243E-01
- Comm_z_send_max:   8.347E-04
- Comm_z_wait_max:   6.625E-01
- Comm_z_recv_max:   1.862E-02
- Comm_z_unpack_max: 2.218E-01
- Comm_z_total_min:  2.505E-01
- Comm_z_pack_min:   7.151E-02
- Comm_z_send_min:   1.199E-04
- Comm_z_wait_min:   8.528E-02
- Comm_z_recv_min:   5.341E-05
- Comm_z_unpack_min: 3.133E-02
+ Comm_total_ave:    1.595E+00
+ Comm_pack_ave:     6.104E-01
+ Comm_send_ave:     0.000E+00
+ Comm_wait_ave:     7.713E-01
+ Comm_recv_ave:     9.827E-03
+ Comm_unpack_ave:   2.035E-01
+ Comm_total_max:    2.435E+00
+ Comm_pack_max:     7.760E-01
+ Comm_send_max:     0.000E+00
+ Comm_wait_max:     1.415E+00
+ Comm_recv_max:     1.722E-02
+ Comm_unpack_max:   6.433E-01
+ Comm_total_min:    9.215E-01
+ Comm_pack_min:     4.459E-01
+ Comm_send_min:     0.000E+00
+ Comm_wait_min:     3.137E-01
+ Comm_recv_min:     5.783E-03
+ Comm_unpack_min:   1.090E-01
+ Send_messages:  0
+ Send_total_words:  7402713600
+ Send_total_bytes:  59221708800
+ Send_min_words:  0
+ Send_min_bytes:  0
+ Send_max_words:  38420
+ Send_max_bytes:  307360
+ Send_min_proc:  0
+ Send_min_words_proc:  66851200
+ Send_min_bytes_proc:  534809600
+ Send_max_proc:  0
+ Send_max_words_proc:  133702400
+ Send_max_bytes_proc:  1069619200
+ Recv_messages:  259200
+ Recv_total_words:  7402713600
+ Recv_total_bytes:  59221708800
+ Recv_min_words:  19380
+ Recv_min_bytes:  155040
+ Recv_max_words:  38420
+ Recv_max_bytes:  307360
+ Recv_min_proc:  2400
+ Recv_min_words_proc:  66851200
+ Recv_min_bytes_proc:  534809600
+ Recv_max_proc:  4800
+ Recv_max_words_proc:  133702400
+ Recv_max_bytes_proc:  1069619200
+ Comm_x_total_ave:  6.794E-01
+ Comm_x_pack_ave:   4.105E-01
+ Comm_x_send_ave:   2.472E-03
+ Comm_x_wait_ave:   1.520E-01
+ Comm_x_recv_ave:   1.560E-03
+ Comm_x_unpack_ave: 1.128E-01
+ Comm_x_total_max:  1.628E+00
+ Comm_x_pack_max:   5.229E-01
+ Comm_x_send_max:   5.990E-03
+ Comm_x_wait_max:   6.443E-01
+ Comm_x_recv_max:   3.165E-03
+ Comm_x_unpack_max: 5.033E-01
+ Comm_x_total_min:  4.789E-01
+ Comm_x_pack_min:   3.059E-01
+ Comm_x_send_min:   1.406E-03
+ Comm_x_wait_min:   5.963E-02
+ Comm_x_recv_min:   8.266E-04
+ Comm_x_unpack_min: 6.458E-02
+ Comm_y_total_ave:  3.977E-01
+ Comm_y_pack_ave:   1.551E-01
+ Comm_y_send_ave:   5.816E-03
+ Comm_y_wait_ave:   1.844E-01
+ Comm_y_recv_ave:   2.179E-03
+ Comm_y_unpack_ave: 5.018E-02
+ Comm_y_total_max:  6.378E-01
+ Comm_y_pack_max:   2.174E-01
+ Comm_y_send_max:   1.381E-02
+ Comm_y_wait_max:   3.877E-01
+ Comm_y_recv_max:   2.976E-03
+ Comm_y_unpack_max: 7.448E-02
+ Comm_y_total_min:  2.234E-01
+ Comm_y_pack_min:   9.385E-02
+ Comm_y_send_min:   1.774E-03
+ Comm_y_wait_min:   9.014E-02
+ Comm_y_recv_min:   1.088E-03
+ Comm_y_unpack_min: 2.523E-02
+ Comm_z_total_ave:  5.001E-01
+ Comm_z_pack_ave:   2.485E-02
+ Comm_z_send_ave:   5.461E-03
+ Comm_z_wait_ave:   4.349E-01
+ Comm_z_recv_ave:   2.523E-03
+ Comm_z_unpack_ave: 3.239E-02
+ Comm_z_total_max:  1.351E+00
+ Comm_z_pack_max:   5.802E-02
+ Comm_z_send_max:   9.918E-03
+ Comm_z_wait_max:   1.224E+00
+ Comm_z_recv_max:   8.039E-03
+ Comm_z_unpack_max: 1.120E-01
+ Comm_z_total_min:  8.784E-02
+ Comm_z_pack_min:   1.594E-02
+ Comm_z_send_min:   2.278E-03
+ Comm_z_wait_min:   1.108E-02
+ Comm_z_recv_min:   7.567E-04
+ Comm_z_unpack_min: 1.093E-02
  Number_gridsum:  800
- Gridsum_Time_ave:         4.637E+00
- Gridsum_Time_comp_ave:    3.807E+00
- Gridsum_Time_comm_ave:    8.262E-01
- Gridsum_Time_max:         5.342E+00
- Gridsum_Time_comp_max:    4.025E+00
- Gridsum_Time_comm_max:    1.575E+00
- Gridsum_Time_min:         4.167E+00
- Gridsum_Time_comp_min:    3.562E+00
- Gridsum_Time_comm_min:    3.482E-01
+ Gridsum_Time_ave:         4.287E+00
+ Gridsum_Time_comp_ave:    3.751E+00
+ Gridsum_Time_comm_ave:    5.327E-01
+ Gridsum_Time_max:         5.398E+00
+ Gridsum_Time_comp_max:    4.188E+00
+ Gridsum_Time_comm_max:    1.205E+00
+ Gridsum_Time_min:         3.675E+00
+ Gridsum_Time_comp_min:    3.137E+00
+ Gridsum_Time_comm_min:    1.321E-01
  Number_Reduce:  800
  Reduce_words:  800
  Reduce_bytes:  6400

@@ -4,11 +4,11 @@
 #PBS -V
 #PBS -j oe
 #PBS -N minighost
-
 cd $PBS_O_WORKDIR
 
-export OMP_NUM_THREADS=1
+
+export OMP_NUM_THREADS=2
 
 EXE=${PWD}/source/miniGhost.x
 
-aprun -n 144 -N 36 -S 18 -d 1 ${EXE} --npx 4 --npy 6 --npz 6 --scaling 1 --nx 672 --ny 672 --nz 672 --num_vars 40 --num_spikes 1 --debug_grid 1 --report_diffusion 21 --percent_sum 100 --num_tsteps 20 --stencil 24 --comm_method 10 --report_perf 1 --error_tol 8
+aprun -n 72 -N 18 -S 9 -d 2 ${EXE} --npx 4 --npy 6 --npz 3 --scaling 1 --nx 672 --ny 672 --nz 672 --num_vars 40 --num_spikes 1 --debug_grid 1 --report_diffusion 21 --percent_sum 100 --num_tsteps 20 --stencil 24 --comm_method 12 --report_perf 1 --error_tol 8

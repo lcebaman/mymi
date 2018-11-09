@@ -275,16 +275,22 @@ CONTAINS
       REAL(KIND=MG_REAL) :: &
          SLICE_BACK,          &   ! Temporary
          SLICE_MINE,          &   ! Temporary
-         SLICE_FRONT              ! Temporary
-
+         SLICE_FRONT,         &             ! Temporary
+         LSUM,                &
+         RES, &
+         DIVI
       ! ---------------------
       ! Executable Statements
       ! ---------------------
    
       IERR = 0
+      LSUM = 0.0
+      DIVI=1.0/27.0
 
-!$OMP PARALLEL DO PRIVATE(SLICE_BACK, SLICE_MINE, SLICE_FRONT) COLLAPSE(2)
-
+!$OMP PARALLEL
+!$OMP DO PRIVATE(SLICE_BACK, SLICE_MINE, SLICE_FRONT, RES)
+!DIR$ BLOCKABLE(J,K)
+!dir$ blockingsize(8)
       DO K = 1, NZ 
          DO J = 1, NY
             DO I = 1, NX
@@ -301,16 +307,18 @@ CONTAINS
                              GRID(I  ,J-1,K+1) + GRID(I  ,J,K+1) + GRID(I  ,J+1,K+1) + &
                              GRID(I+1,J-1,K+1) + GRID(I+1,J,K+1) + GRID(I+1,J+1,K+1)
 
-               WORK(I,J,K) = ( SLICE_BACK + SLICE_MINE + SLICE_FRONT ) / 27.0
+!               WORK(I,J,K) = ( SLICE_BACK + SLICE_MINE + SLICE_FRONT ) / 27.0
+                RES = ( SLICE_BACK + SLICE_MINE + SLICE_FRONT ) *DIVI
+                WORK(I,J,K) = RES
 
             END DO
          END DO
       END DO
 
-!$OMP END PARALLEL DO
+!$OMP END DO
+      
 
-!$OMP PARALLEL DO COLLAPSE(3)
-
+!$OMP DO
       DO K = 1, NZ
          DO J = 1, NY
             DO I = 1, NX
@@ -318,8 +326,8 @@ CONTAINS
             END DO
          END DO
       END DO
-
-!$OMP END PARALLEL DO 
+!$OMP END DO
+!$OMP END PARALLEL 
 
       ! Accumulate flux out of physical domain.
 

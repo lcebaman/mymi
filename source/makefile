@@ -59,14 +59,14 @@ OPT_F =
 
 FFLAGS += $(OPT_F)
 # Free-form Fortran source code:
-FFLAGS += -f free -h list=a
+FFLAGS += -f free -h list=a -O3 -hfp3  -O ipa4 
 # Array bounds checking: (expensive!)
 #FFLAGS += -Mbounds
 # Compile to include checkpointing capability.
 #FFLAGS += -D_MG_CHECKPT
 
 LD=$(CC)
-LDFLAGS=$(CFLAGS)
+LDFLAGS=$(CFLAGS) # -Wl,--whole-archive,-ldmapp,--no-whole-archive
 LIBS=
 
 include make_targets

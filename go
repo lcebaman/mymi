@@ -41,15 +41,15 @@ cat << EOF > job
 #PBS -V
 #PBS -j oe
 #PBS -N minighost
-
 cd \$PBS_O_WORKDIR
+
 
 export OMP_NUM_THREADS=${nth}
 
 EXE=\${PWD}/source/miniGhost.x
 
 aprun -n ${mpi} -N ${ppn} -S ${pps} -d ${nth} \${EXE} --npx ${npx} --npy ${npy} --npz ${npz} \
---scaling 1 --nx 672 --ny 672 --nz 672 --num_vars 40 --num_spikes 1 --debug_grid 1 --report_diffusion 21 --percent_sum 100 --num_tsteps 20 --stencil 24 --comm_method 10 --report_perf 1 --error_tol 8
+--scaling 1 --nx 672 --ny 672 --nz 672 --num_vars 40 --num_spikes 1 --debug_grid 1 --report_diffusion 21 --percent_sum 100 --num_tsteps 20 --stencil 24 --comm_method 12 --report_perf 1 --error_tol 8
 EOF
 
 qsub job
